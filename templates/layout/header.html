@@ -1,0 +1,49 @@
+{% load static %}
+
+<header role="banner" class="fr-header">
+    <div class="fr-header__body">
+        <div class="fr-container">
+            <div class="fr-header__body-row">
+                <div class="fr-header__brand fr-enlarge-link">
+                    <div class="fr-header__brand-top">
+                        <div class="fr-header__logo">
+                            <p class="fr-logo">
+                                République
+                                <br>Française
+                            </p>
+                        </div>
+                        <div class="fr-header__operator">
+                            <img height="100px" class="apilos-fi-btn--secondary fr-mr-1w" src="{% static "img/shom_logo.png" %}">
+                        </div>
+                        <div class="fr-header__navbar">
+                            {% if user.is_authenticated %}
+                                {{ user }}
+                            {% else %}
+                                <button class="fr-btn fr-fi-edit-line" id='login'></button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="fr-header__service">
+                        <a href="/" title="Accueil - APiLos">
+                            <p class="fr-header__service-title">SPPNaut</p>
+                        </a>
+                        <p class="fr-header__service-tagline">Chaine de production des publications nautiques</p>
+                        <p class="fr-header__service-tagline fr-text--sm"><i>Plateforme interactive et géolocalisée</i></p>
+                    </div>
+                </div>
+                {% if not without_action_button %}
+                    <div class="fr-header__tools">
+                        <div class="fr-header__tools-links">
+                            {% if user.is_authenticated %}
+                                Bonjour&nbsp;
+                                <strong>{{ request.user }}</strong>
+                            {% else %}
+                                <a class="fr-btn" id='login' href="#">S'identifier</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
