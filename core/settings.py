@@ -77,13 +77,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "USER": config("DB_USER"),
-        "NAME": config("DB_NAME"),
-        "HOST": config("DB_HOST"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "PORT": config("DB_PORT", default="5432"),
+        "USER": config("POSTGRESQL_ADDON_USER"),
+        "NAME": config("POSTGRESQL_ADDON_DB"),
+        "HOST": config("POSTGRESQL_ADDON_HOST"),
+        "PASSWORD": config("POSTGRESQL_ADDON_PASSWORD"),
+        "PORT": config("POSTGRESQL_ADDON_PORT", default="5432"),
         "TEST": {
-            "NAME": config("DB_NAME") + "-test",
+            "NAME": config("POSTGRESQL_ADDON_DB") + "-test",
         },
         "ATOMIC_REQUESTS": True,
     }
