@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 Django = ">=3.2.11,<4.0"
+django-decouple = "*"
 
 [dev-packages]
 
