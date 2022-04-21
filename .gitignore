@@ -2,3 +2,4 @@ Contenu_du_mac
 .DS_Store
 .env
 pgdata
+__pycache__
