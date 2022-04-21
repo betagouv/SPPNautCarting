@@ -10,6 +10,9 @@ psycopg2-binary = "*"
 
 [dev-packages]
 pre-commit = "*"
+black = "*"
+pylint = "*"
+djhtml = "*"
 
 [requires]
 python_version = "3.10"

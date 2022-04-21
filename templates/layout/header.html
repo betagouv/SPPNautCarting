@@ -37,8 +37,9 @@
                             {% if user.is_authenticated %}
                                 Bonjour&nbsp;
                                 <strong>{{ request.user }}</strong>
+                                <a class="fr-btn" id='logout' href="{% url 'logout' %}">Se déconnecter</a>
                             {% else %}
-                                <a class="fr-btn" id='login' href="#">S'identifier</a>
+                                <a class="fr-btn" id='login' href="{% url 'login' %}">S'identifier</a>
                             {% endif %}
                         </div>
                     </div>
