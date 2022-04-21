@@ -9,6 +9,7 @@ django-decouple = "*"
 psycopg2-binary = "*"
 
 [dev-packages]
+pre-commit = "*"
 
 [requires]
 python_version = "3.10"
