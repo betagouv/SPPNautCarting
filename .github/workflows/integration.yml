@@ -3,15 +3,11 @@ name: SPPNaut Interface integration
 env:
   SECRET_KEY: your-genereated-secret_key
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push]
 
 jobs:
-  build:
-
+  build_and_test:
+    name: Build and test
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -19,15 +15,17 @@ jobs:
         python-version: [3.9]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run Tests
-      run: |
-        python manage.py test
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+#    - name: Lint with black
+#      run: |
+      - name: Run Tests
+        run: |
+          python manage.py test
