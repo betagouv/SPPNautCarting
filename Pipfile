@@ -14,6 +14,7 @@ black = "*"
 pylint = "*"
 djhtml = "*"
 mypy = "*"
+django-stubs = "*"
 
 [requires]
 python_version = "3.10"
