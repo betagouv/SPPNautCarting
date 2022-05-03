@@ -76,8 +76,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "USER": config("POSTGRESQL_ADDON_USER"),
-        "NAME": config("POSTGRESQL_ADDON_DB"),
-        "HOST": config("POSTGRESQL_ADDON_HOST"),
+        "NAME": config("POSTGRESQL_ADDON_DB", default="sppnaut"),
+        "HOST": config("POSTGRESQL_ADDON_HOST", default="localhost"),
         "PASSWORD": config("POSTGRESQL_ADDON_PASSWORD"),
         "PORT": config("POSTGRESQL_ADDON_PORT", default="5432"),
         "TEST": {
