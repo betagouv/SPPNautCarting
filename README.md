@@ -8,8 +8,8 @@ SPPNaut est une startup d'Etat dont la mission est la modernisaton et l'ouvertur
 ### Prerequis
 
 Pour faire tourner l'interface en local, il est conseiller d'utiliser :
-* pyenv : avec un virtual env python >= 3.10
-* pipenv
+* un environnement virtuel pour faire tourner python >= 3.10
+* pipenv (voir pour passer à piplock ?)
 * docker et docker-compose pour faire tourner la base de données Postgresql
 
 ### Installation
