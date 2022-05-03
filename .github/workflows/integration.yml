@@ -22,6 +22,8 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRESQL_ADDON_DB }}
           POSTGRES_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRESQL_ADDON_PASSWORD }}
+        port:
+          - 5432:5432
 
         # Set health checks to wait until postgres has started
         options: >-
