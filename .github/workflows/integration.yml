@@ -56,9 +56,9 @@ jobs:
           python manage.py test
 
   deploy:
-    name: Deploy to clever cloud
+    name: Deploy to Clever Cloud
     runs-on: ubuntu-latest
-
+    needs: build_and_test
     steps:
       # This action requires an unshallow working copy,
       # so the following prerequisites are necessary:
