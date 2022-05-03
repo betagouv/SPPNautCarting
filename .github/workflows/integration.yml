@@ -1,11 +1,5 @@
 name: SPPNaut Interface integration
 
-env:
-  SECRET_KEY: your-genereated-secret_key
-  POSTGRESQL_ADDON_HOST: postgres
-  POSTGRESQL_ADDON_PASSWORD: sppnaut
-  POSTGRESQL_ADDON_USER: sppnaut
-
 on: [push]
 
 jobs:
@@ -25,8 +19,10 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: $POSTGRESQL_ADDON_PASSWORD
-          POSTGRES_USER: POSTGRESQL_ADDON_USER
+          POSTGRES_DB: ${{ secrets.POSTGRESQL_ADDON_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRESQL_ADDON_PASSWORD }}
+
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -41,11 +37,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          POSTGRESQL_ADDON_HOST: ${{ secrets.POSTGRESQL_ADDON_HOST }}
+          POSTGRESQL_ADDON_DB: ${{ secrets.POSTGRESQL_ADDON_DB }}
+          POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
+          POSTGRESQL_ADDON_PASSWORD: ${{ secrets.POSTGRESQL_ADDON_PASSWORD }}
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-#    - name: Lint with black
-#      run: |
       - name: Run Tests
         run: |
           python manage.py test
