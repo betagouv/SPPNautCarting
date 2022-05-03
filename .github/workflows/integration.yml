@@ -1,6 +1,9 @@
 name: SPPNaut Interface integration
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build_and_test:
