@@ -3,3 +3,4 @@ Contenu_du_mac
 .env
 pgdata
 __pycache__
+.venv

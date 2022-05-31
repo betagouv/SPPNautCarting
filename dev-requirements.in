@@ -1,0 +1,8 @@
+--constraint=requirements.txt
+
+pre-commit
+black
+pylint
+djhtml
+mypy
+django-stubs
