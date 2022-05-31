@@ -2,6 +2,7 @@
 Router config for home module
 """
 from django.urls import path
+
 from . import views
 
 urlpatterns = [
@@ -9,10 +10,5 @@ urlpatterns = [
         "",
         views.index,
         name="index",
-    ),
-    path(
-        "main",
-        views.main,
-        name="main",
     ),
 ]

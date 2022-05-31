@@ -33,15 +33,7 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
     cp .env.template .env
     ```
 
-Lancement de la base de données
-
-`docker-compose -f docker-compose.db.yml up -d`
-
-Migration
-
-`./manage.py migrate`
-
-lancement de django
+1. Lancement de django
 
 `./manage.py runserver 0.0.0.0:8000`
 
