@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from pathlib import Path
+
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -72,20 +73,6 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "USER": config("POSTGRESQL_ADDON_USER"),
-        "NAME": config("POSTGRESQL_ADDON_DB", default="sppnaut"),
-        "HOST": config("POSTGRESQL_ADDON_HOST", default="localhost"),
-        "PASSWORD": config("POSTGRESQL_ADDON_PASSWORD"),
-        "PORT": config("POSTGRESQL_ADDON_PORT", default="5432"),
-        "TEST": {
-            "NAME": config("POSTGRESQL_ADDON_DB") + "-test",
-        },
-        "ATOMIC_REQUESTS": True,
-    }
-}
 
 # Static files
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -133,7 +120,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# Redirect to home URL after login
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
