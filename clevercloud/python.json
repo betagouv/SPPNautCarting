@@ -4,9 +4,6 @@
     },
     "deploy": {
         "module": "core.wsgi:application",
-        "managetasks": [
-            "collectstatic --noinput",
-            "migrate"
-        ]
+        "managetasks": ["collectstatic --noinput"]
     }
 }
