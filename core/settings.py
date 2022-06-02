@@ -47,7 +47,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "home.middleware.BasicAuthMiddleware"
+    "home.middleware.BasicAuthMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -140,4 +140,6 @@ LOGGING = {
 
 GENERATOR_SERVICE_HOST = config("GENERATOR_SERVICE_HOST")
 
-BASICAUTH_USERS = { config("BASICAUTH_USERS_USERNAME"): config("BASICAUTH_USERS_PASSWORD") }
+BASICAUTH_USERS = {
+    config("BASICAUTH_USERS_USERNAME"): config("BASICAUTH_USERS_PASSWORD")
+}
