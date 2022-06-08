@@ -11,4 +11,9 @@ urlpatterns = [
         views.index,
         name="index",
     ),
+    path(
+        "pdf",
+        views.pubnaut_generator,
+        name="pubnaut",
+    ),
 ]

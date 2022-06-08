@@ -1,0 +1,23 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+    <input type="file" id="fileInput" allowdirs multiple webkitdirectory/>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function(event) {
+            document.getElementById('fileInput').addEventListener('change', function() {
+                var uuid = '{{identifiant}}'
+                console.log(uuid)
+                for (var i = 0; i < this.files.length; i++) {
+                    var my_file = this.files[i]
+                    console.log(my_file)
+                }
+
+            });
+        });
+    </script>
+
+{% endblock %}

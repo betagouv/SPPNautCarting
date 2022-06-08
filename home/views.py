@@ -1,6 +1,8 @@
 """
 Views for home module
 """
+import uuid
+from django.shortcuts import render
 import requests
 from django.conf import settings
 from django.http import FileResponse
@@ -30,3 +32,8 @@ class Index(FormView):
 
 
 index = Index.as_view()
+
+
+def pubnaut_generator(request):
+    return render(request, "pdf.html", {'identifiant' : uuid.uuid4()})
+
