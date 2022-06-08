@@ -62,7 +62,6 @@ def validate_request(request):
 
     Returns:
         - True if authentication passed
-        - Adding request['REMOTE_USER'] as authenticated username.
     """
     if "HTTP_AUTHORIZATION" not in request.META:
         return False
