@@ -2,10 +2,11 @@
 Views for home module
 """
 import uuid
-from django.shortcuts import render
+
 import requests
 from django.conf import settings
 from django.http import FileResponse
+from django.shortcuts import render
 from django.views.generic import FormView
 
 from home.forms import UploadFileForm
@@ -35,5 +36,5 @@ index = Index.as_view()
 
 
 def pubnaut_generator(request):
-    return render(request, "pdf.html", {'identifiant' : uuid.uuid4()})
-
+    # FIXME: Utiliser Formulaire Django
+    return render(request, "pdf.html", {"generation_id": uuid.uuid4()})

@@ -4,19 +4,23 @@
 
 {% block content %}
 
-    <input type="file" id="fileInput" allowdirs multiple webkitdirectory/>
+    <form id="uploadForm">
+        <input type="file" allowdirs multiple webkitdirectory/>
+        <input type="hidden" name="generation_id" value="{{generation_id}}">
+        <input type="hidden" name="upload_url" value="{{upload_url}}">
+        <input type="hidden" name="launch_generation_url" value="{{launch_generation_url}}">
+        <!--- FIXME: CSRF ? -->
+        <button>Upload/Generate</button>
+    </form>
 
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function(event) {
-            document.getElementById('fileInput').addEventListener('change', function() {
-                var uuid = '{{identifiant}}'
-                console.log(uuid)
-                for (var i = 0; i < this.files.length; i++) {
-                    var my_file = this.files[i]
-                    console.log(my_file)
-                }
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault()
 
-            });
+            for (const file of e.target.querySelector('input[type=file]').files) {
+                console.log(file)
+            }
+            fetch()
         });
     </script>
 
