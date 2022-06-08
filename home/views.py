@@ -14,8 +14,11 @@ class Index(FormView):
     template_name = "index.html"
 
     def form_valid(self, form):
+        username, password = list(settings.BASICAUTH_USERS.items())[0]
         response = requests.post(
-            settings.GENERATOR_SERVICE_HOST, files={"file": form.cleaned_data["file"]}
+            settings.GENERATOR_SERVICE_HOST,
+            files={"file": form.cleaned_data["file"]},
+            auth=(username, password),
         )
 
         http_response = FileResponse(response)
