@@ -2,6 +2,7 @@
 Views for home module
 """
 import uuid
+from base64 import b64encode
 
 import requests
 from django.conf import settings
@@ -37,4 +38,26 @@ index = Index.as_view()
 
 def pubnaut_generator(request):
     # FIXME: Utiliser Formulaire Django
-    return render(request, "pdf.html", {"generation_id": uuid.uuid4()})
+
+    generation_id = uuid.uuid4()
+    upload_url = (
+        f"{settings.GENERATOR_SERVICE_HOST}/publication/{generation_id}/upload_input"
+    )
+    launch_generation_url = (
+        f"{settings.GENERATOR_SERVICE_HOST}/publication/{generation_id}/generate"
+    )
+    username, password = list(settings.BASICAUTH_USERS.items())[0]
+    auth_token = b64encode(bytes(f"{username}:{password}", encoding="utf8")).decode(
+        "utf8"
+    )
+
+    return render(
+        request,
+        "pdf.html",
+        {
+            "generation_id": generation_id,
+            "upload_url": upload_url,
+            "launch_generation_url": launch_generation_url,
+            "auth_token": auth_token,
+        },
+    )

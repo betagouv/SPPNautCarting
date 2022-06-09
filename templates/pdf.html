@@ -1,27 +1,48 @@
-{% extends "layout/base.html" %}
+{% extends "layout/base.html" %} {% load static %} {% block content %}
 
-{% load static %}
+<form id="uploadForm">
+    <input type="file" allowdirs multiple webkitdirectory />
+    <input type="hidden" name="auth_token" value="{{auth_token}}" />
+    <input type="hidden" name="generation_id" value="{{generation_id}}" />
+    <input type="hidden" name="upload_url" value="{{upload_url}}" />
+    <input
+        type="hidden"
+        name="launch_generation_url"
+        value="{{launch_generation_url}}"
+    />
+    <!--- FIXME: CSRF ? -->
+    <button>Upload/Generate</button>
+</form>
 
-{% block content %}
+<script>
+    document
+        .getElementById("uploadForm")
+        .addEventListener("submit", function (e) {
+            e.preventDefault();
 
-    <form id="uploadForm">
-        <input type="file" allowdirs multiple webkitdirectory/>
-        <input type="hidden" name="generation_id" value="{{generation_id}}">
-        <input type="hidden" name="upload_url" value="{{upload_url}}">
-        <input type="hidden" name="launch_generation_url" value="{{launch_generation_url}}">
-        <!--- FIXME: CSRF ? -->
-        <button>Upload/Generate</button>
-    </form>
+            const UPLOAD_URL = e.target.querySelector(
+                "input[name=upload_url]"
+            ).value;
+            const AUTH_TOKEN = e.target.querySelector(
+                "input[name=auth_token]"
+            ).value;
 
-    <script>
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            e.preventDefault()
+            for (const file of e.target.querySelector("input[type=file]")
+                .files) {
+                console.log(file);
 
-            for (const file of e.target.querySelector('input[type=file]').files) {
-                console.log(file)
+                var data = new FormData();
+                data.append("file", file);
+                data.append("webkitRelativePath", file.webkitRelativePath);
+                fetch(UPLOAD_URL, {
+                    headers: new Headers({
+                        authorization: `Basic ${AUTH_TOKEN}`,
+                    }),
+                    method: "POST",
+                    body: data,
+                });
             }
-            fetch()
         });
-    </script>
+</script>
 
 {% endblock %}
