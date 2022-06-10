@@ -3,6 +3,7 @@ Views for home module
 """
 import uuid
 from base64 import b64encode
+from http import HTTPStatus
 
 import requests
 from django.conf import settings
@@ -65,7 +66,19 @@ def pubnaut_generator(request):
 
 
 def toto(request, generation_id):
-    generation_done = request_check_if_generation_done()
-    if generation_done:
-        return FileResponse(generation_done)
+    publication_url = f"{settings.GENERATOR_SERVICE_HOST}/publication/{generation_id}/"
+    username, password = list(settings.BASICAUTH_USERS.items())[0]
+    response = requests.get(
+        publication_url,
+        auth=(username, password),
+    )
+
+    if response.status_code == HTTPStatus.OK:
+        http_response = FileResponse(response)
+        headers_to_forward = ["Content-Type", "Content-Length", "Content-Disposition"]
+        for header in headers_to_forward:
+            http_response.headers[header] = response.headers[header]
+
+        return http_response
+
     return HttpResponse("<meta http-equiv='refresh' content='10'>")
