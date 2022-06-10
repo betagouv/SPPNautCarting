@@ -1,6 +1,6 @@
-{% extends "layout/base.html" %} {% load static %} {% block content %}
+{% extends "layout/base.html" %} {% block content %}
 
-<form id="uploadForm">
+<form id="uploadForm" action="{% url 'home:toto' generation_id %}">
     <input type="file" allowdirs multiple webkitdirectory />
     <input type="hidden" name="auth_token" value="{{auth_token}}" />
     <input type="hidden" name="generation_id" value="{{generation_id}}" />
@@ -17,7 +17,7 @@
 <script>
     document
         .getElementById("uploadForm")
-        .addEventListener("submit", function (e) {
+        .addEventListener("submit", async function (e) {
             e.preventDefault();
 
             const UPLOAD_URL = e.target.querySelector(
@@ -26,22 +26,40 @@
             const AUTH_TOKEN = e.target.querySelector(
                 "input[name=auth_token]"
             ).value;
+            const LAUNCH_GENERATION_URL = e.target.querySelector(
+                "input[name=launch_generation_url]"
+            ).value;
 
+            const uploads = [];
             for (const file of e.target.querySelector("input[type=file]")
                 .files) {
                 console.log(file);
 
-                var data = new FormData();
+                const data = new FormData();
                 data.append("file", file);
                 data.append("webkitRelativePath", file.webkitRelativePath);
-                fetch(UPLOAD_URL, {
-                    headers: new Headers({
-                        authorization: `Basic ${AUTH_TOKEN}`,
-                    }),
-                    method: "POST",
-                    body: data,
-                });
+                uploads.push(
+                    fetch(UPLOAD_URL, {
+                        headers: new Headers({
+                            authorization: `Basic ${AUTH_TOKEN}`,
+                        }),
+                        method: "POST",
+                        body: data,
+                    })
+                );
             }
+
+            // FIXME: Gestion d'erreur si un upload échoue
+            await Promise.all(uploads);
+
+            // FIXME: Gestion d'erreur si le status_code est pas 200
+            await fetch(LAUNCH_GENERATION_URL, {
+                method: "POST",
+                headers: new Headers({
+                    authorization: `Basic ${AUTH_TOKEN}`,
+                }),
+            });
+            window.location = e.target.action;
         });
 </script>
 

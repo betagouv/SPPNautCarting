@@ -6,8 +6,9 @@ from base64 import b64encode
 
 import requests
 from django.conf import settings
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import FormView
 
 from home.forms import UploadFileForm
@@ -61,3 +62,10 @@ def pubnaut_generator(request):
             "auth_token": auth_token,
         },
     )
+
+
+def toto(request, generation_id):
+    generation_done = request_check_if_generation_done()
+    if generation_done:
+        return FileResponse(generation_done)
+    return HttpResponse("<meta http-equiv='refresh' content='10'>")

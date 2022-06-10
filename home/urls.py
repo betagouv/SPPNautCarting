@@ -16,4 +16,5 @@ urlpatterns = [
         views.pubnaut_generator,
         name="pubnaut",
     ),
+    path("toto/<slug:generation_id>/", views.toto, name="toto"),
 ]
