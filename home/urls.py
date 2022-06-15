@@ -12,9 +12,9 @@ urlpatterns = [
         name="index",
     ),
     path(
-        "pdf",
-        views.pubnaut_generator,
-        name="pubnaut",
+        "publication/",
+        views.publication_upload,
+        name="publication_upload",
     ),
-    path("toto/<slug:generation_id>/", views.toto, name="toto"),
+    path("publication/<slug:generation_id>/", views.publication_display, name="publication_display"),
 ]
