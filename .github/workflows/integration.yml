@@ -42,9 +42,10 @@ jobs:
           fetch-depth: 0
 
       # Deploy your application
-      - uses: 47ng/actions-clever-cloud@v1.1
+      - uses: rik/actions-clever-cloud@27db58285fce18efcca692b8a0ae70970898703e
         with:
           appID: app_62a6232b-6030-4ad4-a177-d24ff1f99d76
+          force: true
         env:
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
