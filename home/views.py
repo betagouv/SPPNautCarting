@@ -11,11 +11,12 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import FormView
+from django.http import HttpResponseRedirect
 
 from home.forms import UploadFileForm
 
 
-class Index(FormView):
+class Tableau(FormView):
     form_class = UploadFileForm
     template_name = "index.html"
 
@@ -28,10 +29,10 @@ class Index(FormView):
         )
         return _forward_http_file(response)
 
+tableau = Tableau.as_view()
 
-
-index = Index.as_view()
-
+def tableau_redirect(request):
+    return HttpResponseRedirect(reverse('home:tableau'))
 
 def publication_upload(request):
     # FIXME: Utiliser Formulaire Django

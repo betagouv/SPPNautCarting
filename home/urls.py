@@ -6,10 +6,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.tableau_redirect),
     path(
-        "",
-        views.index,
-        name="index",
+        "tableau/",
+        views.tableau,
+        name="tableau",
     ),
     path(
         "publication/",
