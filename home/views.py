@@ -31,8 +31,10 @@ class Tableau(FormView):
 
 tableau = Tableau.as_view()
 
+
 def tableau_redirect(request):
-    return HttpResponseRedirect(reverse('home:tableau'))
+    return HttpResponseRedirect(reverse("home:tableau"))
+
 
 def publication_upload(request):
     # FIXME: Utiliser Formulaire Django
@@ -69,10 +71,14 @@ def publication_display(request, generation_id):
     if response.status_code == HTTPStatus.OK:
         return _forward_http_file(response)
 
+    logs = ""
+    if response.status_code == HTTPStatus.NOT_FOUND:
+        logs = str(response.content, "utf-8")
+
     return render(
         request,
         "generating_page.html",
-        {"logs": str(response.content, "utf-8")},
+        {"logs": logs},
     )
 
 
