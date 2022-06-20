@@ -31,6 +31,8 @@ class Tableau(FormView):
 
 tableau = Tableau.as_view()
 
+def tableau_redirect(request):
+    return HttpResponseRedirect(reverse('home:tableau'))
 
 def publication_upload(request):
     # FIXME: Utiliser Formulaire Django
