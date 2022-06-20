@@ -7,11 +7,10 @@ from http import HTTPStatus
 
 import requests
 from django.conf import settings
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import FormView
-from django.http import HttpResponseRedirect
 
 from home.forms import UploadFileForm
 
@@ -29,10 +28,9 @@ class Tableau(FormView):
         )
         return _forward_http_file(response)
 
+
 tableau = Tableau.as_view()
 
-def tableau_redirect(request):
-    return HttpResponseRedirect(reverse('home:tableau'))
 
 def publication_upload(request):
     # FIXME: Utiliser Formulaire Django
@@ -69,7 +67,11 @@ def publication_display(request, generation_id):
     if response.status_code == HTTPStatus.OK:
         return _forward_http_file(response)
 
-    return HttpResponse("<meta http-equiv='refresh' content='10'>")
+    return render(
+        request,
+        "generating_page.html",
+        {"logs": str(response.content, "utf-8")},
+    )
 
 
 def _forward_http_file(response):
