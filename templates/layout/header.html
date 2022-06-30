@@ -41,6 +41,10 @@
                     {% url 'home:publication_upload' as publication_upload %}
                     <a class="fr-nav__link" href="{{publication_upload}}" target="_self" {% if publication_upload == request.path %}aria-current="page"{% endif %}>Génération de publications</a>
                   </li>
+                  <li class="fr-nav__item">
+                    {% url 'home:publication_cellar' as publication_cellar %}
+                    <a class="fr-nav__link" href="{{publication_cellar}}" target="_self" {% if publication_cellar == request.path %}aria-current="page"{% endif %}>Génération de publications du référentiel</a>
+                  </li>
               </ul>
             </nav>
         </div>

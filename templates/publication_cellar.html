@@ -1,0 +1,26 @@
+{% extends "layout/base.html" %} {% load static %} {% block content %}
+
+<form
+    id="uploadForm"
+    action="{% url 'home:publication_display' generation_id %}"
+>
+    <select class="fr-select" name="ouvrage">
+        {% for ouvrage in ouvrages %}
+        <option value="{{ouvrage}}">{{ouvrage}}</option>
+        {% endfor %}
+    </select>
+
+    <input type="hidden" name="auth_token" value="{{auth_token}}" />
+    <input type="hidden" name="upload_url" value="{{upload_url}}" />
+    <input
+        type="hidden"
+        name="launch_generation_url"
+        value="{{launch_generation_url}}"
+    />
+    <!--- FIXME: CSRF ? -->
+    <button class="fr-btn">Generate</button>
+</form>
+
+<script src="{% static 'js/publication.js' %}" defer></script>
+
+{% endblock %}
