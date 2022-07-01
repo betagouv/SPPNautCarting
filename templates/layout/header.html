@@ -27,4 +27,22 @@
             </div>
         </div>
     </div>
+
+    <div class="fr-header__menu">
+        <div class="fr-container">
+
+            <nav class="fr-nav" id="header-navigation" role="navigation" aria-label="Menu principal">
+                <ul class="fr-nav__list">
+                  <li class="fr-nav__item">
+                        {% url 'home:tableau' as tableau %}
+                        <a class="fr-nav__link" href="{{tableau}}" target="_self" {% if tableau == request.path %}aria-current="page"{% endif %}>Génération de tableaux</a>
+                  </li>
+                  <li class="fr-nav__item">
+                    {% url 'home:publication_upload' as publication_upload %}
+                    <a class="fr-nav__link" href="{{publication_upload}}" target="_self" {% if publication_upload == request.path %}aria-current="page"{% endif %}>Génération de publications</a>
+                  </li>
+              </ul>
+            </nav>
+        </div>
+    </div>
 </header>

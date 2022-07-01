@@ -7,7 +7,7 @@ from http import HTTPStatus
 
 import requests
 from django.conf import settings
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import FormView
@@ -15,9 +15,9 @@ from django.views.generic import FormView
 from home.forms import UploadFileForm
 
 
-class Index(FormView):
+class Tableau(FormView):
     form_class = UploadFileForm
-    template_name = "index.html"
+    template_name = "tableau_upload.html"
 
     def form_valid(self, form):
         username, password = list(settings.BASICAUTH_USERS.items())[0]
@@ -29,8 +29,11 @@ class Index(FormView):
         return _forward_http_file(response)
 
 
+tableau = Tableau.as_view()
 
-index = Index.as_view()
+
+def tableau_redirect(request):
+    return HttpResponseRedirect(reverse("home:tableau"))
 
 
 def publication_upload(request):
@@ -68,7 +71,15 @@ def publication_display(request, generation_id):
     if response.status_code == HTTPStatus.OK:
         return _forward_http_file(response)
 
-    return HttpResponse("<meta http-equiv='refresh' content='10'>")
+    logs = ""
+    if response.status_code == HTTPStatus.NOT_FOUND:
+        logs = str(response.content, "utf-8")
+
+    return render(
+        request,
+        "generating_page.html",
+        {"logs": logs},
+    )
 
 
 def _forward_http_file(response):
