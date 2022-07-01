@@ -17,7 +17,7 @@ from home.forms import UploadFileForm
 
 class Tableau(FormView):
     form_class = UploadFileForm
-    template_name = "index.html"
+    template_name = "tableau_upload.html"
 
     def form_valid(self, form):
         username, password = list(settings.BASICAUTH_USERS.items())[0]

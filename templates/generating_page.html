@@ -1,12 +1,20 @@
 {% extends "layout/base.html" %}
 
+{% load static %}
+
+{% block css_extras %}
+<link rel="stylesheet" href="{% static 'css/sppnaut.css' %}">
+{% endblock %}
+
 
 {% block meta %}
 <meta http-equiv='refresh' content='10'>
 {% endblock %}
 
-{% load static %}
-
 {% block content %}
+<p>Génération de publication en cours :</p>
+<div class='sppnaut-aligncenter' id="submit_button" >
+    <img src="{% static 'img/loading.gif' %}" width="20px" class="fr-mr-1w"/>
 {{ logs }}
+</div>
 {% endblock %}

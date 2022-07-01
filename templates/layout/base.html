@@ -12,7 +12,7 @@
 
         <title>{% block page_title %}SPPNaut{% endblock%}</title>
         <meta name="description" content="{% block page_description %}Plateforme de publication nautique du SHOM{% endblock %}">
-        
+
         {% block meta %}{% endblock %}
 
         <!--Favicon-->
@@ -37,7 +37,15 @@
             {% include "layout/header.html" %}
         {% endblock %}
         <main role="main" class="contentAll">
-            {% block content %}{% endblock %}
+            <div class="fr-container-fluid ds_banner">
+                <div class="fr-container">
+                    <div class="fr-grid-row fr-grid-row--gutters fr-py-6w">
+                        <div class="fr-col-lg-11 fr-col-offset-lg-1 fr-mb-2w">
+                            {% block content %}{% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
         {% block footer %}
             {% include "layout/footer.html" %}
