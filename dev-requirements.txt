@@ -70,8 +70,8 @@ django-stubs-ext==0.4.0 \
     --hash=sha256:3104c4748c34bd741c310a3e6af90dffba46e41bccbe243896e38a708262876b \
     --hash=sha256:901fc77b6338ea29fa381300ff598dd57d461a4882b756404e2aa7724f76fd7d
     # via django-stubs
-djhtml==1.5.0 \
-    --hash=sha256:eeccc5e5cc6d1371e8434903de5043b24efa1000b6857b9bf342e1868aa995ae
+djhtml==1.5.1 \
+    --hash=sha256:d3b9060e9c45e2a56125203f2508ae591aba41a2f14ed2fa8bafb99b0fc15eb3
     # via -r dev-requirements.in
 filelock==3.7.0 \
     --hash=sha256:b795f1b42a61bbf8ec7113c341dad679d772567b936fbd1bf43c9a238e673e20 \
