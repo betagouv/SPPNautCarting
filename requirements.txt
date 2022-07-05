@@ -16,9 +16,9 @@ charset-normalizer==2.0.12 \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
     --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
     # via requests
-django==4.0.5 \
-    --hash=sha256:502ae42b6ab1b612c933fb50d5ff850facf858a4c212f76946ecd8ea5b3bf2d9 \
-    --hash=sha256:f7431a5de7277966f3785557c3928433347d998c1e6459324501378a291e5aab
+django==4.0.6 \
+    --hash=sha256:a67a793ff6827fd373555537dca0da293a63a316fe34cb7f367f898ccca3c3ae \
+    --hash=sha256:ca54ebedfcbc60d191391efbf02ba68fb52165b8bf6ccd6fe71f098cac1fe59e
     # via -r requirements.in
 django-decouple==2.1 \
     --hash=sha256:a7f4b4d1eaedde3a7d1a8e0489dae4afa96cff3eb575d569d92d9ba5f4283f90
