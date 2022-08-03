@@ -20,7 +20,7 @@ idna==3.3
     # via requests
 requests==2.28.1
     # via -r requirements.in
-sentry-sdk==1.7.2
+sentry-sdk==1.9.0
     # via -r requirements.in
 sqlparse==0.4.2
     # via django
