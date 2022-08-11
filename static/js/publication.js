@@ -7,6 +7,12 @@ async function generate_publication_from_files(e) {
     const AUTH_TOKEN = form.elements['auth_token'].value
     const LAUNCH_GENERATION_URL = form.elements['launch_generation_url'].value
 
+    /*
+    FIXME: On ne gère que le cas dossier vide.
+    Autres cas que l'on pourrait gérer pour mieux informer les utilisateurices
+    - Présence du fichier {PUB}/xml/document.xml
+    - Présence des trois sous-dossiers {PUB}/illustrations, {PUB}/tableaux, {PUB}/xml
+    */
     if (form.elements['files'].files.length == 0) {
         document.getElementById('div-error').hidden = false;
     }
