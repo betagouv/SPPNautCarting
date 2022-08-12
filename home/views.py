@@ -75,7 +75,7 @@ def publication_display(request, generation_id):
         return render(
             request,
             "publication_generation_failed.html",
-            {'generation_id':generation_id}
+            {"generation_id": generation_id},
         )
 
     logs = ""
