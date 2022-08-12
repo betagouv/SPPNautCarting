@@ -4,3 +4,11 @@
     display:flex;
     align-items: center;
 }
+
+.sppnaut-nowrap{
+    white-space: nowrap;
+}
+
+.sppnaut-italic{
+    font-style: italic;
+}

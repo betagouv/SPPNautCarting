@@ -71,6 +71,13 @@ def publication_display(request, generation_id):
     if response.status_code == HTTPStatus.OK:
         return _forward_http_file(response)
 
+    if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+        return render(
+            request,
+            "publication_generation_failed.html",
+            {'generation_id':generation_id}
+        )
+
     logs = ""
     if response.status_code == HTTPStatus.NOT_FOUND:
         logs = str(response.content, "utf-8")
