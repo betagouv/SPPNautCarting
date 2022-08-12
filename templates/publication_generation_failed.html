@@ -1,0 +1,26 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+<h3>La génération de la publication a échoué</h3>
+
+<p>L'équipe a été informée de ce problème.</p>
+
+<p>
+    N'hésitez pas à faire part à
+    <a
+        href="mailto:equipe@sppnaut.beta.gouv.fr?subject=La génération de la publication d'identifiant {{ generation_id }} a échouée"
+    >
+        l'équipe SPPNAUT
+    </a>
+    de votre expérience.
+    <br />
+    Merci de préciser l'identifiant de cette génération :
+    <span class="sppnaut-nowrap sppnaut-italic"> {{ generation_id }}. </span>
+    <br />
+    Nous reviendrons vers vous dans les plus brefs délais.
+</p>
+
+<a href="{% url 'home:publication_upload' %}">
+    Recommencer une nouvelle génération de publication
+</a>
+{% endblock %}
