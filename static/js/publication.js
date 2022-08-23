@@ -8,20 +8,22 @@ async function generate_publication_from_files(e) {
     const AUTH_TOKEN = form.elements['auth_token'].value
     const LAUNCH_GENERATION_URL = form.elements['launch_generation_url'].value
 
-    const uploads = [];
-    if (form.elements['files'] == undefined) {
-        // Ouvrage stored in Cellar
-        uploads.push(
-            fetch(UPLOAD_URL, {
-                headers: new Headers({
-                    authorization: `Basic ${AUTH_TOKEN}`,
-                }),
-                method: "POST",
-                body: JSON.stringify({ "ouvrage": OUVRAGE }),
-            })
-        );
-    } else {
-        // Ouvrage uploaded from browser
+    /*
+    FIXME: On ne gère que le cas dossier vide.
+    Autres cas que l'on pourrait gérer pour mieux informer les utilisateurices
+    - Présence du fichier {PUB}/xml/document.xml
+    - Présence des trois sous-dossiers {PUB}/illustrations, {PUB}/tableaux, {PUB}/xml
+    */
+    if (form.elements['files'].files.length == 0) {
+        document.getElementById('div-error').hidden = false;
+    }
+    else {
+        document.getElementById('div-error').hidden = true;
+        submit_button = document.getElementsByTagName('button')[0];
+        submit_button.getElementsByTagName('img')[0].hidden = false;
+        submit_button.disabled = true;
+
+        const uploads = [];
         for (const file of form.elements['files'].files) {
 
             const data = new FormData();
