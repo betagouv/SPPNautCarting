@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - cellar
 
 jobs:
   build_and_test:

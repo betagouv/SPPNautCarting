@@ -1,5 +1,8 @@
-from django import forms
+import json
+import requests
 
+from django import forms
+from django.conf import settings
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(
@@ -9,7 +12,19 @@ class UploadFileForm(forms.Form):
     )
 
 
+def get_ouvrages():
+    username, password = list(settings.BASICAUTH_USERS.items())[0]
+
+    response = requests.get(
+        f"{settings.GENERATOR_SERVICE_HOST}/publication/ouvrages/list",
+        auth=(username, password),
+    )
+
+    ouvrages = response.json()
+    return [(ouvrage, ouvrage) for ouvrage in ouvrages]
+
+
 class PublicationReferentielForm(forms.Form):
     ouvrage = forms.ChoiceField(
-        choices=[("g4p", "g4p")], widget=forms.Select(attrs={"class": "fr-select"})
+        choices=get_ouvrages, widget=forms.Select(attrs={"class": "fr-select"})
     )
