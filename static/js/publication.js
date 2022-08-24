@@ -4,7 +4,6 @@ async function generate_publication_from_files(e) {
 
     const form = e.target
     const UPLOAD_URL = form.elements['upload_url'].value
-    const OUVRAGE = form.elements['ouvrage'].value
     const AUTH_TOKEN = form.elements['auth_token'].value
     const LAUNCH_GENERATION_URL = form.elements['launch_generation_url'].value
 
@@ -39,6 +38,18 @@ async function generate_publication_from_files(e) {
                 })
             );
         }
+
+        // FIXME: Gestion d'erreur si un upload échoue
+        await Promise.all(uploads);
+
+        // FIXME: Gestion d'erreur si le status_code est pas 200
+        await fetch(LAUNCH_GENERATION_URL, {
+            method: "POST",
+            headers: new Headers({
+                authorization: `Basic ${AUTH_TOKEN}`,
+            }),
+        });
+        window.location = form.action;
     }
 
 }
