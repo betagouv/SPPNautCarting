@@ -2,6 +2,7 @@
 Views for home module
 """
 import json
+import logging
 import uuid
 from base64 import b64encode
 from http import HTTPStatus
@@ -9,11 +10,11 @@ from http import HTTPStatus
 import requests
 from django.conf import settings
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
 
-from home.forms import UploadFileForm
+from home.forms import PublicationReferentielForm, UploadFileForm
 
 
 class Tableau(FormView):
@@ -61,36 +62,57 @@ def publication_upload(request):
     )
 
 
-def publication_cellar(request):
-    # FIXME: Utiliser Formulaire Django
+class PublicationReferentiel(FormView):
+    form_class = PublicationReferentielForm
+    template_name = "publication_referentiel.html"
 
-    generation_id = uuid.uuid4()
-    upload_url = _generate_publication_url(generation_id, "upload_from_cellar")
-    launch_generation_url = _generate_publication_url(generation_id, "generate")
+    def form_valid(self, form):
+        username, password = list(settings.BASICAUTH_USERS.items())[0]
+        response = requests.post(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/ouvrage/generate",
+            {"ouvrage": form.cleaned_data["ouvrage"]},
+            auth=(username, password),
+        )
+        json_response = response.json()
+        generation_id = json_response["generation_id"]
 
-    username, password = _get_basicauth_credentials()
-    auth_token = b64encode(bytes(f"{username}:{password}", encoding="utf8")).decode(
-        "utf8"
-    )
+        return redirect("home:publication_display", generation_id=generation_id)
 
-    response = requests.get(
-        _generate_ouvrages_list_url(),
-        auth=(username, password),
-    )
 
-    ouvrages = json.loads(response.content)
+publication_referentiel = PublicationReferentiel.as_view()
 
-    return render(
-        request,
-        "publication_cellar.html",
-        {
-            "generation_id": generation_id,
-            "ouvrages": ouvrages,
-            "upload_url": upload_url,
-            "launch_generation_url": launch_generation_url,
-            "auth_token": auth_token,
-        },
-    )
+
+# def publication_cellar(request):
+#     # FIXME: Utiliser Formulaire Django
+
+#     generation_id = uuid.uuid4()
+#     upload_url = _generate_publication_url(generation_id, "upload_from_cellar")
+#     # TODO : nouvelle URL
+#     launch_generation_url = _generate_publication_url(generation_id, "generate")
+
+#     username, password = _get_basicauth_credentials()
+#     auth_token = b64encode(bytes(f"{username}:{password}", encoding="utf8")).decode(
+#         "utf8"
+#     )
+
+#     response = requests.get(
+#         _generate_ouvrages_list_url(),
+#         auth=(username, password),
+#     )
+
+#     ouvrages = json.loads(response.content)
+
+#     return render(
+#         request,
+#         "publication_cellar.html",
+#         {
+#             "generation_id": generation_id,
+#             "ouvrages": ouvrages,
+#             "upload_url": upload_url,
+#             "launch_generation_url": launch_generation_url,
+#             "auth_token": auth_token,
+#         },
+#     )
 
 
 def publication_display(request, generation_id):
@@ -136,7 +158,3 @@ def _get_basicauth_credentials():
 
 def _generate_publication_url(generation_id, suffix):
     return f"{settings.GENERATOR_SERVICE_HOST}/publication/{generation_id}/{suffix}"
-
-
-def _generate_ouvrages_list_url():
-    return f"{settings.GENERATOR_SERVICE_HOST}/publication/ouvrages/list"

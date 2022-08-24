@@ -19,8 +19,8 @@ urlpatterns = [
     ),
     path(
         "publication-referentiel/",
-        views.publication_cellar,
-        name="publication_cellar",
+        views.publication_referentiel,
+        name="publication_referentiel",
     ),
     path(
         "publication/<slug:generation_id>/",

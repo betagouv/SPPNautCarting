@@ -1,0 +1,9 @@
+{% extends "layout/base.html" %} {% load static %} {% block content %}
+
+<form id="uploadForm" action="" method="POST">
+    {% csrf_token %} {{ form.as_p }}
+
+    <button type="submit" class="fr-mt-1w fr-btn">Générer le PDF</button>
+</form>
+
+{% endblock %}

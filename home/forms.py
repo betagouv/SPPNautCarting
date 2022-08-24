@@ -7,3 +7,9 @@ class UploadFileForm(forms.Form):
             "required": "Vous devez séléctionner un fichier tableau type format XML"
         },
     )
+
+
+class PublicationReferentielForm(forms.Form):
+    ouvrage = forms.ChoiceField(
+        choices=[("g4p", "g4p")], widget=forms.Select(attrs={"class": "fr-select"})
+    )
