@@ -13,7 +13,7 @@
                             </p>
                         </div>
                         <div class="fr-header__operator">
-                            <img height="100px" class="apilos-fi-btn--secondary fr-mr-1w" src="{% static "img/shom_logo.png" %}">
+                            <img height="100px" src="{% static "img/shom_logo.png" %}">
                         </div>
                     </div>
                     <div class="fr-header__service">
@@ -38,8 +38,12 @@
                         <a class="fr-nav__link" href="{{tableau}}" target="_self" {% if tableau == request.path %}aria-current="page"{% endif %}>Génération de tableaux</a>
                   </li>
                   <li class="fr-nav__item">
+                    {% url 'home:publication_referentiel' as publication_referentiel %}
+                    <a class="fr-nav__link" href="{{publication_referentiel}}" target="_self" {% if publication_referentiel == request.path %}aria-current="page"{% endif %}>Génération d'ouvrage en préparation</a>
+                  </li>
+                  <li class="fr-nav__item">
                     {% url 'home:publication_upload' as publication_upload %}
-                    <a class="fr-nav__link" href="{{publication_upload}}" target="_self" {% if publication_upload == request.path %}aria-current="page"{% endif %}>Génération de publications</a>
+                    <a class="fr-nav__link" href="{{publication_upload}}" target="_self" {% if publication_upload == request.path %}aria-current="page"{% endif %}>Génération d'ouvrage téléversé</a>
                   </li>
               </ul>
             </nav>

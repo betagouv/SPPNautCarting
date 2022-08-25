@@ -5,14 +5,15 @@ import uuid
 from base64 import b64encode
 from http import HTTPStatus
 
-import requests
 from django.conf import settings
-from django.http import FileResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import FileResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
 
-from home.forms import UploadFileForm
+from .forms import PublicationReferentielForm, UploadFileForm
+
+from . import generator
 
 
 class Tableau(FormView):
@@ -20,11 +21,8 @@ class Tableau(FormView):
     template_name = "tableau_upload.html"
 
     def form_valid(self, form):
-        username, password = list(settings.BASICAUTH_USERS.items())[0]
-        response = requests.post(
-            settings.GENERATOR_SERVICE_HOST,
-            files={"file": form.cleaned_data["file"]},
-            auth=(username, password),
+        response = generator.post(
+            settings.GENERATOR_SERVICE_HOST, files={"file": form.cleaned_data["file"]}
         )
         return _forward_http_file(response)
 
@@ -43,10 +41,12 @@ def publication_upload(request):
     upload_url = _generate_publication_url(generation_id, "upload_input")
     launch_generation_url = _generate_publication_url(generation_id, "generate")
 
-    username, password = _get_basicauth_credentials()
-    auth_token = b64encode(bytes(f"{username}:{password}", encoding="utf8")).decode(
-        "utf8"
-    )
+    auth_token = b64encode(
+        bytes(
+            f"{settings.GENERATOR_USERNAME}:{settings.GENERATOR_PASSWORD}",
+            encoding="utf8",
+        )
+    ).decode("utf8")
 
     return render(
         request,
@@ -60,13 +60,27 @@ def publication_upload(request):
     )
 
 
+class PublicationReferentiel(FormView):
+    form_class = PublicationReferentielForm
+    template_name = "publication_referentiel.html"
+
+    def form_valid(self, form):
+        response = generator.post(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/from_preparation/generate",
+            {"ouvrage": form.cleaned_data["ouvrage"]},
+        )
+        json_response = response.json()
+        generation_id = json_response["generation_id"]
+
+        return redirect("home:publication_display", generation_id=generation_id)
+
+
+publication_referentiel = PublicationReferentiel.as_view()
+
+
 def publication_display(request, generation_id):
     publication_url = _generate_publication_url(generation_id, "")
-    username, password = _get_basicauth_credentials()
-    response = requests.get(
-        publication_url,
-        auth=(username, password),
-    )
+    response = generator.get(publication_url)
 
     if response.status_code == HTTPStatus.OK:
         return _forward_http_file(response)
@@ -95,10 +109,6 @@ def _forward_http_file(response):
     for header in headers_to_forward:
         http_response.headers[header] = response.headers[header]
     return http_response
-
-
-def _get_basicauth_credentials():
-    return list(settings.BASICAUTH_USERS.items())[0]
 
 
 def _generate_publication_url(generation_id, suffix):
