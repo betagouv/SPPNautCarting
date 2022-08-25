@@ -27,5 +27,5 @@ def get_ouvrages():
 class PublicationReferentielForm(forms.Form):
     ouvrage = forms.ChoiceField(
         choices=get_ouvrages, widget=forms.Select(attrs={"class": "fr-select"}),
-        label="Selectionnez un ouvrage"
+        label="Sélectionnez un ouvrage",
     )
