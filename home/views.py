@@ -11,7 +11,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
 
-from home.forms import PublicationReferentielForm, UploadFileForm
+from .forms import PublicationReferentielForm, UploadFileForm
 
 from . import generator
 

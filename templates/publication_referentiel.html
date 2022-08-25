@@ -6,11 +6,11 @@
         faites un export XML dans le référentiel OuvragesEnPreparation pour visualiser vos dernières modifications.
     </p>
 </div>
-<form class="fr-mt-3w" id="uploadForm" action="" method="POST">
+<form class="fr-mt-3w" action="" method="POST">
 
     {% csrf_token %} {{ form.as_p }}
 
-    <button type="submit" class="fr-mt-1w fr-btn">Générer le PDF</button>
+    <button class="fr-mt-1w fr-btn">Générer le PDF</button>
 </form>
 
 {% endblock %}
