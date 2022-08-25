@@ -1,8 +1,7 @@
-import json
-import requests
-
 from django import forms
 from django.conf import settings
+
+from . import generator
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(
@@ -12,20 +11,13 @@ class UploadFileForm(forms.Form):
     )
 
 
-def get_ouvrages():
-    username, password = list(settings.BASICAUTH_USERS.items())[0]
-
-    response = requests.get(
-        f"{settings.GENERATOR_SERVICE_HOST}/publication/ouvrages/list",
-        auth=(username, password),
-    )
-
-    ouvrages = response.json()
+def _get_ouvrages():
+    ouvrages = generator.get(f"{settings.GENERATOR_SERVICE_HOST}/publication/from_preparation/list").json()
     return [(ouvrage, ouvrage) for ouvrage in ouvrages]
 
 
 class PublicationReferentielForm(forms.Form):
     ouvrage = forms.ChoiceField(
-        choices=get_ouvrages, widget=forms.Select(attrs={"class": "fr-select"}),
+        choices=_get_ouvrages, widget=forms.Select(attrs={"class": "fr-select"}),
         label="Sélectionnez un ouvrage",
     )
