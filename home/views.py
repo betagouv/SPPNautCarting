@@ -15,12 +15,15 @@ from home.forms import PublicationReferentielForm, UploadFileForm
 
 from . import generator
 
+
 class Tableau(FormView):
     form_class = UploadFileForm
     template_name = "tableau_upload.html"
 
     def form_valid(self, form):
-        response = generator.post(settings.GENERATOR_SERVICE_HOST,files={"file": form.cleaned_data["file"]})
+        response = generator.post(
+            settings.GENERATOR_SERVICE_HOST, files={"file": form.cleaned_data["file"]}
+        )
         return _forward_http_file(response)
 
 
@@ -39,10 +42,11 @@ def publication_upload(request):
     launch_generation_url = _generate_publication_url(generation_id, "generate")
 
     auth_token = b64encode(
-        bytes(f"{settings.GENERATOR_USERNAME}:{settings.GENERATOR_PASSWORD}", encoding="utf8")
-    ).decode(
-        "utf8"
-    )
+        bytes(
+            f"{settings.GENERATOR_USERNAME}:{settings.GENERATOR_PASSWORD}",
+            encoding="utf8",
+        )
+    ).decode("utf8")
 
     return render(
         request,
