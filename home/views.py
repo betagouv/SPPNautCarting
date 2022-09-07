@@ -6,7 +6,7 @@ from base64 import b64encode
 from http import HTTPStatus
 
 from django.conf import settings
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
@@ -113,3 +113,10 @@ def _forward_http_file(response):
 
 def _generate_publication_url(generation_id, suffix):
     return f"{settings.GENERATOR_SERVICE_HOST}/publication/{generation_id}/{suffix}"
+
+import logging
+from tutorial import sum
+def procrastinate(request):
+    ret = sum.defer(a=1, b=3)
+    logging.warning(ret)
+    return HttpResponse()

@@ -27,4 +27,9 @@ urlpatterns = [
         views.publication_display,
         name="publication_display",
     ),
+    path(
+        "procrastinate",
+        views.procrastinate,
+        name="procrastinate",
+    ),
 ]
