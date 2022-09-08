@@ -1,9 +1,12 @@
 """
 Views for home module
 """
+import datetime
+import logging
 import uuid
 from base64 import b64encode
 from http import HTTPStatus
+from itertools import groupby
 
 from django.conf import settings
 from django.http import FileResponse, HttpResponseRedirect
@@ -119,6 +122,27 @@ class PublicationProd(FormView):
         generation_id = json_response["generation_id"]
 
         return redirect("home:publication_display", generation_id=generation_id)
+
+    def get_context_data(self, **kwargs):
+        ouvrages = generator.get(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
+        ).json()
+
+        logging.warning(ouvrages)
+
+        ouvrages = {
+            date: list(ouvrages)
+            for date, ouvrages in groupby(
+                ouvrages.items(),
+                # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
+                lambda x: datetime.datetime.fromisoformat(
+                    x[1]["document.pdf"]["date"].replace("Z", "+00:00")
+                ).date(),
+            )
+        }
+
+        kwargs["ouvrages"] = ouvrages
+        return super().get_context_data(**kwargs)
 
 
 publication_prod = PublicationProd.as_view()
