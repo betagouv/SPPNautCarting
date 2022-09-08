@@ -11,9 +11,12 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
 
-from .forms import PublicationReferentielForm, UploadFileForm
-
 from . import generator
+from .forms import (
+    PublicationReferentielPreparationForm,
+    PublicationReferentielProductionForm,
+    UploadFileForm,
+)
 
 
 class Tableau(FormView):
@@ -61,7 +64,7 @@ def publication_upload(request):
 
 
 class PublicationReferentiel(FormView):
-    form_class = PublicationReferentielForm
+    form_class = PublicationReferentielPreparationForm
     template_name = "publication_referentiel.html"
 
     def form_valid(self, form):
@@ -101,6 +104,24 @@ def publication_display(request, generation_id):
         "generating_page.html",
         {"logs": logs},
     )
+
+
+class PublicationProd(FormView):
+    form_class = PublicationReferentielProductionForm
+    template_name = "publication_prod.html"
+
+    def form_valid(self, form):
+        response = generator.post(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/generate",
+            {"ouvrage": form.cleaned_data["ouvrage"]},
+        )
+        json_response = response.json()
+        generation_id = json_response["generation_id"]
+
+        return redirect("home:publication_display", generation_id=generation_id)
+
+
+publication_prod = PublicationProd.as_view()
 
 
 def _forward_http_file(response):

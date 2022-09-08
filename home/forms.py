@@ -1,3 +1,5 @@
+from functools import partial
+
 from django import forms
 from django.conf import settings
 
@@ -12,16 +14,20 @@ class UploadFileForm(forms.Form):
     )
 
 
-def _get_ouvrages():
+def _get_ouvrages(source):
     ouvrages = generator.get(
-        f"{settings.GENERATOR_SERVICE_HOST}/publication/from_preparation/list"
+        f"{settings.GENERATOR_SERVICE_HOST}/publication/from_{source}/list"
     ).json()
     return [(ouvrage, ouvrage) for ouvrage in ouvrages]
 
 
-class PublicationReferentielForm(forms.Form):
+class PublicationReferentielPreparationForm(forms.Form):
     ouvrage = forms.ChoiceField(
-        choices=_get_ouvrages,
+        choices=partial(_get_ouvrages, "preparation"),
         widget=forms.Select(attrs={"class": "fr-select"}),
         label="Sélectionnez un ouvrage",
     )
+
+
+class PublicationReferentielProductionForm(forms.Form):
+    ouvrage = forms.CharField()

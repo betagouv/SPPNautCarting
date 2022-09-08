@@ -27,4 +27,9 @@ urlpatterns = [
         views.publication_display,
         name="publication_display",
     ),
+    path(
+        "publication-prod/",
+        views.publication_prod,
+        name="publication_prod",
+    ),
 ]

@@ -1,0 +1,9 @@
+{% extends "layout/base.html" %} {% load static %} {% block content %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="ouvrage" value="g4" />
+    <button class="fr-mt-1w fr-btn">Générer le PDF G4</button>
+</form>
+
+{% endblock %}
