@@ -1,9 +1,11 @@
 """
 Views for home module
 """
+import datetime
 import uuid
 from base64 import b64encode
 from http import HTTPStatus
+from itertools import groupby
 
 from django.conf import settings
 from django.http import FileResponse, HttpResponseRedirect
@@ -11,9 +13,9 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import FormView
 
-from .forms import PublicationReferentielForm, UploadFileForm
-
 from . import generator
+from .forms import (PublicationReferentielPreparationForm,
+                    PublicationReferentielProductionForm, UploadFileForm)
 
 
 class Tableau(FormView):
@@ -61,7 +63,7 @@ def publication_upload(request):
 
 
 class PublicationReferentiel(FormView):
-    form_class = PublicationReferentielForm
+    form_class = PublicationReferentielPreparationForm
     template_name = "publication_referentiel.html"
 
     def form_valid(self, form):
@@ -101,6 +103,43 @@ def publication_display(request, generation_id):
         "generating_page.html",
         {"logs": logs},
     )
+
+
+class PublicationProd(FormView):
+    form_class = PublicationReferentielProductionForm
+    template_name = "publication_prod.html"
+
+    def form_valid(self, form):
+        response = generator.post(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/generate",
+            {"ouvrage": form.cleaned_data["ouvrage"]},
+        )
+        json_response = response.json()
+        generation_id = json_response["generation_id"]
+
+        return redirect("home:publication_display", generation_id=generation_id)
+
+    def get_context_data(self, **kwargs):
+        ouvrages = generator.get(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
+        ).json()
+
+        ouvrages = {
+            date: list(ouvrages)
+            for date, ouvrages in groupby(
+                ouvrages.items(),
+                # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
+                lambda x: datetime.datetime.fromisoformat(
+                    x[1]["document.pdf"]["date"].replace("Z", "+00:00")
+                ).date(),
+            )
+        }
+
+        kwargs["ouvrages"] = ouvrages
+        return super().get_context_data(**kwargs)
+
+
+publication_prod = PublicationProd.as_view()
 
 
 def _forward_http_file(response):
