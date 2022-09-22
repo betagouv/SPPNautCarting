@@ -21,7 +21,7 @@ def _get_preparation_ouvrages():
 
 class PublicationReferentielPreparationForm(forms.Form):
     ouvrage = forms.ChoiceField(
-        choices=_get_preparation_ouvrages(),
+        choices=_get_preparation_ouvrages,
         widget=forms.Select(attrs={"class": "fr-select"}),
         label="Sélectionnez un ouvrage",
     )
