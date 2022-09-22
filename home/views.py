@@ -2,7 +2,6 @@
 Views for home module
 """
 import datetime
-import logging
 import uuid
 from base64 import b64encode
 from http import HTTPStatus
@@ -15,11 +14,8 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from . import generator
-from .forms import (
-    PublicationReferentielPreparationForm,
-    PublicationReferentielProductionForm,
-    UploadFileForm,
-)
+from .forms import (PublicationReferentielPreparationForm,
+                    PublicationReferentielProductionForm, UploadFileForm)
 
 
 class Tableau(FormView):
@@ -127,8 +123,6 @@ class PublicationProd(FormView):
         ouvrages = generator.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
-
-        logging.warning(ouvrages)
 
         ouvrages = {
             date: list(ouvrages)
