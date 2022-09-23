@@ -14,8 +14,11 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from . import generator
-from .forms import (PublicationReferentielPreparationForm,
-                    PublicationReferentielProductionForm, UploadFileForm)
+from .forms import (
+    PublicationReferentielPreparationForm,
+    PublicationReferentielProductionForm,
+    UploadFileForm,
+)
 
 
 class Tableau(FormView):
@@ -124,14 +127,22 @@ class PublicationProd(FormView):
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
 
+        def keyfunc(x):
+            try:
+                date = x[1]["document.pdf"]["date"]
+                # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
+                return datetime.datetime.fromisoformat(
+                    date.replace("Z", "+00:00")
+                ).date()
+            except:
+                # Nous protège du cas où des objets invalides sont déposés dans le bucket (ainsi ils sont ignorés)
+                pass
+
         ouvrages = {
             date: list(ouvrages)
             for date, ouvrages in groupby(
                 ouvrages.items(),
-                # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
-                lambda x: datetime.datetime.fromisoformat(
-                    x[1]["document.pdf"]["date"].replace("Z", "+00:00")
-                ).date(),
+                keyfunc,
             )
         }
 

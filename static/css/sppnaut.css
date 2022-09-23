@@ -12,3 +12,11 @@
 .sppnaut-italic{
     font-style: italic;
 }
+
+.sppnaut-vignette {
+    list-style: none;
+}
+
+.sppnaut-vignette img {
+    height: 150px;
+}

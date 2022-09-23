@@ -1,17 +1,25 @@
 {% extends "layout/base.html" %} {% load static %} {% block content %}
 
+{% block css_extras %}
+<link rel="stylesheet" href="{% static 'css/sppnaut.css' %}">
+{% endblock %}
+
 {% for date, ouvrage in ouvrages.items %}
 <h2>
     {{ date|date:'d/m/Y' }}
 </h2>
-
 <ul>
 {% for ouvrage_name, files in ouvrage %}
 <li>
     <h3>{{ ouvrage_name }} :</h3>
+
     <ul>
         {% for file_name, file_info in files.items %}
+            {% if file_name == 'vignette.jpg' %}
+            <li class="sppnaut-vignette"><img src="{{file_info.url}}" alt="Vignette" /></li>
+            {% else %}
             <li><a href="{{file_info.url}}">{{ file_name }}</a></li>
+            {% endif %}
         {% endfor %}
     </ul>
     <form action="" method="POST">
