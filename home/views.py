@@ -4,6 +4,7 @@ Views for home module
 import datetime
 import uuid
 from base64 import b64encode
+from collections import defaultdict
 from http import HTTPStatus
 from itertools import groupby
 
@@ -14,8 +15,11 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from . import generator
-from .forms import (PublicationReferentielPreparationForm,
-                    PublicationReferentielProductionForm, UploadFileForm)
+from .forms import (
+    PublicationReferentielPreparationForm,
+    PublicationReferentielProductionForm,
+    UploadFileForm,
+)
 
 
 class Tableau(FormView):
@@ -120,22 +124,27 @@ class PublicationProd(FormView):
         return redirect("home:publication_display", generation_id=generation_id)
 
     def get_context_data(self, **kwargs):
-        ouvrages = generator.get(
+        ouvrages_from_genrator = generator.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
-
-        ouvrages = {
-            date: list(ouvrages)
-            for date, ouvrages in groupby(
-                ouvrages.items(),
-                # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
-                lambda x: datetime.datetime.fromisoformat(
-                    x[1]["document.pdf"]["date"].replace("Z", "+00:00")
-                ).date(),
+        ouvrages_from_genrator = dict(
+            filter(
+                lambda x: "document.pdf" in x[1] and "date" in x[1]["document.pdf"],
+                ouvrages_from_genrator.items(),
             )
-        }
+        )
+        ouvrage_list = defaultdict(list)
+        for date, ouvrages in groupby(
+            ouvrages_from_genrator.items(),
+            lambda ouvrage: datetime.datetime.fromisoformat(
+                # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
+                ouvrage[1]["document.pdf"]["date"].replace("Z", "+00:00")
+            ).date(),
+        ):
+            ouvrage_list[date].extend(list(ouvrages))
+            ouvrage_list[date] = sorted(ouvrage_list[date])
 
-        kwargs["ouvrages"] = ouvrages
+        kwargs["ouvrages"] = dict(sorted(ouvrage_list.items(), reverse=True))
         return super().get_context_data(**kwargs)
 
 
