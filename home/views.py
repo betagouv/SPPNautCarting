@@ -124,18 +124,18 @@ class PublicationProd(FormView):
         return redirect("home:publication_display", generation_id=generation_id)
 
     def get_context_data(self, **kwargs):
-        ouvrages_from_genrator = generator.get(
+        ouvrages_from_generator = generator.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
-        ouvrages_from_genrator = dict(
+        ouvrages_from_generator = dict(
             filter(
                 lambda x: "document.pdf" in x[1] and "date" in x[1]["document.pdf"],
-                ouvrages_from_genrator.items(),
+                ouvrages_from_generator.items(),
             )
         )
         ouvrage_list = defaultdict(list)
         for date, ouvrages in groupby(
-            ouvrages_from_genrator.items(),
+            ouvrages_from_generator.items(),
             lambda ouvrage: datetime.datetime.fromisoformat(
                 # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
                 ouvrage[1]["document.pdf"]["date"].replace("Z", "+00:00")
