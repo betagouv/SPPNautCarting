@@ -1,4 +1,4 @@
-name: SPPNaut Interface integration
+name: Pull request
 
 on:
   push:
@@ -31,23 +31,3 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           pytest unit_tests
-
-  deploy:
-    name: Deploy to Clever Cloud
-    runs-on: ubuntu-latest
-    needs: build_and_test
-    steps:
-      # This action requires an unshallow working copy,
-      # so the following prerequisites are necessary:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      # Deploy your application
-      - uses: 47ng/actions-clever-cloud@v1.2.0
-        with:
-          appID: app_62a6232b-6030-4ad4-a177-d24ff1f99d76
-          force: true
-        env:
-          CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
-          CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
