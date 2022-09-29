@@ -1,13 +1,9 @@
 import datetime
-import logging
 from base64 import b64encode
 
 import pytest
-import requests
 import requests_mock
 from django.urls import reverse
-
-from home.views import PublicationProd
 
 
 @pytest.fixture
@@ -21,8 +17,8 @@ def authorization_header(settings):
     ).decode("utf8")
 
 
-class TestGenerateFromProduction:
-    def test_get_publication_prod(self, settings, client, authorization_header):
+class TestPublicationProd:
+    def test_get(self, settings, client, authorization_header):
         with requests_mock.Mocker() as m:
             ouvrage_list_response = {
                 "103": {
@@ -45,9 +41,7 @@ class TestGenerateFromProduction:
                 datetime.date(2022, 9, 16)
             ]
 
-    def test_get_publication_prod_sort_by_date(
-        self, settings, client, authorization_header
-    ):
+    def test_group_and_desc_sort_by_date(self, settings, client, authorization_header):
         with requests_mock.Mocker() as m:
             ouvrage_list_response = {
                 "103": {
@@ -84,9 +78,7 @@ class TestGenerateFromProduction:
                 datetime.date(2022, 9, 8),
             ]
 
-    def test_get_publication_prod_group_by_date_order_by_label(
-        self, settings, client, authorization_header
-    ):
+    def test_sort_by_ouvrage_name(self, settings, client, authorization_header):
         with requests_mock.Mocker() as m:
             ouvrage_list_response = {
                 "1": {
