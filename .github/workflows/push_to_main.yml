@@ -24,11 +24,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r dev-requirements.txt
-      - name: read default environment file to launch tests
-        run: cat .env.template >>${GITHUB_ENV}
       - name: Run Tests
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           pytest unit_tests
 
