@@ -127,12 +127,6 @@ class PublicationProd(FormView):
         ouvrages_from_generator = generator.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
-        ouvrages_from_generator = dict(
-            filter(
-                lambda x: "document.pdf" in x[1] and "date" in x[1]["document.pdf"],
-                ouvrages_from_generator.items(),
-            )
-        )
         ouvrage_list = defaultdict(list)
         for date, ouvrages in groupby(
             ouvrages_from_generator.items(),
