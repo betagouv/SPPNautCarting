@@ -126,17 +126,15 @@ class PublicationProd(FormView):
         ouvrages_from_generator = generator.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
-        ouvrage_list = defaultdict(dict)
+        ouvrages = defaultdict(dict)
         for ouvrage, files in ouvrages_from_generator.items():
             document_date = datetime.datetime.fromisoformat(
                 # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
                 files["document.pdf"]["date"].replace("Z", "+00:00")
             ).date()
-            ouvrage_list[document_date][ouvrage] = files
-            ouvrage_list[document_date] = dict(
-                sorted(ouvrage_list[document_date].items())
-            )
-        kwargs["ouvrages"] = dict(sorted(ouvrage_list.items(), reverse=True))
+            ouvrages[document_date][ouvrage] = files
+            ouvrages[document_date] = dict(sorted(ouvrages[document_date].items()))
+        kwargs["ouvrages"] = dict(sorted(ouvrages.items(), reverse=True))
         return super().get_context_data(**kwargs)
 
 
