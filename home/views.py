@@ -6,7 +6,6 @@ import uuid
 from base64 import b64encode
 from collections import defaultdict
 from http import HTTPStatus
-from itertools import groupby
 
 from django.conf import settings
 from django.http import FileResponse, HttpResponseRedirect
@@ -127,17 +126,16 @@ class PublicationProd(FormView):
         ouvrages_from_generator = generator.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
-        ouvrage_list = defaultdict(list)
-        for date, ouvrages in groupby(
-            ouvrages_from_generator.items(),
-            lambda ouvrage: datetime.datetime.fromisoformat(
+        ouvrage_list = defaultdict(dict)
+        for ouvrage, files in ouvrages_from_generator.items():
+            document_date = datetime.datetime.fromisoformat(
                 # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
-                ouvrage[1]["document.pdf"]["date"].replace("Z", "+00:00")
-            ).date(),
-        ):
-            ouvrage_list[date].extend(list(ouvrages))
-            ouvrage_list[date] = sorted(ouvrage_list[date])
-
+                files["document.pdf"]["date"].replace("Z", "+00:00")
+            ).date()
+            ouvrage_list[document_date][ouvrage] = files
+            ouvrage_list[document_date] = dict(
+                sorted(ouvrage_list[document_date].items())
+            )
         kwargs["ouvrages"] = dict(sorted(ouvrage_list.items(), reverse=True))
         return super().get_context_data(**kwargs)
 
