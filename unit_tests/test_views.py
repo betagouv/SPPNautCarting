@@ -2,7 +2,6 @@ import datetime
 from base64 import b64encode
 
 import pytest
-from django.urls import reverse
 
 
 @pytest.fixture
@@ -31,7 +30,7 @@ class TestPublicationProd:
             json=ouvrage_list_response,
         )
         response = client.get(
-            reverse("home:publication_prod"),
+            "/publication-prod/",
             HTTP_AUTHORIZATION=authorization_header,
         )
         assert list(response.context["ouvrages"].keys()) == [datetime.date(2022, 9, 16)]
@@ -65,7 +64,7 @@ class TestPublicationProd:
         )
 
         response = client.get(
-            reverse("home:publication_prod"),
+            "/publication-prod/",
             HTTP_AUTHORIZATION=authorization_header,
         )
         assert list(response.context["ouvrages"].keys()) == [
@@ -109,7 +108,7 @@ class TestPublicationProd:
         )
 
         response = client.get(
-            reverse("home:publication_prod"),
+            "/publication-prod/",
             HTTP_AUTHORIZATION=authorization_header,
         )
         assert list(response.context["ouvrages"].keys()) == [
