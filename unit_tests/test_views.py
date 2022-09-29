@@ -85,7 +85,7 @@ class TestPublicationProd:
             },
             "2": {
                 "document.pdf": {
-                    "date": "2022-09-16T14:29:57.340Z",
+                    "date": "2022-09-23T14:29:57.340Z",
                     "url": "http://fake.url",
                 }
             },
@@ -111,14 +111,10 @@ class TestPublicationProd:
             "/publication-prod/",
             HTTP_AUTHORIZATION=authorization_header,
         )
-        assert list(response.context["ouvrages"].keys()) == [
-            datetime.date(2022, 9, 16),
-        ]
         assert list(
             response.context["ouvrages"][datetime.date(2022, 9, 16)].keys()
         ) == [
             "1",
             "103",
-            "2",
             "g4",
         ]
