@@ -1,4 +1,4 @@
-name: SPPNaut Interface integration
+name: Push to Main
 
 on:
   push:
@@ -23,14 +23,10 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: read default environment file to launch tests
-        run: cat .env.template >>${GITHUB_ENV}
+          pip install -r requirements.txt -r dev-requirements.txt
       - name: Run Tests
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
-          python manage.py test
+          pytest unit_tests
 
   deploy:
     name: Deploy to Clever Cloud

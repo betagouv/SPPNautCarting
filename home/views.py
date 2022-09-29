@@ -4,8 +4,8 @@ Views for home module
 import datetime
 import uuid
 from base64 import b64encode
+from collections import defaultdict
 from http import HTTPStatus
-from itertools import groupby
 
 from django.conf import settings
 from django.http import FileResponse, HttpResponseRedirect
@@ -14,8 +14,11 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from . import generator
-from .forms import (PublicationReferentielPreparationForm,
-                    PublicationReferentielProductionForm, UploadFileForm)
+from .forms import (
+    PublicationReferentielPreparationForm,
+    PublicationReferentielProductionForm,
+    UploadFileForm,
+)
 
 
 class Tableau(FormView):
@@ -120,22 +123,18 @@ class PublicationProd(FormView):
         return redirect("home:publication_display", generation_id=generation_id)
 
     def get_context_data(self, **kwargs):
-        ouvrages = generator.get(
+        ouvrages_from_generator = generator.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list"
         ).json()
-
-        ouvrages = {
-            date: list(ouvrages)
-            for date, ouvrages in groupby(
-                ouvrages.items(),
+        ouvrages = defaultdict(dict)
+        for ouvrage, files in ouvrages_from_generator.items():
+            document_date = datetime.datetime.fromisoformat(
                 # Le problème du Z est corrigé dans Python 3.11 : https://docs.python.org/3.11/whatsnew/3.11.html#datetime
-                lambda x: datetime.datetime.fromisoformat(
-                    x[1]["document.pdf"]["date"].replace("Z", "+00:00")
-                ).date(),
-            )
-        }
-
-        kwargs["ouvrages"] = ouvrages
+                files["document.pdf"]["date"].replace("Z", "+00:00")
+            ).date()
+            ouvrages[document_date][ouvrage] = files
+            ouvrages[document_date] = dict(sorted(ouvrages[document_date].items()))
+        kwargs["ouvrages"] = dict(sorted(ouvrages.items(), reverse=True))
         return super().get_context_data(**kwargs)
 
 
