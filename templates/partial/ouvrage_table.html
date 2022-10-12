@@ -1,0 +1,37 @@
+<div class="fr-table">
+    <table>
+        <caption class='fr-mb-3w'>{{caption}}</caption>
+        <tbody>
+            {% for ouvrage in ouvrages %}
+                <tr>
+                    <th scope="row">
+                        <img height="297" width="210" class="sppnaut-width-auto sppnaut-max-h-8w" src="{{ouvrage.vignette.url}}" alt=""/>
+                    </th>
+                    <th class="fr-h3 sppnaut-width-full" scope="row">
+                        {{ ouvrage.name }}
+                    </th>
+                    {% for file_type, file in ouvrage.files.items %}
+                        <td>
+                            {% if file %}
+                            <a href="{{file.url}}" title="{{ file.name }}">
+                                {{ file_type }}
+                            </a>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    {% if allow_forced_generation %}
+                        <td>
+                            <form action="" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="ouvrage" value="{{ouvrage.name}}" />
+                                <button class="fr-btn fr-btn--icon fr-icon-refresh-line" titre="Re-Générer l'ouvrage">
+                                    Re-Générer l'ouvrage
+                                </button>
+                            </form>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

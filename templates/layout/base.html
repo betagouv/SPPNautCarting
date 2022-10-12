@@ -25,22 +25,20 @@
         <!--Css-->
 
         <link rel="stylesheet" href="{% static "dsfr/dist/dsfr/dsfr.min.css" %}">
-        {% block css_extras %}{% endblock %}
+        <link rel="stylesheet" href="{% static "dsfr/dist/utility/icons/icons.css" %}">
+        <link rel="stylesheet" href="{% static 'css/sppnaut.css' %}">
 
-        <!--Js-->
-
-        {% block javascript_extras %}{% endblock %}
     </head>
 
     <body>
         {% block header %}
             {% include "layout/header.html" %}
         {% endblock %}
-        <main role="main" class="contentAll">
-            <div class="fr-container-fluid ds_banner">
+        <main role="main">
+            <div class="fr-container--fluid ds_banner">
                 <div class="fr-container">
                     <div class="fr-grid-row fr-grid-row--gutters fr-py-6w">
-                        <div class="fr-col-lg-11 fr-col-offset-lg-1 fr-mb-2w">
+                        <div class="fr-col-12 fr-mb-2w">
                             {% block content %}{% endblock %}
                         </div>
                     </div>
@@ -72,5 +70,8 @@
             })();
         </script>
         <!-- End Matomo Code -->
+
+        <script type="module" src="{% static "dsfr/dist/dsfr/dsfr.module.min.js" %}"></script>
+
     </body>
 </html>

@@ -1,0 +1,7 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block content %}
+    {% include "partial/ouvrage_table.html" with allow_forced_generation=False %}
+{% endblock %}
