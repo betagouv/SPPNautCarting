@@ -40,7 +40,7 @@ jobs:
           fetch-depth: 0
 
       # Deploy your application
-      - uses: 47ng/actions-clever-cloud@v1.2.0
+      - uses: 47ng/actions-clever-cloud@v1.3.1
         with:
           appID: app_62a6232b-6030-4ad4-a177-d24ff1f99d76
           force: true
