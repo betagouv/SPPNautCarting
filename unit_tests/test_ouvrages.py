@@ -146,7 +146,7 @@ class TestOuvrage:
             "PDF": OuvrageFile(
                 "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
             ),
-            "Metadata": OuvrageFile(
+            "Métadonnées": OuvrageFile(
                 "OUVNAUT_IN_G4.xml",
                 "http://fake_metadata.url",
                 datetime.date(2022, 9, 10),
@@ -172,6 +172,6 @@ class TestOuvrage:
             "PDF": OuvrageFile(
                 "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
             ),
-            "Metadata": None,
+            "Métadonnées": None,
             "Vignette": None,
         }

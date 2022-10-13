@@ -49,7 +49,7 @@ class Ouvrage(NamedTuple):
     def files(self):
         return {
             "PDF": self.document,
-            "Metadata": self.metadata,
+            "Métadonnées": self.metadata,
             "Vignette": self.vignette,
         }
 
