@@ -12,3 +12,19 @@
 .sppnaut-italic{
     font-style: italic;
 }
+
+.sppnaut-width-full {
+    width: 100%;
+}
+
+.sppnaut-width-auto {
+    width: auto;
+}
+
+.sppnaut-max-h-8w {
+    max-height: 4rem;
+}
+
+.sppnaut-max-w-100w {
+    max-width: 50rem;
+}

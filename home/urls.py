@@ -28,8 +28,13 @@ urlpatterns = [
         name="publication_display",
     ),
     path(
-        "publication-prod/",
-        views.publication_prod,
-        name="publication_prod",
+        "ouvrages-by-date/",
+        views.ouvrages_by_date,
+        name="ouvrages_by_date",
+    ),
+    path(
+        "ouvrages-by-name/",
+        views.ouvrages_by_name,
+        name="ouvrages_by_name",
     ),
 ]

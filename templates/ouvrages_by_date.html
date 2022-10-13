@@ -1,0 +1,13 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+    {% for caption,ouvrages in ouvrages_by_date.items %}
+        {% include "partial/ouvrage_table.html" with allow_forced_generation=True %}
+    {% endfor %}
+
+
+
+{% endblock %}
