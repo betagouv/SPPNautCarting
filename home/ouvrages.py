@@ -9,7 +9,7 @@ class OuvrageFile(NamedTuple):
     date: datetime.date
 
     @classmethod
-    def from_json(cls, name, json):
+    def from_json(cls, name, json: dict):
         if not json:
             return None
         date = datetime.datetime.fromisoformat(
@@ -26,20 +26,20 @@ class Ouvrage(NamedTuple):
     metadata: OuvrageFile | None = None
 
     @classmethod
-    def from_json(cls, name, json):
+    def from_json(cls, name, json: dict):
         if "document.pdf" not in json:
             return None
 
         document = OuvrageFile.from_json("document.pdf", json["document.pdf"])
         vignette = OuvrageFile.from_json("vignette.jpg", json.get("vignette.jpg"))
-        metadata_jsons = [
+        metadata_file_instances = [
             (x, y)
             for x, y in json.items()
             if x.startswith("OUVNAUT_") and x.endswith(".xml")
         ]
         metadata = None
-        if len(metadata_jsons) == 1:
-            metadata_name, metadata_json = metadata_jsons[0]
+        if len(metadata_file_instances) == 1:
+            metadata_name, metadata_json = metadata_file_instances[0]
             metadata = OuvrageFile.from_json(metadata_name, metadata_json)
         else:
             logging.warning("No metadata found for ouvrage named `%s`", name)

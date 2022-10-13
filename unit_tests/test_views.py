@@ -15,7 +15,7 @@ def authorization_header(settings):
     ).decode("utf8")
 
 
-class TestPublicationProdByDate:
+class TestOuvragesByDate:
     def test_group_and_desc_sort_by_document_date(
         self, settings, client, authorization_header, requests_mock
     ):
@@ -112,7 +112,7 @@ class TestPublicationProdByDate:
         ]
 
 
-class TestPublicationProdOuvrage:
+class TestOuvragesByName:
     def test_sort_by_ouvrage_name(
         self, settings, client, authorization_header, requests_mock
     ):

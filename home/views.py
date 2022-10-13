@@ -1,15 +1,11 @@
 """
 Views for home module
 """
-import datetime
-import logging
 import uuid
-from abc import ABC
 from base64 import b64encode
 from collections import defaultdict
 from http import HTTPStatus
 from operator import attrgetter
-from typing import NamedTuple
 
 from django.conf import settings
 from django.http import FileResponse, HttpResponseRedirect
@@ -121,13 +117,13 @@ def ouvrages_by_name(request):
     ).json()
 
     ouvrages = [
-        Ouvrage.from_json(ouvrage, files)
+        ouvrage_item
         for ouvrage, files in ouvrages_from_generator.items()
-        if "document.pdf" in files.keys()
+        if (ouvrage_item := Ouvrage.from_json(ouvrage, files))
     ]
     return render(
         request,
-        "publication_prod_by_ouvrage.html",
+        "ouvrages_by_name.html",
         {
             "ouvrages": sorted(ouvrages, key=attrgetter("name")),
         },
@@ -135,7 +131,7 @@ def ouvrages_by_name(request):
 
 
 class OuvragesByDate(FormView):
-    template_name = "publication_prod_by_date.html"
+    template_name = "ouvrages_by_date.html"
     form_class = PublicationReferentielProductionForm
 
     def form_valid(self, form):
