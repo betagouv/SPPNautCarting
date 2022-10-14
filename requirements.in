@@ -1,4 +1,4 @@
-Django>=3.2.11, <5.0
-django-decouple
+Django
+python-decouple
 requests
 sentry-sdk
