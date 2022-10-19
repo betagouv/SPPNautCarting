@@ -10,22 +10,33 @@
                     <th class="fr-h3 sppnaut-width-full" scope="row">
                         {{ ouvrage.name }}
                     </th>
-                    {% for file_type, file in ouvrage.files.items %}
-                        <td>
-                            {% if file %}
-                            <a href="{{file.url}}" title="{{ file.name }}">
-                                {{ file_type }}
+
+                    <td>
+                        <a class='fr-btn' href="{{ouvrage.document}}" title="{{ ouvrage.document.name }}">
+                            PDF
+                        </a>
+                    </td>
+                    <td>
+                        {% if ouvrage.metadata %}
+                            <a class='fr-btn fr-btn--secondary' href="{{ouvrage.metadata}}" title="{{ ouvrage.metadata.name }}">
+                                Métadonnées
                             </a>
-                            {% endif %}
-                        </td>
-                    {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if ouvrage.vignette %}
+                            <a class='fr-btn fr-btn--secondary' href="{{ouvrage.vignette}}" title="{{ ouvrage.vignette.name }}">
+                                Vignette
+                            </a>
+                        {% endif %}
+                    </td>
                     {% if allow_forced_generation %}
                         <td>
                             <form action="" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" name="ouvrage" value="{{ouvrage.name}}" />
-                                <button class="fr-btn fr-btn--icon fr-icon-refresh-line" titre="Re-Générer l'ouvrage">
-                                    Re-Générer l'ouvrage
+                                <button class="fr-btn fr-btn--icon-left fr-icon-refresh-line fr-btn--tertiary" titre="Re-Générer l'ouvrage">
+                                    Regénérer
                                 </button>
                             </form>
                         </td>
