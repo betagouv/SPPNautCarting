@@ -1,11 +1,6 @@
 --constraint=requirements.txt
 
 black
-django-stubs
-djhtml
-mypy
-pre-commit
-pylint
 pytest
 pytest-django
 pytest-dotenv

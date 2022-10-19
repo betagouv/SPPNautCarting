@@ -38,3 +38,16 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 `./manage.py runserver 0.0.0.0:8000`
 
 L'interface est disponible sur votre navigateur à l'adresse [http://localhost:8000](http://localhost:8000)
+
+### Lister les licenses
+
+Processus à suivre en utilisant le package pip-licenses
+
+```sh
+$> rm -rf .venv
+$> python -m venv .venv --prompt $(basename $(pwd))
+$> source .venv/bin/activate
+$> pip install -r requirements.txt -r dev-requirements.txt
+$> pip install -U pip-licenses
+$> pip-licenses > licenses.csv
+```
