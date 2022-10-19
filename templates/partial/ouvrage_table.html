@@ -12,20 +12,20 @@
                     </th>
 
                     <td>
-                        <a class='fr-btn' href="{{ouvrage.document}}" title="{{ ouvrage.document.name }}">
+                        <a class='fr-btn fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.document}}" title="{{ ouvrage.document.name }}">
                             PDF
                         </a>
                     </td>
                     <td>
                         {% if ouvrage.metadata %}
-                            <a class='fr-btn fr-btn--secondary' href="{{ouvrage.metadata}}" title="{{ ouvrage.metadata.name }}">
+                            <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.metadata}}" title="{{ ouvrage.metadata.name }}">
                                 Métadonnées
                             </a>
                         {% endif %}
                     </td>
                     <td>
                         {% if ouvrage.vignette %}
-                            <a class='fr-btn fr-btn--secondary' href="{{ouvrage.vignette}}" title="{{ ouvrage.vignette.name }}">
+                            <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.vignette}}" title="{{ ouvrage.vignette.name }}">
                                 Vignette
                             </a>
                         {% endif %}
@@ -35,7 +35,7 @@
                             <form action="" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" name="ouvrage" value="{{ouvrage.name}}" />
-                                <button class="fr-btn fr-btn--icon-left fr-icon-refresh-line fr-btn--tertiary" titre="Re-Générer l'ouvrage">
+                                <button class="fr-btn fr-btn--tertiary fr-btn--icon-left fr-icon-refresh-line" titre="Re-Générer l'ouvrage">
                                     Regénérer
                                 </button>
                             </form>
