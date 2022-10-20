@@ -165,3 +165,5 @@ class TestOuvrage:
         assert ouvrage.document == OuvrageFile(
             "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
         )
+        assert ouvrage.metadata is None
+        assert ouvrage.vignette is None
