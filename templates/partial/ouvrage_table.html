@@ -12,20 +12,20 @@
                     </th>
 
                     <td>
-                        <a class='fr-btn fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.document}}" title="{{ ouvrage.document.name }}">
+                        <a class='fr-btn fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.document.url}}" title="{{ ouvrage.document.name }}">
                             PDF
                         </a>
                     </td>
                     <td>
                         {% if ouvrage.metadata %}
-                            <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.metadata}}" title="{{ ouvrage.metadata.name }}">
+                            <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.metadata.url}}" title="{{ ouvrage.metadata.name }}">
                                 Métadonnées
                             </a>
                         {% endif %}
                     </td>
                     <td>
                         {% if ouvrage.vignette %}
-                            <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.vignette}}" title="{{ ouvrage.vignette.name }}">
+                            <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.vignette.url}}" title="{{ ouvrage.vignette.name }}">
                                 Vignette
                             </a>
                         {% endif %}
