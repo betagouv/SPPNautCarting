@@ -46,13 +46,5 @@ class Ouvrage(NamedTuple):
         return cls(name, document, vignette, metadata)
 
     @property
-    def files(self):
-        return {
-            "PDF": self.document,
-            "Métadonnées": self.metadata,
-            "Vignette": self.vignette,
-        }
-
-    @property
     def date(self):
         return self.document.date
