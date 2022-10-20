@@ -142,21 +142,15 @@ class TestOuvrage:
             },
         )
 
-        assert ouvrage.files == {
-            "PDF": OuvrageFile(
-                "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
-            ),
-            "Métadonnées": OuvrageFile(
-                "OUVNAUT_IN_G4.xml",
-                "http://fake_metadata.url",
-                datetime.date(2022, 9, 10),
-            ),
-            "Vignette": OuvrageFile(
-                "vignette.jpg",
-                "http://fake_vignette.url",
-                datetime.date(2022, 10, 22),
-            ),
-        }
+        assert ouvrage.document == OuvrageFile(
+            "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
+        )
+        assert ouvrage.metadata == OuvrageFile(
+            "OUVNAUT_IN_G4.xml", "http://fake_metadata.url", datetime.date(2022, 9, 10)
+        )
+        assert ouvrage.vignette == OuvrageFile(
+            "vignette.jpg", "http://fake_vignette.url", datetime.date(2022, 10, 22)
+        )
 
     def test_files_one_document_pdf(self):
         ouvrage = Ouvrage.from_json(
@@ -168,10 +162,8 @@ class TestOuvrage:
                 }
             },
         )
-        assert ouvrage.files == {
-            "PDF": OuvrageFile(
-                "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
-            ),
-            "Métadonnées": None,
-            "Vignette": None,
-        }
+        assert ouvrage.document == OuvrageFile(
+            "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
+        )
+        assert ouvrage.metadata is None
+        assert ouvrage.vignette is None
