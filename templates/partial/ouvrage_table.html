@@ -32,7 +32,7 @@
                     </td>
                     {% if allow_forced_generation %}
                         <td>
-                            <form action="" method="POST">
+                            <form action="" method="POST" onsubmit="return confirm('Voulez-vous regénérer l\'ouvrage {{ ouvrage.name }} ?')">
                                 {% csrf_token %}
                                 <input type="hidden" name="ouvrage" value="{{ouvrage.name}}" />
                                 <button class="fr-btn fr-btn--tertiary fr-btn--icon-left fr-icon-refresh-line" titre="Re-Générer l'ouvrage">
