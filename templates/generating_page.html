@@ -1,13 +1,15 @@
 {% extends "layout/base.html" %}
 
 {% load static %}
+{% block page_title %}Génération de publication en cours{% endblock%}
 
 {% block meta %}
 <meta http-equiv='refresh' content='10'>
 {% endblock %}
 
 {% block content %}
-<p>Génération de publication en cours :</p>
+<h1>Génération de publication en cours</h1>
+
 <div class='sppnaut-aligncenter' id="submit_button" >
     <img src="{% static 'img/loading.gif' %}" width="20px" class="fr-mr-1w"/>
 {{ logs }}

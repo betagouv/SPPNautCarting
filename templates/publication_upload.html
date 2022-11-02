@@ -1,9 +1,11 @@
 {% extends "layout/base.html" %}
 
 {% load static %}
+{% block page_title %}Génération d'ouvrage téléversé{% endblock%}
 
 {% block content %}
 
+<h1>Génération d'ouvrage téléversé</h1>
 
 <form id="uploadForm" action="{% url 'home:publication_display' generation_id %}">
     <input type="hidden" name="auth_token" value="{{auth_token}}" />
