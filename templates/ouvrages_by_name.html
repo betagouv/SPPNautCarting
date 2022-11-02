@@ -2,6 +2,9 @@
 
 {% load static %}
 
+{% block page_title %}Ouvrages en production (par nom){% endblock%}
+
 {% block content %}
+    <h1>Ouvrages en production (par nom)</h1>
     {% include "partial/ouvrage_table.html" with allow_forced_generation=False %}
 {% endblock %}

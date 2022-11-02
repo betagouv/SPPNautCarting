@@ -2,10 +2,11 @@
 
 {% load static %}
 
-
+{% block page_title %}Génération de tableaux{% endblock%}
 
 {% block content %}
-
+    <h1>Génération de tableaux</h1>
+    
     <form method="post" action="" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="fr-upload-group">
