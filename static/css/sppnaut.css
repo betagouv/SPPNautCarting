@@ -28,3 +28,7 @@
 .sppnaut-max-w-100w {
     max-width: 50rem;
 }
+
+.sppnaut-overflow-y-auto {
+    overflow-y: auto;
+}
