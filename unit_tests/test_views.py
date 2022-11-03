@@ -157,3 +157,60 @@ class TestOuvragesByName:
             "2",
             "g4",
         ]
+
+
+class TestPublicationDisplay:
+    def test_generation_failed(
+        self, settings, client, authorization_header, requests_mock
+    ):
+        requests_mock.get(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/fake_generation_id/",
+            status_code=500,
+            text="Oh noes!\nMany errors!",
+        )
+
+        response = client.get(
+            "/publication/fake_generation_id/",
+            HTTP_AUTHORIZATION=authorization_header,
+        )
+
+        assert response.context["generation_id"] == "fake_generation_id"
+        assert response.context["logs"] == "Oh noes!\nMany errors!"
+
+    def test_generation_in_progress(
+        self, settings, client, authorization_header, requests_mock
+    ):
+        requests_mock.get(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/fake_generation_id/",
+            status_code=404,
+            text="Étape 1 sur 126",
+        )
+
+        response = client.get(
+            "/publication/fake_generation_id/",
+            HTTP_AUTHORIZATION=authorization_header,
+        )
+
+        assert response.context["displayable_step"] == "Étape 1 sur 126"
+
+    def test_generation_success(
+        self, settings, client, authorization_header, requests_mock
+    ):
+        requests_mock.get(
+            f"{settings.GENERATOR_SERVICE_HOST}/publication/fake_generation_id/",
+            status_code=200,
+            headers={
+                "content-type": "application/pdf",
+                "content-length": "123",
+                "content-disposition": 'inline; filename="g4p.pdf"',
+            },
+        )
+
+        response = client.get(
+            "/publication/fake_generation_id/",
+            HTTP_AUTHORIZATION=authorization_header,
+        )
+
+        assert response.headers["content-type"] == "application/pdf"
+        assert response.headers["content-length"] == "123"
+        assert response.headers["content-disposition"] == 'inline; filename="g4p.pdf"'

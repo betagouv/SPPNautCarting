@@ -92,19 +92,17 @@ def publication_display(request, generation_id):
     if response.status_code == HTTPStatus.OK:
         return _forward_http_file(response)
 
-    logs = response.json()
-
     if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
         return render(
             request,
             "publication_generation_failed.html",
-            {"generation_id": generation_id, "error": logs["error"]},
+            {"generation_id": generation_id, "logs": response.text},
         )
 
     return render(
         request,
         "generating_page.html",
-        {"displayable_step": logs["displayable_step"]},
+        {"displayable_step": response.text},
     )
 
 

@@ -8,19 +8,6 @@
 <p>L'équipe a été informée de ce problème.</p>
 
 <p>
-    <section class="fr-accordion">
-        <h3 class="fr-accordion__title">
-            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-106">Détail de l'erreur</button>
-        </h3>
-        <div class="fr-collapse" id="accordion-106">
-            <code>
-                {{ error|linebreaksbr }}
-            </code>
-        </div>
-    </section>
-</p>
-
-<p>
     N'hésitez pas à faire part à
     <a
         href="mailto:equipe@sppnaut.beta.gouv.fr?subject=La génération de la publication d'identifiant {{ generation_id }} a échouée"
@@ -34,6 +21,15 @@
     <br />
     Nous reviendrons vers vous dans les plus brefs délais.
 </p>
+
+<section class="fr-accordion fr-mb-3w">
+    <h3 class="fr-accordion__title">
+        <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-logs">Détail de l'erreur</button>
+    </h3>
+    <div class="fr-collapse" id="accordion-logs">
+        <pre class="sppnaut-overflow-y-auto">{{ logs }}</pre>
+    </div>
+</section>
 
 <a href="{% url 'home:publication_upload' %}">
     Recommencer une nouvelle génération de publication
