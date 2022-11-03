@@ -8,9 +8,8 @@ from http import HTTPStatus
 from operator import attrgetter
 
 from django.conf import settings
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse
 from django.views.decorators.http import require_GET
 from django.views.generic import FormView
 
@@ -35,10 +34,6 @@ class Tableau(FormView):
 
 
 tableau = Tableau.as_view()
-
-
-def tableau_redirect(request):
-    return HttpResponseRedirect(reverse("home:tableau"))
 
 
 def publication_upload(request):
