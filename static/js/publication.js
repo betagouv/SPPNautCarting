@@ -18,7 +18,7 @@ async function generate_publication_from_files(e) {
     }
     else {
         document.getElementById('div-error').hidden = true;
-        submit_button = document.getElementsByTagName('button')[0];
+        submit_button = form.getElementsByTagName('button')[0];
         submit_button.getElementsByTagName('img')[0].hidden = false;
         submit_button.disabled = true;
 
