@@ -2,11 +2,12 @@
 Router config for home module
 """
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
 urlpatterns = [
-    path("", views.tableau_redirect),
+    path("", RedirectView.as_view(pattern_name="home:ouvrages_by_name")),
     path(
         "tableau/",
         views.tableau,
