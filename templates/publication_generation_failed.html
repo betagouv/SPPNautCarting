@@ -3,28 +3,34 @@
 {% block page_title %}La génération de la publication a échoué{% endblock page_title %}
 
 {% block content %}
-<h1>La génération de la publication a échoué</h1>
 
-<p>L'équipe a été informée de ce problème.</p>
 
-<p>
-    N'hésitez pas à faire part à
-    <a
-        href="mailto:equipe@sppnaut.beta.gouv.fr?subject=La génération de la publication d'identifiant {{ generation_id }} a échouée"
-    >
-        l'équipe SPPNAUT
-    </a>
-    de votre expérience.
-    <br />
-    Merci de préciser l'identifiant de cette génération :
-    <span class="sppnaut-nowrap sppnaut-italic"> {{ generation_id }}. </span>
-    <br />
-    Nous reviendrons vers vous dans les plus brefs délais.
-</p>
+<h1 >La génération de la publication a échoué</h1>
+<div class="fr-alert fr-alert--warning">
 
-<section class="fr-accordion fr-mb-3w">
+
+    <h3 class="fr-alert__title">L'équipe a été informée de ce problème.</h3>
+
+    <p>
+        N'hésitez pas à faire part à
+        <a
+            href="mailto:equipe@sppnaut.beta.gouv.fr?subject=La génération de la publication d'identifiant {{ generation_id }} a échouée"
+        >
+            l'équipe SPPNAUT
+        </a>
+        de votre expérience.
+    </p>
+    <p>
+        Merci de préciser l'identifiant de cette génération :
+        <span class="sppnaut-nowrap sppnaut-italic"> {{ generation_id }}. </span>
+        <br />
+        Nous reviendrons vers vous dans les plus brefs délais.
+    </p>
+</div>
+
+<section class="fr-accordion fr-mb-3w fr-mt-3w">
     <h3 class="fr-accordion__title">
-        <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-logs">Détail de l'erreur</button>
+        <button class="fr-accordion__btn  fr-h3" aria-expanded="false" aria-controls="accordion-logs">Détail de l'erreur</button>
     </h3>
     <div class="fr-collapse" id="accordion-logs">
         <pre class="sppnaut-overflow-y-auto">{{ logs }}</pre>
@@ -34,4 +40,5 @@
 <a href="{% url 'home:publication_upload' %}">
     Recommencer une nouvelle génération de publication
 </a>
+
 {% endblock %}
