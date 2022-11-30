@@ -1,4 +1,3 @@
-import datetime
 from base64 import b64encode
 
 import pytest
@@ -90,6 +89,18 @@ class TestOuvragesByDate:
                     "url": "http://fake.url",
                 },
             },
+            "c11": {
+                "document.pdf": {
+                    "date": "2022-09-16T14:56:18.066Z",
+                    "url": "http://fake.url",
+                }
+            },
+            "c2": {
+                "document.pdf": {
+                    "date": "2022-09-16T14:57:28.066Z",
+                    "url": "http://fake.url",
+                }
+            },
         }
         requests_mock.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/from_production/list",
@@ -108,6 +119,8 @@ class TestOuvragesByDate:
         ] == [
             "1",
             "103",
+            "c2",
+            "c11",
             "g4",
         ]
 

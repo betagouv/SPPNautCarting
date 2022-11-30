@@ -12,6 +12,7 @@ from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET
 from django.views.generic import FormView
+from natsort import natsorted
 
 from . import generator
 from .forms import (
@@ -149,7 +150,7 @@ class OuvragesByDate(FormView):
         ouvrages = defaultdict(list)
         for ouvrage in ouvrage_objects:
             ouvrages[ouvrage.date].append(ouvrage)
-            ouvrages[ouvrage.date] = sorted(
+            ouvrages[ouvrage.date] = natsorted(
                 ouvrages[ouvrage.date], key=attrgetter("name")
             )
         ouvrages_by_date = dict(sorted(ouvrages.items(), reverse=True))
