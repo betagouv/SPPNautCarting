@@ -1,5 +1,6 @@
 Django
 natsort
+psycopg2
 python-decouple
 requests
 sentry-sdk

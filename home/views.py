@@ -8,6 +8,8 @@ from http import HTTPStatus
 from operator import attrgetter
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import FileResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET
@@ -23,7 +25,7 @@ from .forms import (
 from .ouvrages import Ouvrage
 
 
-class Tableau(FormView):
+class Tableau(LoginRequiredMixin, FormView):
     form_class = UploadFileForm
     template_name = "tableau_upload.html"
 
@@ -37,6 +39,7 @@ class Tableau(FormView):
 tableau = Tableau.as_view()
 
 
+@login_required
 def publication_upload(request):
     # FIXME: Utiliser Formulaire Django
 
@@ -63,7 +66,7 @@ def publication_upload(request):
     )
 
 
-class PublicationReferentiel(FormView):
+class PublicationReferentiel(LoginRequiredMixin, FormView):
     form_class = PublicationReferentielPreparationForm
     template_name = "publication_referentiel.html"
 
@@ -81,6 +84,7 @@ class PublicationReferentiel(FormView):
 publication_referentiel = PublicationReferentiel.as_view()
 
 
+@login_required
 def publication_display(request, generation_id):
     publication_url = _generate_publication_url(generation_id, "")
     response = generator.get(publication_url)
@@ -102,6 +106,7 @@ def publication_display(request, generation_id):
     )
 
 
+@login_required
 @require_GET
 def ouvrages_by_name(request):
     ouvrages_from_generator = generator.get(
@@ -122,7 +127,7 @@ def ouvrages_by_name(request):
     )
 
 
-class OuvragesByDate(FormView):
+class OuvragesByDate(LoginRequiredMixin, FormView):
     template_name = "ouvrages_by_date.html"
     form_class = PublicationReferentielProductionForm
 
