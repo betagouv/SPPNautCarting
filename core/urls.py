@@ -15,5 +15,3 @@ urlpatterns: URLList = [
     path("accounts/logout/", auth_views.logout_then_login, name="logout"),
     path("", include(("home.urls", "users"), namespace="home")),
 ]
-for s in static(settings.STATIC_URL, document_root=settings.STATIC_ROOT):
-    urlpatterns.append(s)

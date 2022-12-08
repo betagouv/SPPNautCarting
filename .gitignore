@@ -3,3 +3,4 @@ Contenu_du_mac
 .env
 __pycache__
 .venv
+staticfiles
