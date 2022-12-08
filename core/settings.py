@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "home",
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "home.middleware.BasicAuthMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -77,7 +77,16 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("POSTGRESQL_ADDON_DB"),
+        "USER": config("POSTGRESQL_ADDON_USER"),
+        "PASSWORD": config("POSTGRESQL_ADDON_PASSWORD"),
+        "HOST": config("POSTGRESQL_ADDON_HOST"),
+        "PORT": config("POSTGRESQL_ADDON_PORT"),
+    }
+}
 
 # Static files
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -159,3 +168,5 @@ sentry_sdk.init(
     # something more human-readable.
     # release="myapp@1.0.0",
 )
+LOGIN_REDIRECT_URL = "home:ouvrages_by_name"
+LANGUAGE_CODE = "fr"

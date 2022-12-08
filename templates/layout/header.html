@@ -13,24 +13,52 @@
                             </p>
                         </div>
                         <div class="fr-header__operator">
-                            <img height="100px" src="{% static "img/shom_logo.png" %}">
+                            <img
+                                class="fr-responsive-img"
+                                style="max-width:9.0625rem;"
+                                src="{% static "img/shom_logo.png" %}"
+                                alt="Shom"
+                            >
+                        </div>
+                        <div class="fr-header__navbar">
+                            <button class="fr-btn--menu fr-btn" data-fr-opened="false" aria-controls="dsfr-header-modal" aria-haspopup="menu" id="dsfr-header-button" title="Menu">
+                                Menu
+                            </button>
                         </div>
                     </div>
                     <div class="fr-header__service">
-                        <a href="/" title="Accueil - APiLos">
+                        <a href="/" title="Accueil - SPPNaut">
                             <p class="fr-header__service-title">SPPNaut</p>
                         </a>
                         <p class="fr-header__service-tagline">Chaine de production des publications nautiques</p>
                         <p class="fr-header__service-tagline fr-text--sm"><i>Plateforme interactive et géolocalisée</i></p>
                     </div>
                 </div>
+                <div class="fr-header__tools">
+                    <div class="fr-header__tools-links">
+                        <ul class="fr-btns-group">
+                            {% if user.is_authenticated %}
+                                <li>
+                                    <a class="fr-btn fr-icon-logout-box-r-line" href="{% url 'logout' %}">
+                                        Se déconnecter
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <div class="fr-header__menu">
+    <div class="fr-header__menu fr-modal" id="dsfr-header-modal" aria-labelledby="dsfr-header-button">
         <div class="fr-container">
-
+            <button class="fr-btn--close fr-btn" aria-controls="dsfr-header-modal" title="Fermer">
+                Fermer
+            </button>
+            <div class="fr-header__menu-links">
+            </div>
             <nav class="fr-nav" id="header-navigation" role="navigation" aria-label="Menu principal">
                 <ul class="fr-nav__list">
                     {% for menu_title, submenus in menu.items %}
@@ -66,6 +94,8 @@
                     {% endfor %}
                 </ul>
             </nav>
+
         </div>
     </div>
+
 </header>

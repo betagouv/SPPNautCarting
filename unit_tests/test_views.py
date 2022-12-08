@@ -3,20 +3,9 @@ from base64 import b64encode
 import pytest
 
 
-@pytest.fixture
-def authorization_header(settings):
-    GENERATOR_USERNAME, GENERATOR_PASSWORD = list(settings.BASICAUTH_USERS.items())[0]
-    return "Basic " + b64encode(
-        bytes(
-            f"{GENERATOR_USERNAME}:{GENERATOR_PASSWORD}",
-            encoding="utf8",
-        )
-    ).decode("utf8")
-
-
 class TestOuvragesByDate:
     def test_group_and_desc_sort_by_document_date(
-        self, settings, client, authorization_header, requests_mock
+        self, settings, admin_client, requests_mock
     ):
         ouvrage_list_response = {
             "103": {
@@ -51,19 +40,14 @@ class TestOuvragesByDate:
             json=ouvrage_list_response,
         )
 
-        response = client.get(
-            "/ouvrages-by-date/",
-            HTTP_AUTHORIZATION=authorization_header,
-        )
+        response = admin_client.get("/ouvrages-by-date/")
         assert list(response.context["ouvrages_by_date"].keys()) == [
             "Ouvrages générés le 23/09/2022",
             "Ouvrages générés le 16/09/2022",
             "Ouvrages générés le 08/09/2022",
         ], "The ouvrage date is the document.pdf one"
 
-    def test_sort_by_ouvrage_name(
-        self, settings, client, authorization_header, requests_mock
-    ):
+    def test_sort_by_ouvrage_name(self, settings, admin_client, requests_mock):
         ouvrage_list_response = {
             "1": {
                 "document.pdf": {
@@ -107,10 +91,7 @@ class TestOuvragesByDate:
             json=ouvrage_list_response,
         )
 
-        response = client.get(
-            "/ouvrages-by-date/",
-            HTTP_AUTHORIZATION=authorization_header,
-        )
+        response = admin_client.get("/ouvrages-by-date/")
         assert [
             ouvrage.name
             for ouvrage in response.context["ouvrages_by_date"][
@@ -126,9 +107,7 @@ class TestOuvragesByDate:
 
 
 class TestOuvragesByName:
-    def test_sort_by_ouvrage_name(
-        self, settings, client, authorization_header, requests_mock
-    ):
+    def test_sort_by_ouvrage_name(self, settings, admin_client, requests_mock):
         ouvrage_list_response = {
             "1": {
                 "document.pdf": {
@@ -160,10 +139,7 @@ class TestOuvragesByName:
             json=ouvrage_list_response,
         )
 
-        response = client.get(
-            "/ouvrages-by-name/",
-            HTTP_AUTHORIZATION=authorization_header,
-        )
+        response = admin_client.get("/ouvrages-by-name/")
         assert [ouvrage.name for ouvrage in response.context["ouvrages"]] == [
             "1",
             "103",
@@ -173,42 +149,30 @@ class TestOuvragesByName:
 
 
 class TestPublicationDisplay:
-    def test_generation_failed(
-        self, settings, client, authorization_header, requests_mock
-    ):
+    def test_generation_failed(self, settings, admin_client, requests_mock):
         requests_mock.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/fake_generation_id/",
             status_code=500,
             text="Oh noes!\nMany errors!",
         )
 
-        response = client.get(
-            "/publication/fake_generation_id/",
-            HTTP_AUTHORIZATION=authorization_header,
-        )
+        response = admin_client.get("/publication/fake_generation_id/")
 
         assert response.context["generation_id"] == "fake_generation_id"
         assert response.context["logs"] == "Oh noes!\nMany errors!"
 
-    def test_generation_in_progress(
-        self, settings, client, authorization_header, requests_mock
-    ):
+    def test_generation_in_progress(self, settings, admin_client, requests_mock):
         requests_mock.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/fake_generation_id/",
             status_code=404,
             text="Étape 1 sur 126",
         )
 
-        response = client.get(
-            "/publication/fake_generation_id/",
-            HTTP_AUTHORIZATION=authorization_header,
-        )
+        response = admin_client.get("/publication/fake_generation_id/")
 
         assert response.context["displayable_step"] == "Étape 1 sur 126"
 
-    def test_generation_success(
-        self, settings, client, authorization_header, requests_mock
-    ):
+    def test_generation_success(self, settings, admin_client, requests_mock):
         requests_mock.get(
             f"{settings.GENERATOR_SERVICE_HOST}/publication/fake_generation_id/",
             status_code=200,
@@ -219,10 +183,7 @@ class TestPublicationDisplay:
             },
         )
 
-        response = client.get(
-            "/publication/fake_generation_id/",
-            HTTP_AUTHORIZATION=authorization_header,
-        )
+        response = admin_client.get("/publication/fake_generation_id/")
 
         assert response.headers["content-type"] == "application/pdf"
         assert response.headers["content-length"] == "123"
