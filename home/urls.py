@@ -1,6 +1,3 @@
-"""
-Router config for home module
-"""
 from django.urls import path
 from django.views.generic import RedirectView
 
