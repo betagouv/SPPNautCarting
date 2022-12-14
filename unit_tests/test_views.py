@@ -142,8 +142,8 @@ class TestOuvragesByName:
         response = admin_client.get("/ouvrages-by-name/")
         assert [ouvrage.name for ouvrage in response.context["ouvrages"]] == [
             "1",
-            "103",
             "2",
+            "103",
             "g4",
         ]
 

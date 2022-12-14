@@ -122,7 +122,7 @@ def ouvrages_by_name(request):
         request,
         "ouvrages_by_name.html",
         {
-            "ouvrages": sorted(ouvrages, key=attrgetter("name")),
+            "ouvrages": natsorted(ouvrages, key=attrgetter("name")),
         },
     )
 
