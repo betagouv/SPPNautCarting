@@ -1,4 +1,4 @@
-<div class="fr-table sppnaut-max-w-100w">
+<div class="fr-table sppnaut-max-w-120w">
     <table>
         <caption class='fr-mb-3w'>{{caption}}</caption>
         <tbody>
@@ -39,6 +39,13 @@
                                     Regénérer
                                 </button>
                             </form>
+                        </td>
+                        <td>
+                            {% if ouvrage.log %}
+                                <a class='fr-link fr-btn--icon-left fr-icon-file-line' href="{{ouvrage.log.url}}" title="{{ ouvrage.log.name }}">
+                                    Log
+                                </a>
+                            {% endif %}
                         </td>
                     {% endif %}
                 </tr>
