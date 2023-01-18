@@ -1,4 +1,4 @@
-<div class="fr-table sppnaut-max-w-100w">
+<div class="fr-table sppnaut-max-w-120w">
     <table>
         <caption class='fr-mb-3w'>{{caption}}</caption>
         <tbody>
@@ -30,7 +30,14 @@
                             </a>
                         {% endif %}
                     </td>
-                    {% if allow_forced_generation %}
+                    {% if has_generation_access %}
+                        <td>
+                            {% if ouvrage.log %}
+                                <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.log.url}}" title="{{ ouvrage.log.name }}">
+                                    Log
+                                </a>
+                            {% endif %}
+                        </td>
                         <td>
                             <form action="" method="POST" onsubmit="return confirm('Voulez-vous regénérer l\'ouvrage {{ ouvrage.name }} ?')">
                                 {% csrf_token %}

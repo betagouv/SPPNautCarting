@@ -24,6 +24,7 @@ class Ouvrage(NamedTuple):
     document: OuvrageFile
     vignette: OuvrageFile | None = None
     metadata: OuvrageFile | None = None
+    log: OuvrageFile | None = None
 
     @classmethod
     def from_json(cls, name, json: dict):
@@ -32,6 +33,7 @@ class Ouvrage(NamedTuple):
 
         document = OuvrageFile.from_json("document.pdf", json["document.pdf"])
         vignette = OuvrageFile.from_json("vignette.jpg", json.get("vignette.jpg"))
+        log = OuvrageFile.from_json("stderr.log", json.get("stderr.log"))
         metadata_file_instances = [
             (x, y)
             for x, y in json.items()
@@ -43,7 +45,7 @@ class Ouvrage(NamedTuple):
             metadata = OuvrageFile.from_json(metadata_name, metadata_json)
         else:
             logging.warning("No metadata found for ouvrage named `%s`", name)
-        return cls(name, document, vignette, metadata)
+        return cls(name, document, vignette, metadata, log)
 
     @property
     def date(self):
