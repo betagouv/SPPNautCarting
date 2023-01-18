@@ -29,9 +29,19 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 
 1. Création des variables d'environnement
 
+En développement :
+
     ```sh
     cp .env.template .env
     ```
+
+Dans les autres environnements, prenez exemple sur le fichier `.env.template` pour configurer vos variables d'environnement sur l'environnement d'execution
+
+1. Implémenter le schéma de la base de données
+
+`./manage.py migrate`
+
+La base de données est composée des tables d'administration de django pour assurer l'authentification
 
 1. Lancement de django
 
