@@ -30,7 +30,14 @@
                             </a>
                         {% endif %}
                     </td>
-                    {% if allow_forced_generation %}
+                    {% if has_generation_access %}
+                        <td>
+                            {% if ouvrage.log %}
+                                <a class='fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line' href="{{ouvrage.log.url}}" title="{{ ouvrage.log.name }}">
+                                    Log
+                                </a>
+                            {% endif %}
+                        </td>
                         <td>
                             <form action="" method="POST" onsubmit="return confirm('Voulez-vous regénérer l\'ouvrage {{ ouvrage.name }} ?')">
                                 {% csrf_token %}
@@ -39,13 +46,6 @@
                                     Regénérer
                                 </button>
                             </form>
-                        </td>
-                        <td>
-                            {% if ouvrage.log %}
-                                <a class='fr-link' href="{{ouvrage.log.url}}" title="{{ ouvrage.log.name }}">
-                                    Log
-                                </a>
-                            {% endif %}
                         </td>
                     {% endif %}
                 </tr>

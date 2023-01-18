@@ -19,49 +19,6 @@ class TestOuvrage:
             OuvrageFile("document.pdf", "http://fake.url", datetime.date(2022, 9, 16)),
         )
 
-    def test_document_pdf_with_vignette_and_metadata_and_log(self):
-        ouvrage = Ouvrage.from_json(
-            "103",
-            {
-                "document.pdf": {
-                    "date": "2022-09-16T14:57:18.066Z",
-                    "url": "http://fake.url",
-                },
-                "vignette.jpg": {
-                    "date": "2022-10-22T14:57:18.066Z",
-                    "url": "http://fake_vignette.url",
-                },
-                "OUVNAUT_IN_G4.xml": {
-                    "date": "2022-09-10T14:57:18.066Z",
-                    "url": "http://fake_metadata.url",
-                },
-                "stderr.log": {
-                    "date": "2023-01-02T14:57:18.066Z",
-                    "url": "http://fake_log.url",
-                },
-            },
-        )
-
-        assert ouvrage == Ouvrage(
-            "103",
-            OuvrageFile("document.pdf", "http://fake.url", datetime.date(2022, 9, 16)),
-            OuvrageFile(
-                "vignette.jpg",
-                "http://fake_vignette.url",
-                datetime.date(2022, 10, 22),
-            ),
-            OuvrageFile(
-                "OUVNAUT_IN_G4.xml",
-                "http://fake_metadata.url",
-                datetime.date(2022, 9, 10),
-            ),
-            OuvrageFile(
-                "stderr.log",
-                "http://fake_log.url",
-                datetime.date(2023, 1, 2),
-            ),
-        )
-
     def test_document_pdf_with_unknown_files(self):
         ouvrage = Ouvrage.from_json(
             "103",
@@ -91,7 +48,7 @@ class TestOuvrage:
         assert ouvrage == Ouvrage(
             "103",
             OuvrageFile("document.pdf", "http://fake.url", datetime.date(2022, 9, 16)),
-        ), "metadata and vignette should be named OUVNAUT*.xml and vignette.jpg"
+        ), "metadata, vignette and log should be named OUVNAUT*.xml, vignette.jpg and stderr.log"
 
     def test_document_pdf_with_2_metadata_files(self):
         ouvrage = Ouvrage.from_json(
@@ -163,6 +120,7 @@ class TestOuvrage:
             },
         )
 
+        assert ouvrage.name == "103"
         assert ouvrage.document == OuvrageFile(
             "document.pdf", "http://fake.url", datetime.date(2022, 9, 16)
         )

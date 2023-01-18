@@ -8,7 +8,7 @@
     <h1>Ouvrages en production (par date)</h1>
 
     {% for caption,ouvrages in ouvrages_by_date.items %}
-        {% include "partial/ouvrage_table.html" with allow_forced_generation=True %}
+        {% include "partial/ouvrage_table.html" with has_generation_access=True %}
     {% endfor %}
 
 
