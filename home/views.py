@@ -7,6 +7,7 @@ from collections import defaultdict
 from http import HTTPStatus
 from operator import attrgetter
 
+import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -123,6 +124,21 @@ def ouvrages_by_name(request):
         "ouvrages_by_name.html",
         {
             "ouvrages": natsorted(ouvrages, key=attrgetter("name")),
+        },
+    )
+
+
+def display_document_xml(request):
+
+    response = generator.get(f"{settings.GENERATOR_SERVICE_HOST}/carting/c22_S1xyp/")
+    document_xml = requests.get(response.text)
+
+    return render(
+        request,
+        "display_document_xml.html",
+        {
+            "presigned_url": response.text,
+            "document_xml": document_xml.content.decode("utf-16"),
         },
     )
 
