@@ -40,4 +40,9 @@ urlpatterns = [
         views.ouvrages_by_name,
         name="ouvrages_by_name",
     ),
+    path(
+        "display-document-xml/",
+        views.display_document_xml,
+        name="display_document_xml",
+    ),
 ]
