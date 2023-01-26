@@ -1,29 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<xsl:transform version="1.0"
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xsl:stylesheet version="1.0"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-<xsl:template match="/">
-
-    <xsl:for-each select="sPara">
-
-        <h4>
-            Titre : <xsl:value-of select="titre/texte/txt"/>
-        </h4>
-
-        <xsl:value-of select="nmrAlinea"/>
-
-        <xsl:for-each select="alinea">
-            <h5>
-                Num Alinea : <xsl:value-of select="nmrAlinea"/>
-            </h5>
-            <div>
-                Texte Alinea : <xsl:value-of select="texte"/>
-            </div>
-        </xsl:for-each>
-
-    </xsl:for-each>
-
+<xsl:output method="html" indent="yes" encoding="iso-8859-1"/>
+<xsl:template match="sPara">
+    <html><body>
+        <xsl:apply-templates/>
+    </body></html>
+</xsl:template>
+<xsl:template match="sPara/titre/nmrAlinea">
+    <h5> <xsl:apply-templates/> </h5>
+</xsl:template>
+<xsl:template match="sPara/titre/texte/txt">
+    <h4 align="center"> <xsl:apply-templates/> </h4>
+</xsl:template>
+<xsl:template match="sPara/alinea/nmrAlinea">
+    <h6> <xsl:apply-templates/> </h6>
+</xsl:template>
+<xsl:template match="sPara/alinea/texte">
+    <p> <xsl:apply-templates/> </p>
 </xsl:template>
 
-</xsl:transform>
+</xsl:stylesheet>
