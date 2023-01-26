@@ -180,7 +180,7 @@ def display_document_xml(request):
         "display_document_xml.html",
         {
             "presigned_url": response.text,
-            "document_xml": ET.tostring(transform_spara, pretty_print=True),
+            "document_xml": ET.tounicode(transform_spara, pretty_print=True),
         },
     )
 
