@@ -5,5 +5,5 @@
 {% block content %}
 - Presigned URL: {{ presigned_url }}<br><br><br>
 - Document XML:<br>
-<div style="white-space: pre-wrap;">{{ document_xml }}</div>
+{{ document_xml | safe }}
 {% endblock %}
