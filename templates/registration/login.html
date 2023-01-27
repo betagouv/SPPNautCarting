@@ -10,11 +10,6 @@
     {% endif %}
 {% endif %}
 
-<div class="fr-alert fr-alert--info">
-    <h3 class="fr-alert__title">Information : Transition de la méthode de connexion</h3>
-    <p>En attendant que tout le monde reçoive des identifiants de connexion personnels, vous pouvez continuer à utiliser l'identifiant commun.</p>
-</div>
-
 <form method="post" action="">
     {% csrf_token %}
     <div class="fr-input-group fr-mt-3w {% if form.errors %}fr-input-group--error{% endif %}">
