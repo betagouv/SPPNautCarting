@@ -22,8 +22,13 @@ urlpatterns = [
     ),
     path(
         "publication/<slug:generation_id>/",
-        views.publication_display,
-        name="publication_display",
+        views.publication_generation_in_progress,
+        name="publication_generation_in_progress",
+    ),
+    path(
+        "publication/<slug:generation_id>/ended/",
+        views.publication_generation_ended,
+        name="publication_generation_ended",
     ),
     path(
         "ouvrages-by-date/",

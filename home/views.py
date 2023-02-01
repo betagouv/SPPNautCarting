@@ -78,19 +78,52 @@ class PublicationReferentiel(LoginRequiredMixin, FormView):
         json_response = response.json()
         generation_id = json_response["generation_id"]
 
-        return redirect("home:publication_display", generation_id=generation_id)
+        return redirect(
+            "home:publication_generation_in_progress", generation_id=generation_id
+        )
 
 
 publication_referentiel = PublicationReferentiel.as_view()
 
 
 @login_required
-def publication_display(request, generation_id):
+def publication_generation_in_progress(request, generation_id):
     publication_url = _generate_publication_url(generation_id, "")
     response = generator.get(publication_url)
 
+    if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+        return redirect("home:publication_generation_ended", generation_id)
+
     if response.status_code == HTTPStatus.OK:
-        return _forward_http_file(response)
+        # When a HTTP or HTML redirect triggers a download, the browser keeps displaying the last page.
+        # If we did an HTTP redirect, users would see an infinite loader with "Etape N of N:".
+        # Instead, we do an HTML redirect which allows us to display a "Generation done" feedback.
+        # HTML redirect = HTML containing <meta name="refresh" content="0;url=destination">
+        return render(
+            request,
+            "publication_generation_success.html",
+            {
+                "generation_id": generation_id,
+            },
+        )
+
+    return render(
+        request,
+        "publication_generation_in_progress.html",
+        {
+            "displayable_step": response.text,
+            "generation_id": generation_id,
+        },
+    )
+
+
+@login_required
+def publication_generation_ended(request, generation_id):
+    publication_url = _generate_publication_url(generation_id, "")
+    response = generator.get(publication_url)
+
+    if response.status_code == HTTPStatus.NOT_FOUND:
+        return redirect("home:publication_generation_in_progress", generation_id)
 
     if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
         return render(
@@ -99,11 +132,7 @@ def publication_display(request, generation_id):
             {"generation_id": generation_id, "logs": response.text},
         )
 
-    return render(
-        request,
-        "generating_page.html",
-        {"displayable_step": response.text},
-    )
+    return _forward_http_file(response)
 
 
 @login_required
@@ -139,7 +168,9 @@ class OuvragesByDate(LoginRequiredMixin, FormView):
         json_response = response.json()
         generation_id = json_response["generation_id"]
 
-        return redirect("home:publication_display", generation_id=generation_id)
+        return redirect(
+            "home:publication_generation_in_progress", generation_id=generation_id
+        )
 
     def get_context_data(self, **kwargs):
         ouvrages_from_generator = generator.get(

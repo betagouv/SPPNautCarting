@@ -1,0 +1,19 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+{% block page_title %}Génération terminée{% endblock page_title %}
+
+{% block meta %}
+<meta http-equiv='refresh' content='0;url={% url "home:publication_generation_ended" generation_id %}'>
+{% endblock meta %}
+
+{% block content %}
+<h1>Génération terminée</h1>
+<p>
+    Un téléchargement a démarré dans votre navigateur,
+    si ce n'est pas le cas vous pouvez
+    <a href="{% url "home:publication_generation_ended" generation_id %}">
+        lancer le téléchargement en cliquant ici
+    </a>.
+</p>
+{% endblock content %}
