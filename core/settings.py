@@ -30,7 +30,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django.contrib.gis",
     "home",
+    "carting",
 ]
 
 MIDDLEWARE = [
@@ -70,7 +72,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": config("POSTGRESQL_ADDON_DB"),
         "USER": config("POSTGRESQL_ADDON_USER"),
         "PASSWORD": config("POSTGRESQL_ADDON_PASSWORD"),
