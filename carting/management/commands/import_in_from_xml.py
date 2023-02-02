@@ -4,30 +4,68 @@ import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from carting.models import Element, ElementTypology
 from core import generator
 
 
 class INElement:
     element: ET.Element
+    xpath: str
 
-    def __init__(self, element):
+    def __init__(
+        self,
+        element,
+        *args,
+        typology: ElementTypology,
+        xpath_prefix="/document",
+        **kwargs,
+    ):
         self.element = element
-
-    def get_bpn_id(self):
-        return (
-            self.element.attrib["bpn_id"]
-            if "bpn_id" in self.element.attrib
-            else "not found"
+        self.typology = typology
+        self.xpath = (
+            f"{xpath_prefix}/{self.typology.label}[@bpn_id={self.get_bpn_id()}]"
         )
 
-    def get_content(self):
-        return ET.fromstring(self.element)
+    def get_bpn_id(self):
+        return self.element.attrib["bpn_id"] if "bpn_id" in self.element.attrib else ""
 
-
-class INChapterElement(INElement):
     def get_content(self):
-        titre = self.element.find("titre")
-        return ET.tostring(titre, encoding="unicode", method="xml")
+        if self.typology == ElementTypology.OUVRAGE:
+            return ""
+        if self.typology in [
+            ElementTypology.CHAPTER,
+            ElementTypology.SUBCHAPTER,
+            ElementTypology.PARAGRAPH,
+            ElementTypology.SUBPARAGRAPH,
+            ElementTypology.SUBSUBPARAGRAPH,
+        ]:
+            titre = self.element.find("titre")
+            return ET.tostring(titre, encoding="unicode", method="xml")
+        return ET.tostring(self.element, encoding="unicode", method="xml")
+
+    def iter(self, tag):
+        return self.element.iter(tag)
+
+    def update_or_create(
+        self,
+    ):
+        Element.objects.update_or_create(
+            bpn_id=self.get_bpn_id(),
+            typology=ElementTypology.OUVRAGE,
+            defaults={
+                "content": self.get_content(),
+                "xpath": self.xpath,
+            },
+        )
+
+    def create_children(self):
+        for typology in ElementTypology:
+            for element in self.element.findall(typology.label):
+                in_element = INElement(
+                    element, typology=typology, xpath_prefix=self.xpath
+                )
+                in_element.update_or_create()
+                in_element.create_children()
 
 
 class Command(BaseCommand):
@@ -51,15 +89,12 @@ class Command(BaseCommand):
         )
         document_xml = requests.get(response.text)
         content_document_xml = document_xml.text  # .content.decode("utf-8")
-        content_root = ET.fromstring(content_document_xml)
-        ouvrage = content_root.find("ouvrage")
-        for chapter in [
-            INChapterElement(chapter) for chapter in ouvrage.iter("chapitre")
-        ]:
 
-            print(f"Chapter {chapter.get_bpn_id()}")
-            print(chapter.get_content())
-            for chapter_alinea in chapter.element.findall("alinea"):
-                print(f"Alinea {get_bpn_id(chapter_alinea)}")
-            for sub_chapter in chapter.element.iter("sChapitre"):
-                print(f"SubChapter {get_bpn_id(sub_chapter)}")
+        content_root = ET.fromstring(content_document_xml)
+        ouvrage = INElement(
+            content_root.find(ElementTypology.OUVRAGE.label),
+            typology=ElementTypology.OUVRAGE,
+            xpath_prefix="/document",
+        )
+        ouvrage.update_or_create()
+        ouvrage.create_children()

@@ -10,6 +10,8 @@ class CustomOSMWidget(forms.widgets.OSMWidget):
     display_raw = True
 
 
+# https://github.com/django/django/blob/f3c89744cc801cc7d134bca9958c4a74aa76380f/django/contrib/gis/forms/widgets.py#L125
+# template openlayers.html à investiguers
 class CustomOSMWidget2(forms.widgets.OpenLayersWidget):
     """
     An OpenLayers/OpenStreetMap-based widget.
