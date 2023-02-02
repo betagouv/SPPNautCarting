@@ -12,6 +12,7 @@ class ElementTypology(models.TextChoices):
     REFERENCE = "REFERENCE", "reference"
     TOPONYME = "TOPONYME", "primaire"
     TABLE = "TABLE", "tableau"
+    ILLUSTRATION = "ILLUSTRATION", "illustration"
 
 
 # Create your models here.

@@ -1,3 +1,4 @@
+import logging
 import xml.etree.ElementTree as ET
 
 import requests
@@ -15,18 +16,15 @@ class INElement:
     def __init__(
         self,
         element,
-        *args,
         typology: ElementTypology,
         xpath_prefix="/document",
-        **kwargs,
     ):
         self.element = element
         self.typology = typology
-        self.xpath = (
-            f"{xpath_prefix}/{self.typology.label}[@bpn_id={self.get_bpn_id()}]"
-        )
+        self.xpath = f"{xpath_prefix}/{self.typology.label}[@bpn_id={self.bpn_id}]"
 
-    def get_bpn_id(self):
+    @property
+    def bpn_id(self):
         return self.element.attrib["bpn_id"] if "bpn_id" in self.element.attrib else ""
 
     def get_content(self):
@@ -50,12 +48,15 @@ class INElement:
         self,
     ):
         Element.objects.update_or_create(
-            bpn_id=self.get_bpn_id(),
-            typology=ElementTypology.OUVRAGE,
+            bpn_id=self.bpn_id,
+            typology=self.typology,
             defaults={
                 "content": self.get_content(),
                 "xpath": self.xpath,
             },
+        )
+        logging.warning(
+            "Element %s créé avec l'id %s", self.typology.label, self.bpn_id
         )
 
     def create_children(self):
@@ -78,14 +79,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        def get_bpn_id(element):
-            return (
-                element.attrib["bpn_id"] if "bpn_id" in element.attrib else "not found"
-            )
 
-        ouvrage = options["ouvrage"]
+        ouvrage_name = options["ouvrage"]
         response = generator.get(
-            f"{settings.GENERATOR_SERVICE_HOST}/carting/{ouvrage}/"
+            f"{settings.GENERATOR_SERVICE_HOST}/carting/{ouvrage_name}/"
         )
         document_xml = requests.get(response.text)
         content_document_xml = document_xml.text  # .content.decode("utf-8")
@@ -98,3 +95,4 @@ class Command(BaseCommand):
         )
         ouvrage.update_or_create()
         ouvrage.create_children()
+        # todo : Compteur du nombre d'éléments créés / mis à jour

@@ -6,6 +6,9 @@ from .models import Element
 # Register your models here.
 @admin.register(Element)
 class ElementAdmin(admin.GISModelAdmin):
+
+    ordering = ("id",)
+
     gis_widget_kwargs = {
         "attrs": {
             "default_lat": 48.6,
