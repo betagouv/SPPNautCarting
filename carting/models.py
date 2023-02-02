@@ -1,16 +1,4 @@
-from django.contrib.gis import forms
 from django.contrib.gis.db import models
-
-from carting.widgets import CustomOSMWidget2
-
-
-class OSMGeometryFormField(forms.GeometryField):
-    widget = CustomOSMWidget2
-    pass
-
-
-class OSMGeometryField(models.GeometryField):
-    form_class = OSMGeometryFormField
 
 
 # Create your models here.
@@ -39,7 +27,7 @@ class Element(models.Model):
     xpath = models.CharField(
         max_length=511
     )  # fixme : 512-1, is it the right convention ?
-    geometry = OSMGeometryField(null=True, blank=True, default=None, srid=4326)
+    geometry = models.GeometryField(null=True, blank=True, default=None, srid=4326)
 
     def __str__(self):
         return f"{self.bpn_id} - {self.typology} - {self.xpath}"
