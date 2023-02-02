@@ -7,7 +7,7 @@ from .models import Element
 @admin.register(Element)
 class ElementAdmin(admin.GISModelAdmin):
 
-    ordering = ("id",)
+    ordering = ("bpn_id",)
 
     gis_widget_kwargs = {
         "attrs": {

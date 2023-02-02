@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.utils import IntegrityError
 
 from carting.models import Element, ElementTypology
 from core import generator
@@ -16,12 +17,17 @@ class INElement:
     def __init__(
         self,
         element,
+        *,
         typology: ElementTypology,
         xpath_prefix="/document",
+        ouvrage_name,
     ):
         self.element = element
         self.typology = typology
-        self.xpath = f"{xpath_prefix}/{self.typology.label}[@bpn_id={self.bpn_id}]"
+        self.xpath = f"{xpath_prefix}/{self.typology.label}" + (
+            f"[@bpn_id={self.bpn_id}]" if self.bpn_id else ""
+        )
+        self.ouvrage_name = ouvrage_name
 
     @property
     def bpn_id(self):
@@ -47,23 +53,31 @@ class INElement:
     def update_or_create(
         self,
     ):
-        Element.objects.update_or_create(
-            bpn_id=self.bpn_id,
-            typology=self.typology,
-            defaults={
-                "content": self.get_content(),
-                "xpath": self.xpath,
-            },
-        )
-        logging.warning(
-            "Element %s créé avec l'id %s", self.typology.label, self.bpn_id
-        )
+        if self.bpn_id:
+            try:
+                Element.objects.update_or_create(
+                    bpn_id=self.bpn_id,
+                    typology=self.typology,
+                    ouvrage_name=self.ouvrage_name,
+                    defaults={
+                        "content": self.get_content(),
+                        "xpath": self.xpath,
+                    },
+                )
+                logging.warning(
+                    "Element %s créé avec l'id %s", self.typology.label, self.bpn_id
+                )
+            except IntegrityError:
+                logging.error("Element avec bpn_id %s existe déjà", self.bpn_id)
 
     def create_children(self):
         for typology in ElementTypology:
             for element in self.element.findall(typology.label):
                 in_element = INElement(
-                    element, typology=typology, xpath_prefix=self.xpath
+                    element,
+                    typology=typology,
+                    xpath_prefix=self.xpath,
+                    ouvrage_name=self.ouvrage_name,
                 )
                 in_element.update_or_create()
                 in_element.create_children()
@@ -92,6 +106,7 @@ class Command(BaseCommand):
             content_root.find(ElementTypology.OUVRAGE.label),
             typology=ElementTypology.OUVRAGE,
             xpath_prefix="/document",
+            ouvrage_name=ouvrage_name,
         )
         ouvrage.update_or_create()
         ouvrage.create_children()

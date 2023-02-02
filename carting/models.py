@@ -18,18 +18,17 @@ class ElementTypology(models.TextChoices):
 # Create your models here.
 class Element(models.Model):
 
-    bpn_id = models.CharField(max_length=32)
+    bpn_id = models.CharField(max_length=32, primary_key=True)
     content = models.TextField(null=True, blank=True, default=None)
     typology = models.CharField(
-        max_length=255,
+        max_length=25,
         choices=ElementTypology.choices,
         null=True,
         blank=True,  # fixme : do we need it ?
         default=None,
     )
-    xpath = models.CharField(
-        max_length=511
-    )  # fixme : 512-1, is it the right convention ?
+    xpath = models.CharField(max_length=512)
+    ouvrage_name = models.CharField(max_length=10)
     geometry = models.GeometryField(null=True, blank=True, default=None, srid=4326)
 
     def __str__(self):
