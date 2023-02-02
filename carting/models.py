@@ -5,6 +5,8 @@ from django.contrib.gis.db import models
 from django.core.serializers import serialize
 from django.utils.safestring import mark_safe
 
+xslt_transform = ET.XSLT(ET.parse("carting/document.xslt"))
+
 
 class SectionTypology(models.TextChoices):
     OUVRAGE = "OUVRAGE", "ouvrage"
@@ -49,10 +51,6 @@ class INSection(models.Model):
 
         if not self.content:
             return ""
+        xslt_transform = ET.XSLT(ET.parse("carting/document.xslt"))
 
-        content_root = ET.fromstring(self.content)
-        content_xslt = ET.parse("carting/document.xslt")
-        transform = ET.XSLT(content_xslt)
-        transform_content = transform(content_root)
-
-        return mark_safe(transform_content)
+        return mark_safe(xslt_transform(ET.fromstring(self.content)))

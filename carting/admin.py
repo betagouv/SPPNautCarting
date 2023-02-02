@@ -9,8 +9,20 @@ logger = logging.getLogger(__name__)
 
 
 @admin.register(INSection)
-class ElementAdmin(admin.GISModelAdmin):
+class INSectionAdmin(admin.GISModelAdmin):
+    gis_widget = CustomOSMWidget
     ordering = ("numero",)
     list_display = ("__str__", "bpn_id", "ouvrage_name")
-    gis_widget = CustomOSMWidget
     search_fields = ("bpn_id", "numero", "content")
+    readonly_fields = (
+        "bpn_id",
+        "numero",
+        "xpath",
+    )
+    fields = (
+        "bpn_id",
+        "numero",
+        "content",
+        "geometry",
+        "xpath",
+    )

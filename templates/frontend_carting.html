@@ -4,6 +4,11 @@
 
 {% block page_title %}Carting{% endblock%}
 
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/carting.css' %}">
+{% endblock %}
+
 {% block main %}
 <div class="fr-container--fluid">
     <div class="fr-grid-row fr-m-1w">
@@ -30,23 +35,24 @@
             </form>
             <hr/>
             <div>
-                {% for element in elements %}
-                    <p>
-                        <a href="{% url 'carting:display_in_with_map' %}?search={{ element.numero }}" class="fr-link">
-                            {{ element.typology }} / {{ element.bpn_id }} :
-                        </a>
-                        {% if element.geometry %}
-                            <button class="fr-btn sppnaut-map"
-                                data-geojson="{{ element.json }}"
-                            >
-                                Voir sur la carte {{ element.geometry.geom_type }}
-                            </button>
-                        {% endif %}
-                    </p>
-                    <p>
-                        {{ element.content_html }}
-                    </p>
-                {% endfor %}
+                <table>
+                    {% for element in elements %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'carting:frontend_carting' %}?search={{ element.numero }}" class="fr-link" title="{{element.get_typology_display}}">
+                                        {{ element.numero }}<br>
+                                    </a>
+                                    {% if element.geometry %}
+                                        <span class="fr-icon-map-pin-2-line" aria-hidden="true" data-geojson="{{ element.json }}"></span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ element.content_html }}
+                                </td>
+                            </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
     </div>
 </div>

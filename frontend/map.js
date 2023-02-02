@@ -28,7 +28,7 @@ const map = new Map({
 });
 window.map = map;
 
-var sppnaut_maps = document.querySelectorAll(".sppnaut-map");
+var sppnaut_maps = document.querySelectorAll("span[data-geojson]");
 for (var i = 0; i < sppnaut_maps.length; i++) {
     sppnaut_maps[i].addEventListener("click", (event) => {
         var source = new VectorSource({

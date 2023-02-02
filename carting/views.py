@@ -8,7 +8,7 @@ from carting.models import INSection
 
 @login_required
 @require_GET
-def display_in_with_map(request):
+def frontend_carting(request):
     elements = []
     search = ""
 
@@ -20,7 +20,7 @@ def display_in_with_map(request):
 
     return render(
         request,
-        "display_in_with_map.html",
+        "frontend_carting.html",
         {
             "elements": elements,
             "search": search,

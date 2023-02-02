@@ -5,15 +5,12 @@ import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from carting.models import INSection, SectionTypology
+from carting.models import SectionTypology
 from core import generator
-
-# from django.db.utils import IntegrityError
 
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        # Named (optional) arguments
         parser.add_argument(
             "--ouvrage",
             required=True,
@@ -27,7 +24,7 @@ class Command(BaseCommand):
             f"{settings.GENERATOR_SERVICE_HOST}/carting/{ouvrage_name}/"
         )
         document_xml = requests.get(response.text)
-        content_document_xml = document_xml.text  # .content.decode("utf-8")
+        content_document_xml = document_xml.text
 
         content_root = ET.fromstring(content_document_xml)
 
