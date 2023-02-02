@@ -1,22 +1,24 @@
 from django.contrib.gis.db import models
 
 
+class ElementTypology(models.TextChoices):
+    OUVRAGE = "OUVRAGE", "ouvrage"
+    CHAPTER = "CHAPTER", "chapitre"
+    SUBCHAPTER = "SUBCHAPTER", "sChapitre"
+    PARAGRAPH = "PARAGRAPH", "para"
+    SUBPARAGRAPH = "SUBPARAGRAPH", "sPara"
+    SUBSUBPARAGRAPH = "SUBSUBPARAGRAPH", "ssPara"
+    ALINEA = "ALINEA", "alinea"
+    REFERENCE = "REFERENCE", "reference"
+    TOPONYME = "TOPONYME", "primaire"
+    TABLE = "TABLE", "tableau"
+
+
 # Create your models here.
 class Element(models.Model):
-    class ElementTypology(models.TextChoices):
-        OUVRAGE = "OUVRAGE", "Ouvrage"
-        CHAPTER = "CHAPTER", "Chapter"
-        SUBCHAPTER = "SUBCHAPTER", "Sub chapter"
-        PARAGRAPH = "PARAGRAPH", "Paragraph"
-        SUBPARAGRAPH = "SUBPARAGRAPH", "SubParagraph"
-        SUBSUBPARAGRAPH = "SUBSUBPARAGRAPH", "SubSubParagraph"
-        ALINEA = "ALINEA", "Alinea"
-        REFERENCE = "REFERENCE", "Reference"
-        TOPONYME = "TOPONYME", "Topomyne"
-        TABLE = "TABLE", "Table"
 
     bpn_id = models.CharField(max_length=32)
-    content = models.TextField()
+    content = models.TextField(null=True, blank=True, default=None)
     typology = models.CharField(
         max_length=255,
         choices=ElementTypology.choices,
