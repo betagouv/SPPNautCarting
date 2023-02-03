@@ -54,21 +54,21 @@ class INElement:
         self,
     ):
         if self.bpn_id:
-            try:
-                Element.objects.update_or_create(
-                    bpn_id=self.bpn_id,
-                    typology=self.typology,
-                    ouvrage_name=self.ouvrage_name,
-                    defaults={
-                        "content": self.get_content(),
-                        "xpath": self.xpath,
-                    },
-                )
-                logging.warning(
-                    "Element %s créé avec l'id %s", self.typology.label, self.bpn_id
-                )
-            except IntegrityError:
-                logging.error("Element avec bpn_id %s existe déjà", self.bpn_id)
+            # try:
+            Element.objects.update_or_create(
+                bpn_id=self.bpn_id,
+                typology=self.typology,
+                ouvrage_name=self.ouvrage_name,
+                defaults={
+                    "content": self.get_content(),
+                    "xpath": self.xpath,
+                },
+            )
+            logging.warning(
+                "Element %s créé avec l'id %s", self.typology.label, self.bpn_id
+            )
+        # except IntegrityError:
+        #     logging.error("Element avec bpn_id %s existe déjà", self.bpn_id)
 
     def create_children(self):
         for typology in ElementTypology:
