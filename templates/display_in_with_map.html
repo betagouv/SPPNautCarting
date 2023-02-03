@@ -1,0 +1,54 @@
+{% extends "layout/base.html" %}
+
+{% block page_title %}Carting{% endblock%}
+
+{% block main %}
+<div class="fr-container--fluid">
+    <div class="fr-grid-row fr-py-6w">
+        <div class="fr-col-12 fr-col-lg-6 fr-mb-2w">
+            CARTE !!!
+        </div>
+        <div class="fr-col-12 fr-col-lg-6 fr-mb-2w">
+            <form method='post'>
+                {% csrf_token %}
+                <div class="fr-search-bar" id="header-search" role="search">
+                    <label class="fr-label" for="{{form.search_field.id_for_label}}">
+                        Recherche
+                    </label>
+                    <input
+                        class="fr-input {% if form.errors %}fr-input--error{% endif %}"
+                        placeholder="Rechercher avec un xpath"
+                        type="search"
+                        id="{{form.search_field.id_for_label}}"
+                        value="{{form.search_field.value}}"
+                        name="{{form.search_field.html_name}}">
+                    <button class="fr-btn" title="Rechercher">
+                        Rechercher
+                    </button>
+                </div>
+                {% for error in form.search_field.errors %}
+                    <p id="text-input-error-desc-error" class="fr-error-text">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+
+            </form>
+            <div>
+                {% for element in elements %}
+                <p>{{ element.bpn_id }}:</p>
+                <ul>
+                        <li>
+                            {{ element.typology }}
+                        </li>
+                        <li>
+                            {{ element.xpath }}
+                        </li>
+                        <li>
+                            {{ element.content }}
+                        </li>
+                    </ul>
+                    {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

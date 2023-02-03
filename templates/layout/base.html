@@ -35,6 +35,7 @@
             {% include "layout/header.html" %}
         {% endblock %}
         <main role="main">
+            {% block main %}
             <div class="fr-container--fluid ds_banner">
                 <div class="fr-container">
                     <div class="fr-grid-row fr-grid-row--gutters fr-py-6w">
@@ -44,6 +45,7 @@
                     </div>
                 </div>
             </div>
+            {% endblock %}
         </main>
         {% block footer %}
             {% include "layout/footer.html" %}

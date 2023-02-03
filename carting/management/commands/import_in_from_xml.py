@@ -4,10 +4,11 @@ import xml.etree.ElementTree as ET
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.utils import IntegrityError
 
 from carting.models import Element, ElementTypology
 from core import generator
+
+# from django.db.utils import IntegrityError
 
 
 class INElement:
@@ -16,17 +17,17 @@ class INElement:
 
     def __init__(
         self,
-        element,
+        element: ET.Element,
         *,
         typology: ElementTypology,
-        xpath_prefix="/document",
-        ouvrage_name,
+        xpath_prefix: str | None = None,
+        ouvrage_name: str,
     ):
         self.element = element
         self.typology = typology
-        self.xpath = f"{xpath_prefix}/{self.typology.label}" + (
-            f"[@bpn_id={self.bpn_id}]" if self.bpn_id else ""
-        )
+        self.xpath = f"{xpath_prefix}/" if xpath_prefix else ""
+        self.xpath += self.typology.label
+        self.xpath += f"[@bpn_id='{self.bpn_id}']" if self.bpn_id else ""
         self.ouvrage_name = ouvrage_name
 
     @property
@@ -55,7 +56,7 @@ class INElement:
     ):
         if self.bpn_id:
             # try:
-            Element.objects.update_or_create(
+            (_, created) = Element.objects.update_or_create(
                 bpn_id=self.bpn_id,
                 typology=self.typology,
                 ouvrage_name=self.ouvrage_name,
@@ -65,7 +66,10 @@ class INElement:
                 },
             )
             logging.warning(
-                "Element %s créé avec l'id %s", self.typology.label, self.bpn_id
+                "Element %s %s avec l'id %s",
+                self.typology.label,
+                ("créé" if created else "mis à jour"),
+                self.bpn_id,
             )
         # except IntegrityError:
         #     logging.error("Element avec bpn_id %s existe déjà", self.bpn_id)
@@ -105,7 +109,6 @@ class Command(BaseCommand):
         ouvrage = INElement(
             content_root.find(ElementTypology.OUVRAGE.label),
             typology=ElementTypology.OUVRAGE,
-            xpath_prefix="/document",
             ouvrage_name=ouvrage_name,
         )
         ouvrage.update_or_create()
