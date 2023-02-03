@@ -4,11 +4,10 @@ import xml.etree.ElementTree as ET
 import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.utils import IntegrityError
 
 from carting.models import Element, ElementTypology
 from core import generator
-
-# from django.db.utils import IntegrityError
 
 
 class INElement:
@@ -20,7 +19,8 @@ class INElement:
         element: ET.Element,
         *,
         typology: ElementTypology,
-        xpath_prefix: str | None = None,
+        xpath_prefix: str = "",
+        numero_prefix: str = "",
         ouvrage_name: str,
     ):
         self.element = element
@@ -28,6 +28,18 @@ class INElement:
         self.xpath = f"{xpath_prefix}/" if xpath_prefix else ""
         self.xpath += self.typology.label
         self.xpath += f"[@bpn_id='{self.bpn_id}']" if self.bpn_id else ""
+        if self.typology == ElementTypology.ALINEA:
+            self.numero = f"{numero_prefix}0.{element.find('nmrAlinea').text}"
+        elif self.typology in [
+            ElementTypology.TABLE,
+            ElementTypology.ILLUSTRATION,
+            ElementTypology.TOPONYME,
+            ElementTypology.OUVRAGE,
+            ElementTypology.REFERENCE,
+        ]:
+            self.numero = numero_prefix
+        else:
+            self.numero = element.find("titre/numero").text
         self.ouvrage_name = ouvrage_name
 
     @property
@@ -55,24 +67,25 @@ class INElement:
         self,
     ):
         if self.bpn_id:
-            # try:
-            (_, created) = Element.objects.update_or_create(
-                bpn_id=self.bpn_id,
-                typology=self.typology,
-                ouvrage_name=self.ouvrage_name,
-                defaults={
-                    "content": self.get_content(),
-                    "xpath": self.xpath,
-                },
-            )
-            logging.warning(
-                "Element %s %s avec l'id %s",
-                self.typology.label,
-                ("créé" if created else "mis à jour"),
-                self.bpn_id,
-            )
-        # except IntegrityError:
-        #     logging.error("Element avec bpn_id %s existe déjà", self.bpn_id)
+            try:
+                (_, created) = Element.objects.update_or_create(
+                    bpn_id=self.bpn_id,
+                    typology=self.typology,
+                    defaults={
+                        "content": self.get_content(),
+                        "xpath": self.xpath,
+                        "numero": self.numero,
+                        "ouvrage_name": self.ouvrage_name,
+                    },
+                )
+                logging.warning(
+                    "Element %s %s avec l'id %s",
+                    self.typology.label,
+                    ("créé" if created else "mis à jour"),
+                    self.bpn_id,
+                )
+            except IntegrityError:
+                logging.error("Element avec bpn_id %s existe déjà", self.bpn_id)
 
     def create_children(self):
         for typology in ElementTypology:
@@ -81,6 +94,7 @@ class INElement:
                     element,
                     typology=typology,
                     xpath_prefix=self.xpath,
+                    numero_prefix=self.numero,
                     ouvrage_name=self.ouvrage_name,
                 )
                 in_element.update_or_create()
@@ -106,6 +120,7 @@ class Command(BaseCommand):
         content_document_xml = document_xml.text  # .content.decode("utf-8")
 
         content_root = ET.fromstring(content_document_xml)
+
         ouvrage = INElement(
             content_root.find(ElementTypology.OUVRAGE.label),
             typology=ElementTypology.OUVRAGE,
