@@ -9,8 +9,8 @@ class ElementTypology(models.TextChoices):
     SUBPARAGRAPH = "SUBPARAGRAPH", "sPara"
     SUBSUBPARAGRAPH = "SUBSUBPARAGRAPH", "ssPara"
     ALINEA = "ALINEA", "alinea"
-    REFERENCE = "REFERENCE", "reference"
-    TOPONYME = "TOPONYME", "principal"
+    REFERENCE = "REFERENCE", "texte/reference"
+    TOPONYME = "TOPONYME", "texte/principal"
     TABLE = "TABLE", "tableau"
     ILLUSTRATION = "ILLUSTRATION", "illustration"
 

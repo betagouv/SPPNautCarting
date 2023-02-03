@@ -28,6 +28,7 @@ class INElement:
         self.xpath = f"{xpath_prefix}/" if xpath_prefix else ""
         self.xpath += self.typology.label
         self.xpath += f"[@bpn_id='{self.bpn_id}']" if self.bpn_id else ""
+        self.ouvrage_name = ouvrage_name
         if self.typology == ElementTypology.ALINEA:
             self.numero = f"{numero_prefix}0.{element.find('nmrAlinea').text}"
         elif self.typology in [
@@ -39,8 +40,7 @@ class INElement:
         ]:
             self.numero = numero_prefix
         else:
-            self.numero = element.find("titre/numero").text
-        self.ouvrage_name = ouvrage_name
+            self.numero = f"{self.ouvrage_name}/{element.find('titre/numero').text}"
 
     @property
     def bpn_id(self):
@@ -125,6 +125,7 @@ class Command(BaseCommand):
             content_root.find(ElementTypology.OUVRAGE.label),
             typology=ElementTypology.OUVRAGE,
             ouvrage_name=ouvrage_name,
+            numero_prefix=ouvrage_name,
         )
         ouvrage.update_or_create()
         ouvrage.create_children()
