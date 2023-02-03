@@ -9,6 +9,8 @@ class ElementAdmin(admin.GISModelAdmin):
 
     ordering = ("bpn_id",)
 
+    search_fields = ("xpath", "bpn_id", "numero")
+
     gis_widget_kwargs = {
         "attrs": {
             "default_lat": 48.6,

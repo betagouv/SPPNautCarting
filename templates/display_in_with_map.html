@@ -17,10 +17,10 @@
                     </label>
                     <input
                         class="fr-input {% if form.errors %}fr-input--error{% endif %}"
-                        placeholder="Rechercher avec un xpath"
+                        placeholder="Rechercher avec un xpath ou un bpn_id"
                         type="search"
                         id="{{form.search_field.id_for_label}}"
-                        value="{{form.search_field.value}}"
+                        value="{{form.search_field.value|default_if_none:''}}"
                         name="{{form.search_field.html_name}}">
                     <button class="fr-btn" title="Rechercher">
                         Rechercher
@@ -33,21 +33,18 @@
                 {% endfor %}
 
             </form>
+            <hr/>
             <div>
                 {% for element in elements %}
-                <p>{{ element.bpn_id }}:</p>
-                <ul>
-                        <li>
-                            {{ element.typology }}
-                        </li>
-                        <li>
-                            {{ element.xpath }}
-                        </li>
-                        <li>
-                            {{ element.content }}
-                        </li>
-                    </ul>
-                    {% endfor %}
+                <p><a href="javascript:{}" role="button" onclick="document.getElementById('{{ element.bpn_id }}').submit()">
+                    {{ element.typology }} / {{ element.bpn_id }} : </a>
+                    <form method='post' id="{{ element.bpn_id }}">
+                        {% csrf_token %}
+                        <input name="{{form.search_field.html_name}}" value="{{ element.bpn_id }}" type="hidden"></input>
+                    </form>
+                    {{ element.content_html }}
+                </p>
+                {% endfor %}
         </div>
     </div>
 </div>

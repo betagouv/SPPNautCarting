@@ -1,7 +1,9 @@
 import requests
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import render
+from django.utils.safestring import mark_safe
 from django.views.generic import FormView
 
 from carting.forms import XPathSearchForm
@@ -24,7 +26,12 @@ class DisplayINWithMap(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         search_field = form.cleaned_data["search_field"]
-        elements = Element.objects.filter(xpath__startswith=search_field)
+        elements = Element.objects.filter(xpath__icontains=search_field).order_by(
+            "numero"
+        )
+        for element in elements:
+            element.content_html = mark_safe(diplay_xml_as_text(element.content))
+
         return render(
             self.request,
             "display_in_with_map.html",
@@ -33,6 +40,16 @@ class DisplayINWithMap(LoginRequiredMixin, FormView):
                 "form": form,
             },
         )
+
+
+def diplay_xml_as_text(content):
+    import lxml.etree as ET
+
+    content_root = ET.fromstring(content.encode("utf-16"))
+    content_xslt = ET.parse("carting/document.xslt")
+    transform = ET.XSLT(content_xslt)
+    transform_content = transform(content_root)
+    return transform_content
 
 
 # Create your views here.
@@ -44,7 +61,7 @@ def display_document_xml(request, ouvrage):
     import lxml.etree as ET
 
     content_root = ET.fromstring(content_document_xml)
-    content_xslt = ET.parse("home/document.xslt")
+    content_xslt = ET.parse("carting/document.xslt")
     transform = ET.XSLT(content_xslt)
 
     paragraphe = None
