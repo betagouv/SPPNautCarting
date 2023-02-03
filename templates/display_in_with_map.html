@@ -9,41 +9,30 @@
             CARTE !!!
         </div>
         <div class="fr-col-12 fr-col-lg-6 fr-mb-2w">
-            <form method='post'>
-                {% csrf_token %}
-                <div class="fr-search-bar" id="header-search" role="search">
-                    <label class="fr-label" for="{{form.search_field.id_for_label}}">
-                        Recherche
-                    </label>
+            <form>
+                <div class="fr-search-bar" role="search">
                     <input
-                        class="fr-input {% if form.errors %}fr-input--error{% endif %}"
+                        class="fr-input"
                         placeholder="Rechercher avec un xpath ou un bpn_id"
                         type="search"
-                        id="{{form.search_field.id_for_label}}"
-                        value="{{form.search_field.value|default_if_none:''}}"
-                        name="{{form.search_field.html_name}}">
+                        value="{{search|default_if_none:''}}"
+                        name="search">
                     <button class="fr-btn" title="Rechercher">
                         Rechercher
                     </button>
                 </div>
-                {% for error in form.search_field.errors %}
-                    <p id="text-input-error-desc-error" class="fr-error-text">
-                        {{ error }}
-                    </p>
-                {% endfor %}
-
             </form>
             <hr/>
             <div>
                 {% for element in elements %}
-                <p><a href="javascript:{}" role="button" onclick="document.getElementById('{{ element.bpn_id }}').submit()">
-                    {{ element.typology }} / {{ element.bpn_id }} : </a>
-                    <form method='post' id="{{ element.bpn_id }}">
-                        {% csrf_token %}
-                        <input name="{{form.search_field.html_name}}" value="{{ element.bpn_id }}" type="hidden"></input>
-                    </form>
-                    {{ element.content_html }}
-                </p>
+                    <p>
+                        <a href="{% url 'carting:display_in_with_map' %}?search={{ element.numero }}" class="fr-link">
+                            {{ element.typology }} / {{ element.bpn_id }} :
+                        </a>
+                    </p>
+                    <p>
+                        {{ element.content_html }}
+                    </p>
                 {% endfor %}
         </div>
     </div>
