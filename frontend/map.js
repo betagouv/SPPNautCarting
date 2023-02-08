@@ -2,8 +2,10 @@ import "ol/ol.css";
 
 import TileLayer from 'ol/layer/Tile.js';
 import Map from 'ol/Map.js';
+import { useGeographic } from 'ol/proj.js';
 import OSM from 'ol/source/OSM.js';
 import View from 'ol/View.js';
+useGeographic();
 
 const map = new Map({
     layers: [
@@ -13,7 +15,7 @@ const map = new Map({
     ],
     target: 'map',
     view: new View({
-        center: [0, 0],
-        zoom: 2,
+        center: [-2, 48],
+        zoom: 12,
     }),
 });
