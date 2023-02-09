@@ -37,10 +37,11 @@
                         </a>
                         {% if element.geometry %}
                             <div class="fr-link sppnaut-map"
-                                id='tata'
+                                data-type="{{ element.geometry.geom_type }}"
+                                data-geom="{{ element.geometry.coords }}"
                                 data-x="{{ element.geometry.coords.0 }}"
                                 data-y="{{ element.geometry.coords.1 }}">
-                                Voir sur la carte
+                                Voir sur la carte {{ element.geometry.geom_type }}
                             </div>
                         {% endif %}
                     </p>
