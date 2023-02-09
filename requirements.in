@@ -1,8 +1,9 @@
 Django
+django-extensions
+lxml
 natsort
 psycopg2
 python-decouple
 requests
 sentry-sdk
 whitenoise
-lxml
