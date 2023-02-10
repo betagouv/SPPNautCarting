@@ -15,7 +15,6 @@ jobs:
           POSTGRES_USER: sppnaut
           POSTGRES_PASSWORD: sppnaut
           POSTGRES_DB: sppnaut
-          # POSTGRES_MULTIPLE_EXTENSIONS: postgis
         options: >-
           --health-cmd pg_isready
           --health-interval 1s
@@ -38,6 +37,10 @@ jobs:
       - name: Install GIS Packages
         run: |
           sudo apt-get install gdal-bin
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
