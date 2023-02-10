@@ -44,7 +44,10 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
 // TODO: allow deleting individual features (#8972)
 {
-    const jsonFormat = new ol.format.GeoJSON();
+    const jsonFormat = new ol.format.GeoJSON({
+        // defaultDataProjection: `EPSG:3857`,
+        // featureProjection: "EPSG:4326",
+    });
 
     function MapWidget(options) {
         this.map = null;
@@ -104,7 +107,11 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         const initial_value = document.getElementById(this.options.id).value;
         if (initial_value) {
             const features = jsonFormat.readFeatures(
-                '{"type": "Feature", "geometry": ' + initial_value + "}"
+                '{"type": "Feature", "geometry": ' + initial_value + "}",
+                {
+                    dataProjection: "EPSG:4326",
+                    featureProjection: "EPSG:3857",
+                }
             );
             const extent = ol.extent.createEmpty();
             features.forEach(function (feature) {
@@ -112,6 +119,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
                 ol.extent.extend(extent, feature.getGeometry().getExtent());
             }, this);
             // Center/zoom the map
+            console.log("Center map", { initial_value, features, extent });
             this.map.getView().fit(extent, { minResolution: 1 });
         } else {
             this.map.getView().setCenter(this.defaultCenter());
@@ -273,8 +281,8 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         }
 
         const value = jsonFormat.writeGeometry(geometry, {
-            // dataProjection: `EPSG:${this.options.map_srid}`,
-            // featureProjection: `EPSG:3857`,
+            dataProjection: `EPSG:${this.options.map_srid}`,
+            featureProjection: `EPSG:3857`,
         });
         console.log({ value, options: this.options });
         document.getElementById(this.options.id).value = value;
