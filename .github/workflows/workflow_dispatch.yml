@@ -2,7 +2,6 @@ name: Test deploy in staging
 
 on:
   pull_request:
-    branches: [display_document_xml_test_deploy]
 
 jobs:
   deploy:
