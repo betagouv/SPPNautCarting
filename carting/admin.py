@@ -1,22 +1,15 @@
+import logging
+
 from django.contrib.gis import admin
 
 from .models import Element
+from .widgets import CustomOSMWidget
+
+logger = logging.getLogger(__name__)
 
 
-# Register your models here.
 @admin.register(Element)
 class ElementAdmin(admin.GISModelAdmin):
-
     ordering = ("bpn_id",)
-
+    gis_widget = CustomOSMWidget
     search_fields = ("xpath", "bpn_id", "numero")
-
-    gis_widget_kwargs = {
-        "attrs": {
-            "default_lat": 48.6,
-            "default_lon": -2.0,
-            "default_zoom": 10,
-            "display_raw": True,
-            "map_srid": 4326,
-        }
-    }

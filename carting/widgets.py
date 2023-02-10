@@ -1,36 +1,36 @@
 from django.contrib.gis import forms
-from django.contrib.gis.geometry import json_regex
 
 
-class CustomOSMWidget(forms.widgets.OSMWidget):
-    map_srid = 4326
+class CustomOSMWidget(forms.widgets.BaseGeometryWidget):
+    template_name = "admin/custom-openlayers.html"
+    default_lon = -2
     default_lat = 48.6
-    default_lon = -2.0
-    default_zoom = 10
+    default_zoom = 12
+    dataset_epsg = "EPSG:4326"
+    map_epsg = "EPSG:3857"
     display_raw = True
 
-
-# https://github.com/django/django/blob/f3c89744cc801cc7d134bca9958c4a74aa76380f/django/contrib/gis/forms/widgets.py#L125
-# template openlayers.html à investiguers
-class CustomOSMWidget2(forms.widgets.OpenLayersWidget):
-    """
-    An OpenLayers/OpenStreetMap-based widget.
-    """
-
-    template_name = "gis/openlayers-osm.html"
-    default_lat = 48.6
-    default_lon = -2.0
-    default_zoom = 10
-    display_raw = True
-    map_srid = 4326
+    class Media:
+        css = {
+            "all": (
+                "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.css",
+                "gis/css/ol3.css",
+            )
+        }
+        js = (
+            "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js",
+            "js/admin-map-widget.js",
+        )
 
     def __init__(self, attrs=None):
-        super().__init__()
+        super().__init__(attrs)
+
         for key in (
-            "default_lon",
-            "default_lat",
+            "dataset_epsg",
+            "map_epsg",
             "default_zoom",
-            "map_srid",
+            "default_lat",
+            "default_lon",
             "display_raw",
         ):
             self.attrs[key] = getattr(self, key)
@@ -38,14 +38,4 @@ class CustomOSMWidget2(forms.widgets.OpenLayersWidget):
             self.attrs.update(attrs)
 
     def serialize(self, value):
-        print("serialize", value, value.srid if value else "")
         return value.json if value else ""
-
-    def deserialize(self, value):
-        geom = super().deserialize(value)
-        print("deserialize", value, self.map_srid, geom.srid)
-        # GeoJSON assumes WGS84 (4326). Use the map's SRID instead.
-        if geom and json_regex.match(value) and self.map_srid != 4326:
-            print("MATCH and self.map_srid != 4326")
-            geom.srid = self.map_srid
-        return geom
