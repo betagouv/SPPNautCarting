@@ -37,6 +37,10 @@ jobs:
       - name: Install GIS Packages
         run: |
           sudo apt-get install gdal-bin
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.tool-versions'
+          cache: 'npm'
       - name: Build assets
         run: |
           npm ci
