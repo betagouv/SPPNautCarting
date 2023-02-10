@@ -1,0 +1,42 @@
+name: Build and test
+
+runs:
+  using: composite
+
+  services:
+    postgres:
+      image: postgis/postgis:14-3.3-alpine
+      env:
+        POSTGRES_USER: sppnaut
+        POSTGRES_PASSWORD: sppnaut
+        POSTGRES_DB: sppnaut
+      options: >-
+        --health-cmd pg_isready
+        --health-interval 1s
+        --health-timeout 1s
+        --health-retries 50
+      ports:
+        - 5434:5432
+
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' # https://github.com/actions/setup-python/issues/571
+    - name: Install GIS Packages
+      run: |
+        sudo apt-get install gdal-bin
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: '.tool-versions'
+        cache: 'npm'
+    - name: Build assets
+      run: |
+        npm ci
+        npm run build
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --require-hashes --no-deps -r requirements.txt -r dev-requirements.txt
+    - name: Run Tests
+      run: |
+        pytest unit_tests
