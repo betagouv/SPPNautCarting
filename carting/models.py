@@ -46,7 +46,7 @@ class Element(models.Model):
 
     @cached_property
     def content_html(self):
-        print("Coucou julie")
+
         if not self.content:
             return ""
 
