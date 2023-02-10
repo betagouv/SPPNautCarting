@@ -1,7 +1,6 @@
 /* global ol */
 "use strict";
 
-console.log("🧨");
 function GeometryTypeControl(opt_options) {
     // Map control to switch type when geometry type is unknown
     const options = opt_options || {};
@@ -44,10 +43,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
 // TODO: allow deleting individual features (#8972)
 {
-    const jsonFormat = new ol.format.GeoJSON({
-        // defaultDataProjection: `EPSG:3857`,
-        // featureProjection: "EPSG:4326",
-    });
+    const jsonFormat = new ol.format.GeoJSON();
 
     function MapWidget(options) {
         this.map = null;
@@ -109,8 +105,10 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
             const features = jsonFormat.readFeatures(
                 '{"type": "Feature", "geometry": ' + initial_value + "}",
                 {
-                    dataProjection: "EPSG:4326",
-                    featureProjection: "EPSG:3857",
+                    // The two next lines are overriden from geodjango sources
+                    // at django/contrib/gis/static/gis/js/OLMapWidget.js
+                    dataProjection: this.options.dataset_epsg,
+                    featureProjection: this.options.map_epsg,
                 }
             );
             const extent = ol.extent.createEmpty();
@@ -119,7 +117,6 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
                 ol.extent.extend(extent, feature.getGeometry().getExtent());
             }, this);
             // Center/zoom the map
-            console.log("Center map", { initial_value, features, extent });
             this.map.getView().fit(extent, { minResolution: 1 });
         } else {
             this.map.getView().setCenter(this.defaultCenter());
@@ -201,11 +198,13 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
     MapWidget.prototype.defaultCenter = function () {
         const center = [this.options.default_lon, this.options.default_lat];
-        if (this.options.map_srid) {
+        if (this.options.map_epsg) {
             return ol.proj.transform(
                 center,
-                this.options.map_srid,
-                this.map.getView().getProjection()
+                // The two next lines are overriden from geodjango sources
+                // at django/contrib/gis/static/gis/js/OLMapWidget.js
+                this.options.dataset_epsg,
+                this.options.map_epsg
             );
         }
         return center;
@@ -281,10 +280,11 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         }
 
         const value = jsonFormat.writeGeometry(geometry, {
-            dataProjection: `EPSG:${this.options.map_srid}`,
-            featureProjection: `EPSG:3857`,
+            // The two next lines are overriden from geodjango sources
+            // at django/contrib/gis/static/gis/js/OLMapWidget.js
+            dataProjection: this.options.dataset_epsg,
+            featureProjection: this.options.map_epsg,
         });
-        console.log({ value, options: this.options });
         document.getElementById(this.options.id).value = value;
     };
 
