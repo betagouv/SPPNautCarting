@@ -164,7 +164,3 @@ sentry_sdk.init(
 )
 LOGIN_REDIRECT_URL = "home:ouvrages_by_name"
 LANGUAGE_CODE = "fr"
-
-# Nico : brew a créé /usr/local/lib/libgdal.dylib
-# GDAL_LIBRARY_PATH = "/opt/homebrew/lib/libgdal.dylib"
-# GEOS_LIBRARY_PATH = "/opt/homebrew/lib/libgeos.dylib"

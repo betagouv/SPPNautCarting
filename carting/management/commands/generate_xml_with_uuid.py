@@ -5,7 +5,7 @@ import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from carting.models import Element, ElementTypology
+from carting.models import INSection, SectionTypology
 from core import generator
 
 # from django.db.utils import IntegrityError
@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
         content_root = ET.fromstring(content_document_xml)
 
-        for topology in ElementTypology:
+        for topology in SectionTypology:
             for element in content_root.iter(topology.label):
                 element.set("bpn_id", str(uuid.uuid4()))
 

@@ -6,7 +6,7 @@ from django.core.serializers import serialize
 from django.utils.safestring import mark_safe
 
 
-class ElementTypology(models.TextChoices):
+class SectionTypology(models.TextChoices):
     OUVRAGE = "OUVRAGE", "ouvrage"
     CHAPTER = "CHAPTER", "chapitre"
     SUBCHAPTER = "SUBCHAPTER", "sChapitre"
@@ -20,14 +20,14 @@ class ElementTypology(models.TextChoices):
     ILLUSTRATION = "ILLUSTRATION", "illustration"
 
 
-class Element(models.Model):
+class INSection(models.Model):
 
-    bpn_id = models.CharField(max_length=40, primary_key=True)
+    bpn_id = models.CharField(max_length=40, unique=True)
     numero = models.CharField(max_length=20, null=True, blank=True, default=None)
     content = models.TextField(null=True, blank=True, default=None)
     typology = models.CharField(
         max_length=25,
-        choices=ElementTypology.choices,
+        choices=SectionTypology.choices,
         null=True,
         blank=True,  # fixme : do we need it ?
         default=None,
@@ -39,7 +39,7 @@ class Element(models.Model):
     geometry = models.GeometryField(null=True, blank=True, default=None, srid=4326)
 
     def __str__(self):
-        return f"{self.numero} - {self.bpn_id} - {self.typology} - {self.xpath}"
+        return f"{self.numero} - {self.typology}"
 
     def json(self):
         return serialize("geojson", [self], fields=("geometry",))

@@ -2,14 +2,15 @@ import logging
 
 from django.contrib.gis import admin
 
-from .models import Element
+from .models import INSection
 from .widgets import CustomOSMWidget
 
 logger = logging.getLogger(__name__)
 
 
-@admin.register(Element)
+@admin.register(INSection)
 class ElementAdmin(admin.GISModelAdmin):
-    ordering = ("bpn_id",)
+    ordering = ("numero",)
+    list_display = ("__str__", "bpn_id", "ouvrage_name")
     gis_widget = CustomOSMWidget
-    search_fields = ("xpath", "bpn_id", "numero")
+    search_fields = ("bpn_id", "numero", "content")

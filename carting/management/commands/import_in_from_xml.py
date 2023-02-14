@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
 
-from carting.models import Element, ElementTypology
+from carting.models import INSection, SectionTypology
 from core import generator
 
 
@@ -18,7 +18,7 @@ class INElement:
         self,
         element: ET.Element,
         *,
-        typology: ElementTypology,
+        typology: SectionTypology,
         xpath_prefix: str = "",
         numero_prefix: str = "",
         ouvrage_name: str,
@@ -29,14 +29,14 @@ class INElement:
         self.xpath += self.typology.label
         self.xpath += f"[@bpn_id='{self.bpn_id}']" if self.bpn_id else ""
         self.ouvrage_name = ouvrage_name
-        if self.typology == ElementTypology.ALINEA:
+        if self.typology == SectionTypology.ALINEA:
             self.numero = f"{numero_prefix}0.{element.find('nmrAlinea').text}"
         elif self.typology in [
-            ElementTypology.TABLE,
-            ElementTypology.ILLUSTRATION,
-            ElementTypology.TOPONYME,
-            ElementTypology.OUVRAGE,
-            ElementTypology.REFERENCE,
+            SectionTypology.TABLE,
+            SectionTypology.ILLUSTRATION,
+            SectionTypology.TOPONYME,
+            SectionTypology.OUVRAGE,
+            SectionTypology.REFERENCE,
         ]:
             self.numero = numero_prefix
         else:
@@ -47,14 +47,14 @@ class INElement:
         return self.element.attrib["bpn_id"] if "bpn_id" in self.element.attrib else ""
 
     def get_content(self):
-        if self.typology == ElementTypology.OUVRAGE:
+        if self.typology == SectionTypology.OUVRAGE:
             return ""
         if self.typology in [
-            ElementTypology.CHAPTER,
-            ElementTypology.SUBCHAPTER,
-            ElementTypology.PARAGRAPH,
-            ElementTypology.SUBPARAGRAPH,
-            ElementTypology.SUBSUBPARAGRAPH,
+            SectionTypology.CHAPTER,
+            SectionTypology.SUBCHAPTER,
+            SectionTypology.PARAGRAPH,
+            SectionTypology.SUBPARAGRAPH,
+            SectionTypology.SUBSUBPARAGRAPH,
         ]:
             titre = self.element.find("titre")
             return ET.tostring(titre, encoding="unicode", method="xml")
@@ -68,7 +68,7 @@ class INElement:
     ):
         if self.bpn_id:
             try:
-                (_, created) = Element.objects.update_or_create(
+                (_, created) = INSection.objects.update_or_create(
                     bpn_id=self.bpn_id,
                     typology=self.typology,
                     defaults={
@@ -88,7 +88,7 @@ class INElement:
                 logging.error("Element avec bpn_id %s existe déjà", self.bpn_id)
 
     def create_children(self):
-        for typology in ElementTypology:
+        for typology in SectionTypology:
             for element in self.element.findall(typology.label):
                 in_element = INElement(
                     element,
@@ -122,8 +122,8 @@ class Command(BaseCommand):
         content_root = ET.fromstring(content_document_xml)
 
         ouvrage = INElement(
-            content_root.find(ElementTypology.OUVRAGE.label),
-            typology=ElementTypology.OUVRAGE,
+            content_root.find(SectionTypology.OUVRAGE.label),
+            typology=SectionTypology.OUVRAGE,
             ouvrage_name=ouvrage_name,
             numero_prefix=ouvrage_name,
         )

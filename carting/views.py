@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
-from carting.models import Element
+from carting.models import INSection
 
 
 @login_required
@@ -14,7 +14,7 @@ def display_in_with_map(request):
 
     if "search" in request.GET:
         search = request.GET["search"]
-        elements = Element.objects.filter(
+        elements = INSection.objects.filter(
             Q(xpath__icontains=search) | Q(numero__startswith=search)
         ).order_by("numero", "xpath")
 
