@@ -9,9 +9,23 @@ SPPNaut est une startup d'Etat dont la mission est la modernisaton et l'ouvertur
 Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 
 -   Python >= 3.10
--   docker et docker-compose pour faire tourner la base de données Postgresql
+-   docker et docker-compose pour faire tourner la base de données Postgresql (cf. [SPPNautGenerator](https://github.com/betagouv/SPPNautGenerator))
 
 ### Installation
+
+1. Installation des librairies nécessaire à GeoDjango (Carting)
+
+Sur Debian/ubuntu,
+
+```sh
+sudo apt-get install binutils libproj-dev gdal-bin
+```
+
+Sur MacOS,
+
+```
+brew install gdal
+```
 
 1. Création et activation de votre environnement virtuel. Par exemple via ces commandes :
 
@@ -48,6 +62,26 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
     `./manage.py runserver 0.0.0.0:8000`
 
     L'interface est disponible sur votre navigateur à l'adresse [http://localhost:8000](http://localhost:8000)
+
+1. Installation des dépendances JS (Carting)
+
+    `npm install`
+
+1. Lancement de parcel pour générer les bundle JS à la volée (Carting)
+
+    `npm run watch`
+
+#### Note pour plus tard
+
+We have to run 2 servers on development env : parcel & python -> to be investiate ([honcho](https://honcho.readthedocs.io/en/latest/index.html), makefile…)
+
+### Ingestion du fichier document.xml d'un ouvrage en base de données (Carting)
+
+Executer,
+
+```
+./manage.py import_in_from_xml --ouvrage z99
+```
 
 ### Lister les licenses
 
