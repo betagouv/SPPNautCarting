@@ -5,7 +5,7 @@ from django.contrib.gis.db import models
 from django.core.serializers import serialize
 from django.utils.safestring import mark_safe
 
-xslt_transform = ET.XSLT(ET.parse("carting/document.xslt"))
+xslt_transform = ET.XSLT(ET.parse("carting/xslt/in_section_html.xslt"))
 
 
 class SectionTypology(models.TextChoices):
@@ -23,8 +23,7 @@ class SectionTypology(models.TextChoices):
 
 
 class INSection(models.Model):
-
-    bpn_id = models.CharField(max_length=40, unique=True)
+    bpn_id = models.UUIDField(editable=False, unique=True)
     numero = models.CharField(max_length=20, null=True, blank=True, default=None)
     content = models.TextField(null=True, blank=True, default=None)
     typology = models.CharField(
@@ -41,16 +40,15 @@ class INSection(models.Model):
     geometry = models.GeometryField(null=True, blank=True, default=None, srid=4326)
 
     def __str__(self):
-        return f"{self.numero} - {self.typology}"
+        return f"{self.numero} - {SectionTypology[self.typology].label}"
 
     def json(self):
         return serialize("geojson", [self], fields=("geometry",))
 
     @cached_property
     def content_html(self):
-
         if not self.content:
             return ""
-        xslt_transform = ET.XSLT(ET.parse("carting/document.xslt"))
+        xslt_transform = ET.XSLT(ET.parse("carting/xslt/in_section_html.xslt"))
 
         return mark_safe(xslt_transform(ET.fromstring(self.content)))

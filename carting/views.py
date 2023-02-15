@@ -8,7 +8,7 @@ from carting.models import INSection
 
 @login_required
 @require_GET
-def frontend_carting(request):
+def index(request):
     elements = []
     search = ""
 
@@ -20,7 +20,7 @@ def frontend_carting(request):
 
     return render(
         request,
-        "frontend_carting.html",
+        "carting/index.html",
         {
             "elements": elements,
             "search": search,

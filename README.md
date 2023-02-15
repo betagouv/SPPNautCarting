@@ -73,7 +73,7 @@ brew install gdal
 
 #### Note pour plus tard
 
-We have to run 2 servers on development env : parcel & python -> to be investiate ([honcho](https://honcho.readthedocs.io/en/latest/index.html), makefile…)
+We have to run 2 servers on development env : parcel & python -> to investigate ([honcho](https://honcho.readthedocs.io/en/latest/index.html), makefile…)
 
 ### Ingestion du fichier document.xml d'un ouvrage en base de données (Carting)
 
