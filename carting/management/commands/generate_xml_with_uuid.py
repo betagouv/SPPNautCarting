@@ -1,5 +1,6 @@
 import uuid
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 import requests
 from django.conf import settings
@@ -21,17 +22,16 @@ class Command(BaseCommand):
 
         ouvrage_name = options["ouvrage"]
         response = generator.get(
-            f"{settings.GENERATOR_SERVICE_HOST}/carting/{ouvrage_name}/"
+            f"{settings.GENERATOR_SERVICE_HOST}/url-for/{ouvrage_name}/xml/document.xml"
         )
         document_xml = requests.get(response.text)
-        content_document_xml = document_xml.text
 
-        content_root = ET.fromstring(content_document_xml)
+        content_root = ET.fromstring(document_xml.text)
 
         for topology in SectionTypology:
             for element in content_root.iter(topology.label):
                 element.set("bpn_id", str(uuid.uuid4()))
 
-        open(f"{ouvrage_name}.xml", "w").write(
+        Path(f"{ouvrage_name}.xml").write_text(
             ET.tostring(content_root, encoding="unicode")
         )
