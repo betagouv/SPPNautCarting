@@ -1,0 +1,60 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block page_title %}Carting{% endblock%}
+
+
+{% block main %}
+<div class="fr-container--fluid">
+    <div class="fr-grid-row fr-m-1w">
+        <div class="fr-col-12 fr-col-lg-6 fr-p-1w">
+
+
+            <div id="map" class="map" style="width: 100%;height: 600px; position: sticky; top: 0; max-height: 100vh;"></div>
+
+
+        </div>
+        <div class="fr-col-12 fr-col-lg-6 fr-p-1w">
+            <form>
+                <div class="fr-search-bar" role="search">
+                    <input
+                        class="fr-input"
+                        placeholder="Cherche par ouvrage/section, ex : z99/4.2.2."
+                        type="search"
+                        value="{{search|default_if_none:''}}"
+                        name="search">
+                    <button class="fr-btn" title="Rechercher">
+                        Rechercher
+                    </button>
+                </div>
+            </form>
+            <hr/>
+            <div>
+                <table>
+                    {% for element in elements %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'carting:index' %}?search={{ element.numero }}" class="fr-link" title="{{element.get_typology_display}}">
+                                        {{ element.numero }}<br>
+                                    </a>
+                                    {% if element.geometry %}
+                                        <span class="fr-icon-map-pin-2-line" aria-hidden="true" data-geojson="{{ element.json }}"></span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ element.content_html }}
+                                </td>
+                            </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<link rel="stylesheet" href="{% static "map.css" %}">
+<script type="module" src="{% static "map.js" %}"></script>
+{% endblock %}

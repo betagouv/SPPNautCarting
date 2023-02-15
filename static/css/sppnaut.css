@@ -13,6 +13,10 @@
     font-style: italic;
 }
 
+.sppnaut-bold {
+    font-weight: bold;
+}
+
 .sppnaut-width-full {
     width: 100%;
 }
