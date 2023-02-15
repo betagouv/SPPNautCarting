@@ -57,23 +57,15 @@ brew install gdal
 
     La base de données est composée des tables d'administration de django pour assurer l'authentification
 
-1. Lancement de django
-
-    `./manage.py runserver 0.0.0.0:8000`
-
-    L'interface est disponible sur votre navigateur à l'adresse [http://localhost:8000](http://localhost:8000)
-
 1. Installation des dépendances JS (Carting)
 
     `npm install`
 
-1. Lancement de parcel pour générer les bundle JS à la volée (Carting)
+1. Lancement des serveurs de développement
 
-    `npm run watch`
+    `honcho start`
 
-#### Note pour plus tard
-
-We have to run 2 servers on development env : parcel & python -> to investigate ([honcho](https://honcho.readthedocs.io/en/latest/index.html), makefile…)
+    L'interface est disponible sur votre navigateur à l'adresse [http://localhost:8000](http://localhost:8000)
 
 ### Ingestion du fichier document.xml d'un ouvrage en base de données (Carting)
 
