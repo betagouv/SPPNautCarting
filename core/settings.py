@@ -164,3 +164,5 @@ sentry_sdk.init(
 )
 LOGIN_REDIRECT_URL = "home:ouvrages_by_name"
 LANGUAGE_CODE = "fr"
+
+SHELL_PLUS_PRINT_SQL = True
