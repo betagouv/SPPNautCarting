@@ -7,27 +7,7 @@ on:
 
 jobs:
   build_and_test:
-    name: Build and test
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgis/postgis:14-3.3-alpine
-        env:
-          POSTGRES_USER: sppnaut
-          POSTGRES_PASSWORD: sppnaut
-          POSTGRES_DB: sppnaut
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 1s
-          --health-timeout 1s
-          --health-retries 50
-        ports:
-          - 5434:5432
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/build_and_test
+    uses: ./.github/workflows/build_and_test.yml
 
   deploy:
     name: Deploy to Clever Cloud

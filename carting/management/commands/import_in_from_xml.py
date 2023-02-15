@@ -114,7 +114,7 @@ class Command(BaseCommand):
 
         ouvrage_name = options["ouvrage"]
         response = generator.get(
-            f"{settings.GENERATOR_SERVICE_HOST}/carting/{ouvrage_name}/"
+            f"{settings.GENERATOR_SERVICE_HOST}/url-for/{ouvrage_name}/xml/document.xml"
         )
         document_xml = requests.get(response.text)
         content_document_xml = document_xml.text  # .content.decode("utf-8")
