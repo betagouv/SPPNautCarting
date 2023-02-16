@@ -14,9 +14,13 @@ def index(request):
 
     if "search" in request.GET:
         search = request.GET["search"]
-        elements = INSection.objects.filter(numero__startswith=search).order_by(
+        ouvrage, _, numero = search.rpartition("/")
+        elements = INSection.objects.filter(numero__startswith=numero).order_by(
             "numero"
         )
+
+        if ouvrage:
+            elements = elements.filter(ouvrage_name=ouvrage)
 
     return render(
         request,

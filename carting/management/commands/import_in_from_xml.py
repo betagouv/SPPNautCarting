@@ -8,23 +8,6 @@ from django.core.management.base import BaseCommand
 from carting.models import INSection, SectionTypology
 from core import generator
 
-count = 0
-
-
-def create_children(parent_in_section, parent_element):
-    for typology in SectionTypology:
-        for element in parent_element.iterfind(typology.label):
-            in_section = INSection.from_xml(
-                element,
-                parent_in_section,
-                typology,
-            )
-            # FIXME : check if in_section is new or has been updated
-            global count
-            count += 1
-            in_section.save()
-            create_children(in_section, element)
-
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -54,6 +37,5 @@ class Command(BaseCommand):
             ouvrage_name=ouvrage_name,
         )
         ouvrage.save()
-        create_children(ouvrage, ouvrage_element)
-        logging.warning(count)
+        INSection.objects.create_children(ouvrage, ouvrage_element)
         # todo : Compteur du nombre d'éléments créés / mis à jour

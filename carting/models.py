@@ -1,3 +1,4 @@
+from collections import defaultdict
 from functools import cached_property
 from xml.etree import ElementTree
 
@@ -24,12 +25,24 @@ class SectionTypology(models.TextChoices):
     ILLUSTRATION = "ILLUSTRATION", "illustration"
 
 
-# class Alinea(INSection):
-#     class Meta:
-#         pas_de_table = True
+class INSectionManager(models.Manager):
+    # Idée : ingest_xml_subtree
+    def create_children(self, parent_in_section, parent_element):
+        for typology in SectionTypology:
+            for element in parent_element.iterfind(typology.label):
+                in_section = INSection.from_xml(
+                    element,
+                    parent_in_section,
+                    typology,
+                )
+                # FIXME : check if in_section is new or has been updated
+                in_section.save()
+                self.create_children(in_section, element)
 
 
 class INSection(TreeNode):
+    objects = INSectionManager()
+
     bpn_id = models.UUIDField(editable=False, primary_key=True)
     numero = models.CharField(max_length=20, null=True, blank=True, default=None)
     content = models.TextField(null=True, blank=True, default=None)
@@ -68,7 +81,7 @@ class INSection(TreeNode):
         ]:
             numero = parent.numero
         else:
-            numero = f"{parent.ouvrage_name}/{element.find('titre/numero').text}"
+            numero = element.find("titre/numero").text
 
         if typology == SectionTypology.OUVRAGE:
             content = ""
