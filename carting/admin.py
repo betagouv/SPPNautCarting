@@ -17,12 +17,10 @@ class INSectionAdmin(admin.GISModelAdmin):
     readonly_fields = (
         "bpn_id",
         "numero",
-        "xpath",
     )
     fields = (
         "bpn_id",
         "numero",
         "content",
         "geometry",
-        "xpath",
     )

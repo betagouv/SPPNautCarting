@@ -14,9 +14,9 @@ def index(request):
 
     if "search" in request.GET:
         search = request.GET["search"]
-        elements = INSection.objects.filter(
-            Q(xpath__icontains=search) | Q(numero__startswith=search)
-        ).order_by("numero", "xpath")
+        elements = INSection.objects.filter(numero__startswith=search).order_by(
+            "numero"
+        )
 
     return render(
         request,
