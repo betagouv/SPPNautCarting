@@ -80,7 +80,7 @@ class INSection(TreeNode):
             SectionTypology.SUBSUBPARAGRAPH,
         ]:
             titre = element.find("titre")
-            content = ElementTree.tostring(titre)
+            content = ElementTree.tostring(titre, encoding="unicode")
         else:
             content = ElementTree.tostring(element, encoding="unicode")
 
