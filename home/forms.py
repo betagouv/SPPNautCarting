@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 
-from home import generator
+from . import generator
 
 
 class UploadFileForm(forms.Form):
