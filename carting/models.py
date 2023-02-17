@@ -62,7 +62,7 @@ class OuvrageSectionManager(models.Manager):
                 )
                 child_ouvrage_section.ingest()
 
-                logging.warning(
+                logging.info(
                     "Section %s ingérée avec l'id %s",
                     typology.label,
                     child_ouvrage_section.bpn_id,
@@ -122,7 +122,15 @@ class OuvrageSection(TreeNode):
     def ingest(self):
         try:
             # This raises if the instance does not exist
-            self.save(update_fields=("numero", "content", "typology", "ouvrage_name"))
+            self.save(
+                update_fields=(
+                    "numero",
+                    "content",
+                    "typology",
+                    "ouvrage_name",
+                    "parent",
+                )
+            )
         except DatabaseError:
             self.save()
 
@@ -153,7 +161,6 @@ class SectionIngester(NamedTuple):
 
 class AlineaIngester(SectionIngester):
     def numero(self, parent: OuvrageSection) -> str:
-        # FIXME: 0. Peut-être plus utile avec l'arborescence?
         return f"{parent.numero}0.{self.element.find('nmrAlinea').text}"
 
 
