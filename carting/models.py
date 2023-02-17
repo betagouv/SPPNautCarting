@@ -125,7 +125,7 @@ class OuvrageSection(TreeNode):
             self.save()
 
     def geojson(self):
-        return serialize("geojson", [self], fields=("geometry",))
+        return serialize("geojson", [self], fields=("geometry", "pk"))
 
     @cached_property
     def content_html(self):

@@ -18,9 +18,13 @@
         <div class="fr-col-12 fr-col-lg-6">
             <div
                 id="map"
-                class="fr-p-1w sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
+                class="fr-p-1w sppnaut-min-h-half-screen sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
             >
             </div>
+            <div id="popup" class="ol-popup">
+                <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+                <div id="popup-content"></div>
+              </div>
         </div>
         <div class="fr-col-12 fr-col-lg-6 fr-p-1w">
             <form>
@@ -40,8 +44,8 @@
             <hr/>
             <div>
                 <table>
-                    {% for section in sections %}
-                        <tr>
+                    {% for section in ancestors|add:descendants %}
+                        <tr id="{{section.pk}}">
                             <td class="sppnaut-v-align-top">
                                 <div class="fr-grid-row">
                                     <span class="fr-col-12">
@@ -53,7 +57,7 @@
                                             {{ section.numero }}
                                         </a>
                                     </span>
-                                    {% if section.geometry %}
+                                    {% if section.geometry and section in descendants %}
                                         <button
                                             class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line fr-col-12"
                                             data-geojson="{{ section.geojson }}"
@@ -63,7 +67,8 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            <td class="sppnaut-v-align-top">
+                            <td class="sppnaut-v-align-top"
+                                data-type="content">
                                 {{ section.content_html }}
                             </td>
                         </tr>

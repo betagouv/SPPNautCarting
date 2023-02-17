@@ -1,7 +1,5 @@
-
-
 .sppnaut-aligncenter {
-    display:flex;
+    display: flex;
     align-items: center;
 }
 
@@ -9,11 +7,11 @@
     vertical-align: top;
 }
 
-.sppnaut-nowrap{
+.sppnaut-nowrap {
     white-space: nowrap;
 }
 
-.sppnaut-italic{
+.sppnaut-italic {
     font-style: italic;
 }
 
@@ -41,6 +39,10 @@
     max-height: 100vh;
 }
 
+.sppnaut-min-h-half-screen {
+    min-height: 50vh;
+}
+
 .sppnaut-max-w-120w {
     max-width: 60rem;
 }
@@ -55,4 +57,8 @@
 
 .sppnaut-top-0 {
     top: 0;
+}
+
+.sppnaut-bg-color-yellow {
+    background-color: yellow;
 }
