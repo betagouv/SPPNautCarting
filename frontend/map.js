@@ -46,8 +46,8 @@ for (var i = 0; i < sppnaut_maps.length; i++) {
         var layer_extent = layer.getSource().getExtent();
         map.getView().setCenter(getCenter(layer_extent));
         map.getView().fit(layer_extent, {
-            maxZoom: 14,
-            padding: [20, 20, 20, 20],
+            maxZoom: 13,
+            padding: [100, 100, 100, 100],
         });
     });
 }

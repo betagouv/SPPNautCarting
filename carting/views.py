@@ -1,32 +1,36 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
-from carting.models import INSection
+from carting.models import OuvrageSection
 
 
 @login_required
 @require_GET
-def index(request):
-    elements = []
-    search = ""
+def index(request: HttpRequest) -> HttpResponse:
+    sections = []
+    search = request.GET.get("search", "")
 
-    if "search" in request.GET:
-        search = request.GET["search"]
-        ouvrage, _, numero = search.rpartition("/")
-        elements = INSection.objects.filter(numero__startswith=numero).order_by(
-            "numero"
-        )
-
+    ouvrage, _, numero = search.rpartition("/")
+    if numero:
+        sections = OuvrageSection.objects.all()
         if ouvrage:
-            elements = elements.filter(ouvrage_name=ouvrage)
+            sections = sections.filter(ouvrage_name=ouvrage)
 
+        try:
+            section = sections.get(numero=numero)
+        except OuvrageSection.DoesNotExist:
+            raise Http404("No MyModel matches the given query.")
+        sections = list(section.ancestors(include_self=True)) + list(
+            section.descendants()
+        )
     return render(
         request,
         "carting/index.html",
         {
-            "elements": elements,
+            "elements": sections,
             "search": search,
         },
     )
