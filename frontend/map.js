@@ -12,13 +12,13 @@ import View from "ol/View.js";
 
 useGeographic();
 
-const fooLayerGroup = new LayerGroup();
+const sectionsLayerGroup = new LayerGroup();
 const map = new Map({
     layers: [
         new TileLayer({
             source: new OSM(),
         }),
-        fooLayerGroup,
+        sectionsLayerGroup,
     ],
     target: "map",
     view: new View({
@@ -26,28 +26,31 @@ const map = new Map({
         zoom: 12,
     }),
 });
+// Expose map to help debug in the browser
 window.map = map;
 
-var sppnaut_maps = document.querySelectorAll("span[data-geojson]");
-for (var i = 0; i < sppnaut_maps.length; i++) {
-    sppnaut_maps[i].addEventListener("click", (event) => {
-        var source = new VectorSource({
-            features: new GeoJSON().readFeatures(
-                JSON.parse(event.target.dataset.geojson)
-            ),
-        });
+const geoSections = document.querySelectorAll("span[data-geojson]");
+for (const geoSection of geoSections) {
+    geoSection.addEventListener("click", showGeometry);
+}
 
-        var layer = new Vector({
-            source: source,
-        });
+function showGeometry(event) {
+    const source = new VectorSource({
+        features: new GeoJSON().readFeatures(
+            JSON.parse(event.target.dataset.geojson)
+        ),
+    });
 
-        fooLayerGroup.getLayers().clear();
-        fooLayerGroup.getLayers().push(layer);
-        var layer_extent = layer.getSource().getExtent();
-        map.getView().setCenter(getCenter(layer_extent));
-        map.getView().fit(layer_extent, {
-            maxZoom: 13,
-            padding: [100, 100, 100, 100],
-        });
+    const layer = new Vector({
+        source: source,
+    });
+
+    sectionsLayerGroup.getLayers().clear();
+    sectionsLayerGroup.getLayers().push(layer);
+    const layer_extent = layer.getSource().getExtent();
+    map.getView().setCenter(getCenter(layer_extent));
+    map.getView().fit(layer_extent, {
+        maxZoom: 13,
+        padding: [100, 100, 100, 100],
     });
 }

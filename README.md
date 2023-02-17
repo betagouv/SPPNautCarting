@@ -80,7 +80,8 @@ We have to run 2 servers on development env : parcel & python -> to investigate 
 Executer,
 
 ```
-./manage.py import_in_from_xml --ouvrage z99
+./manage.py ingest_ouvrage_xml z99
+./manage.py import_some_geometry z99
 ```
 
 ### Lister les licenses

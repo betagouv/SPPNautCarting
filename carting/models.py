@@ -11,9 +11,8 @@ from django.core.serializers import serialize
 from django.db import DatabaseError
 from django.utils.safestring import mark_safe
 from tree_queries.models import TreeNode, TreeQuerySet
-from tree_queries.query import TreeManager
 
-xslt_transform = ET.XSLT(ET.parse("carting/xslt/in_section_html.xslt"))
+xslt_transform = ET.XSLT(ET.parse("carting/xslt/ouvrage_section_html.xslt"))
 
 
 class SectionTypology(models.TextChoices):
@@ -38,7 +37,6 @@ class SectionTypology(models.TextChoices):
             self.SUBPARAGRAPH: ParagraphIngester,
             self.SUBSUBPARAGRAPH: ParagraphIngester,
             self.ALINEA: AlineaIngester,
-            # FIXME: Ne devrait-on pas avoir un autre numéro ?
             self.TABLE: FigureIngester,
             self.ILLUSTRATION: FigureIngester,
             self.TOPONYME: SectionIngester,
@@ -47,10 +45,7 @@ class SectionTypology(models.TextChoices):
         return to_ingester[self]
 
 
-class OuvrageSectionManager(TreeManager):
-
-    _with_tree_fields = True
-
+class OuvrageSectionManager(models.Manager):
     def ingest_xml_subtree(
         self,
         ouvrage_name: str,
@@ -80,7 +75,6 @@ class OuvrageSectionManager(TreeManager):
 class OuvrageSection(TreeNode):
     objects = OuvrageSectionManager.from_queryset(TreeQuerySet)()
 
-    # FIXME: À tester : peut-on retrouver dans le XML uniquement avec bpn_id
     bpn_id = models.UUIDField(editable=False, primary_key=True)
     numero = models.CharField(max_length=20, editable=False)
     content = models.TextField(editable=False)
@@ -88,16 +82,10 @@ class OuvrageSection(TreeNode):
     typology = models.CharField(
         max_length=25, choices=SectionTypology.choices, editable=False
     )
-    # FIXME: Est-ce qu'on peut/veut en faire un field qui va chercher le root?
-    # FIXME: Peut-être une entité ouvrage?
     ouvrage_name = models.CharField(max_length=10, editable=False)
-    # FIXME: Valider la géométrie ?
-    # geos.geometry.GEOSGeometry.valid
     geometry = models.GeometryField(null=True, blank=True, default=None, srid=4326)
 
-    # FIXME: Unique_together ouvrage_name/typology/numero
     class Meta:
-        # FIXME: ordering = ("ouvrage_name", "numero",)
         ordering = ("numero",)
 
     def __str__(self):
@@ -144,9 +132,6 @@ class OuvrageSection(TreeNode):
     def content_html(self):
         if not self.content:
             return ""
-        # FIXME: Remove before merging
-        xslt_transform = ET.XSLT(ET.parse("carting/xslt/in_section_html.xslt"))
-
         return mark_safe(xslt_transform(ET.fromstring(self.content)))
 
 
@@ -154,7 +139,6 @@ class SectionIngester(NamedTuple):
     element: ElementTree.Element
     ouvrage_name: str
 
-    # FIXME: Illustrations
     def numero(self, parent: OuvrageSection) -> str:
         return parent.numero
 

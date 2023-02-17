@@ -31,7 +31,7 @@ def children(instance):
 
 
 @admin.register(OuvrageSection)
-class INSectionAdmin(GISModelAdmin):
+class OuvrageSectionAdmin(GISModelAdmin):
     gis_widget = CustomOSMWidget
     ordering = ("numero",)
     list_display = ("__str__", "bpn_id", "ouvrage_name")

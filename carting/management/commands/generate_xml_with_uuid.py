@@ -2,11 +2,9 @@ import uuid
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from carting.models import SectionTypology
-from core import generator
 
 
 class Command(BaseCommand):
@@ -29,6 +27,9 @@ class Command(BaseCommand):
                 element.set("bpn_id", str(uuid.uuid4()))
 
         for element in content_root.iter("principal"):
+            element.set("bpn_id", str(uuid.uuid4()))
+
+        for element in content_root.iter("reference"):
             element.set("bpn_id", str(uuid.uuid4()))
 
         Path(xml_file.name).write_text(

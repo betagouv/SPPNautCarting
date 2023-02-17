@@ -7,6 +7,7 @@ from django.views.decorators.http import require_GET
 from carting.models import OuvrageSection
 
 
+# FIXME : Les sections commençant par '0.' ne devraient pas être affichées (pas de géométrie attachée); les illustrations en '0.' sont mal ordonnées
 @login_required
 @require_GET
 def index(request: HttpRequest) -> HttpResponse:
@@ -22,7 +23,7 @@ def index(request: HttpRequest) -> HttpResponse:
         try:
             section = sections.get(numero=numero)
         except OuvrageSection.DoesNotExist:
-            raise Http404("No MyModel matches the given query.")
+            raise Http404("No OuvrageSection matches the given query.")
         sections = list(section.ancestors(include_self=True)) + list(
             section.descendants()
         )

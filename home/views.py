@@ -16,13 +16,10 @@ from django.views.decorators.http import require_GET
 from django.views.generic import FormView
 from natsort import natsorted
 
-from core import generator
+from home import generator
 
-from .forms import (
-    PublicationReferentielPreparationForm,
-    PublicationReferentielProductionForm,
-    UploadFileForm,
-)
+from .forms import (PublicationReferentielPreparationForm,
+                    PublicationReferentielProductionForm, UploadFileForm)
 from .ouvrages import Ouvrage
 
 
