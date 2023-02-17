@@ -47,7 +47,10 @@ class SectionTypology(models.TextChoices):
         return to_ingester[self]
 
 
-class OuvrageSectionManager(models.Manager):
+class OuvrageSectionManager(TreeManager):
+
+    _with_tree_fields = True
+
     def ingest_xml_subtree(
         self,
         ouvrage_name: str,
