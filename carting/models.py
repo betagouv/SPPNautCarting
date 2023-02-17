@@ -8,6 +8,7 @@ from xml.etree import ElementTree
 import lxml.etree as ET
 from django.contrib.gis.db import models
 from django.core.serializers import serialize
+from django.db import DatabaseError
 from django.utils.safestring import mark_safe
 from tree_queries.models import TreeNode, TreeQuerySet
 from tree_queries.query import TreeManager
@@ -59,14 +60,7 @@ class OuvrageSectionManager(models.Manager):
                 child_ouvrage_section = OuvrageSection.from_xml(
                     child_element, ouvrage_section, typology, ouvrage_name
                 )
-                child_ouvrage_section.save(
-                    update_fields=(
-                        "numero",
-                        "content",
-                        "typology",
-                        "ouvrage_name",
-                    )
-                )
+                child_ouvrage_section.ingest()
 
                 logging.warning(
                     "Section %s ingérée avec l'id %s",
@@ -87,6 +81,7 @@ class OuvrageSection(TreeNode):
     bpn_id = models.UUIDField(editable=False, primary_key=True)
     numero = models.CharField(max_length=20, editable=False)
     content = models.TextField(editable=False)
+    # FIXME: D'où tu râles pas quand on met toto et instance.full_clean()
     typology = models.CharField(
         max_length=25, choices=SectionTypology.choices, editable=False
     )
@@ -123,6 +118,13 @@ class OuvrageSection(TreeNode):
             ouvrage_name=ouvrage_name,
             parent=parent,
         )
+
+    def ingest(self):
+        try:
+            # This raises if the instance does not exist
+            self.save(update_fields=("numero", "content", "typology", "ouvrage_name"))
+        except DatabaseError:
+            self.save()
 
     def geojson(self):
         return serialize("geojson", [self], fields=("geometry",))
