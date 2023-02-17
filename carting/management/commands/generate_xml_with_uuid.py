@@ -2,7 +2,6 @@ import uuid
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -13,25 +12,26 @@ from core import generator
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
-            "--ouvrage",
-            required=True,
-            help="Ouvrage name, ex = 12, c22, l1",
+            "filepath",
+            type=str,
+            help="filepath to document.xml file",
         )
 
     def handle(self, *args, **options):
+        filepath = options.get("filepath")
 
-        ouvrage_name = options["ouvrage"]
-        response = generator.get(
-            f"{settings.GENERATOR_SERVICE_HOST}/url-for/{ouvrage_name}/xml/document.xml"
-        )
-        document_xml = requests.get(response.text)
+        xml_file = Path(str(filepath))
+        content_root = ET.parse(xml_file, parser=ET.XMLParser(encoding="UTF-16"))
 
-        content_root = ET.fromstring(document_xml.text)
-
-        for topology in SectionTypology:
-            for element in content_root.iter(topology.label):
+        for topology in SectionTypology.labels:
+            topology = topology.split("/")[-1]
+            for element in content_root.iter(topology):
                 element.set("bpn_id", str(uuid.uuid4()))
 
-        Path(f"{ouvrage_name}.xml").write_text(
-            ET.tostring(content_root, encoding="unicode")
+        for element in content_root.iter("principal"):
+            element.set("bpn_id", str(uuid.uuid4()))
+
+        Path(xml_file.name).write_text(
+            ET.tostring(content_root.getroot(), encoding="unicode"),
+            encoding="UTF-16",
         )
