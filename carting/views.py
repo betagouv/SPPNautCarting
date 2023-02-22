@@ -31,7 +31,7 @@ def index(request: HttpRequest) -> HttpResponse:
         request,
         "carting/index.html",
         {
-            "elements": sections,
+            "sections": sections,
             "search": search,
         },
     )

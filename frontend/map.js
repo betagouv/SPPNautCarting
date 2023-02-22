@@ -13,6 +13,7 @@ import View from "ol/View.js";
 useGeographic();
 
 const sectionsLayerGroup = new LayerGroup();
+const mapElement = document.querySelector("#map");
 const map = new Map({
     layers: [
         new TileLayer({
@@ -20,7 +21,7 @@ const map = new Map({
         }),
         sectionsLayerGroup,
     ],
-    target: "map",
+    target: mapElement,
     view: new View({
         center: [-2.0, 48.65],
         zoom: 12,
@@ -29,12 +30,14 @@ const map = new Map({
 // Expose map to help debug in the browser
 window.map = map;
 
-const geoSections = document.querySelectorAll("span[data-geojson]");
+const geoSections = document.querySelectorAll("[data-geojson]");
 for (const geoSection of geoSections) {
     geoSection.addEventListener("click", showGeometry);
 }
 
 function showGeometry(event) {
+    mapElement.scrollIntoView({ behavior: "smooth" });
+
     const source = new VectorSource({
         features: new GeoJSON().readFeatures(
             JSON.parse(event.target.dataset.geojson)

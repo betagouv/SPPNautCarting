@@ -5,6 +5,10 @@
     align-items: center;
 }
 
+.sppnaut-v-align-top {
+    vertical-align: top;
+}
+
 .sppnaut-nowrap{
     white-space: nowrap;
 }
@@ -25,8 +29,16 @@
     width: auto;
 }
 
+.sppnaut-h-full {
+    height: 100%;
+}
+
 .sppnaut-max-h-8w {
     max-height: 4rem;
+}
+
+.sppnaut-max-h-screen {
+    max-height: 100vh;
 }
 
 .sppnaut-max-w-120w {
@@ -35,4 +47,12 @@
 
 .sppnaut-overflow-y-auto {
     overflow-y: auto;
+}
+
+.sppnaut-sticky {
+    position: sticky;
+}
+
+.sppnaut-top-0 {
+    top: 0;
 }
