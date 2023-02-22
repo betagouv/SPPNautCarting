@@ -30,7 +30,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "django.contrib.gis",
+    "django_extensions",
     "home",
+    "carting",
 ]
 
 MIDDLEWARE = [
@@ -70,7 +73,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": config("POSTGRESQL_ADDON_DB"),
         "USER": config("POSTGRESQL_ADDON_USER"),
         "PASSWORD": config("POSTGRESQL_ADDON_PASSWORD"),
@@ -84,6 +87,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+    BASE_DIR / "compiled_static",
 ]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True
@@ -160,3 +164,7 @@ sentry_sdk.init(
 )
 LOGIN_REDIRECT_URL = "home:ouvrages_by_name"
 LANGUAGE_CODE = "fr"
+
+SHELL_PLUS_PRINT_SQL = True
+GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", default=None)
+GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", default=None)

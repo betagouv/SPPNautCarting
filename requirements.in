@@ -1,4 +1,7 @@
 Django
+django-extensions
+django-tree-queries
+lxml
 natsort
 psycopg2
 python-decouple

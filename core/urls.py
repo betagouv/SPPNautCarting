@@ -14,4 +14,5 @@ urlpatterns: URLList = [
     path("accounts/login/", auth_views.LoginView.as_view()),
     path("accounts/logout/", auth_views.logout_then_login, name="logout"),
     path("", include(("home.urls", "users"), namespace="home")),
+    path("carting/", include(("carting.urls", "carting"), namespace="carting")),
 ]

@@ -1,0 +1,76 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block page_title %}Carting{% endblock%}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static "map.css" %}">
+{% endblock %}
+
+{% block js %}
+<script type="module" src="{% static "map.js" %}"></script>
+{% endblock %}
+
+{% block main %}
+<div class="fr-container--fluid">
+    <div class="fr-grid-row fr-m-1w">
+        <div class="fr-col-12 fr-col-lg-6">
+            <div
+                id="map"
+                class="fr-p-1w sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
+            >
+            </div>
+        </div>
+        <div class="fr-col-12 fr-col-lg-6 fr-p-1w">
+            <form>
+                <div class="fr-search-bar" role="search">
+                    <input
+                        class="fr-input"
+                        placeholder="Cherche par ouvrage/section, ex : z99/4.2.2."
+                        type="search"
+                        value="{{search|default_if_none:''}}"
+                        name="search"
+                    >
+                    <button class="fr-btn" title="Rechercher">
+                        Rechercher
+                    </button>
+                </div>
+            </form>
+            <hr/>
+            <div>
+                <table>
+                    {% for section in sections %}
+                        <tr>
+                            <td class="sppnaut-v-align-top">
+                                <div class="fr-grid-row">
+                                    <span class="fr-col-12">
+                                        <a
+                                            href="{% url 'carting:index' %}?search={{ section.numero }}"
+                                            class="fr-link"
+                                            title="{{ section.get_typology_display }}"
+                                        >
+                                            {{ section.numero }}
+                                        </a>
+                                    </span>
+                                    {% if section.geometry %}
+                                        <button
+                                            class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line fr-col-12"
+                                            data-geojson="{{ section.geojson }}"
+                                        >
+                                            Montrer sur la carte
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="sppnaut-v-align-top">
+                                {{ section.content_html }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,5 +11,6 @@
     "python.testing.pytestEnabled": true,
     "files.associations": {
         "*.html": "django-html"
-    }
+    },
+    "python.analysis.typeCheckingMode": "basic"
 }

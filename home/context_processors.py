@@ -15,5 +15,8 @@ def menu(request):
                 ),
                 "Génération d'ouvrage téléversé": reverse("home:publication_upload"),
             },
+            "Carting": {
+                "Display INs": reverse("carting:index"),
+            },
         }
     }

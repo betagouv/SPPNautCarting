@@ -1,0 +1,21 @@
+{
+    "scripts": {
+        "build": "parcel build",
+        "watch": "parcel watch"
+    },
+    "source": [
+        "frontend/map.js"
+    ],
+    "targets": {
+        "default": {
+            "distDir": "./compiled_static"
+        }
+    },
+    "dependencies": {
+        "ol": "^7.2.2",
+        "parcel": "^2.8.3"
+    },
+    "devDependencies": {
+        "buffer": "^5.7.1"
+    }
+}
