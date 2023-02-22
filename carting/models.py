@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from functools import cached_property
 from typing import NamedTuple
@@ -25,8 +26,8 @@ class SectionTypology(models.TextChoices):
     ALINEA = "ALINEA", "alinea"
     TABLE = "TABLE", "tableau"
     ILLUSTRATION = "ILLUSTRATION", "illustration"
-    TOPONYME = "TOPONYME", "texte/principal"
-    REFERENCE = "REFERENCE", "texte/reference"
+    TOPONYME = "TOPONYME", "principal"
+    REFERENCE = "REFERENCE", "reference"
 
     def ingester(self) -> type[SectionIngester]:
         to_ingester = {
@@ -44,6 +45,14 @@ class SectionTypology(models.TextChoices):
         }
         return to_ingester[self]
 
+    def iterable(self, element):
+        if self in (SectionTypology.TOPONYME, SectionTypology.REFERENCE):
+            return itertools.chain(
+                element.iterfind("texte/" + self.label),
+                element.iterfind("liste/texte/" + self.label),
+            )
+        return element.iterfind(self.label)
+
 
 class OuvrageSectionManager(models.Manager):
     def ingest_xml_subtree(
@@ -54,7 +63,7 @@ class OuvrageSectionManager(models.Manager):
     ) -> int:
         ingested = 0
         for typology in SectionTypology:
-            for child_element in element.iterfind(typology.label):
+            for child_element in typology.iterable(element):
                 child_ouvrage_section = OuvrageSection.from_xml(
                     child_element, ouvrage_section, typology, ouvrage_name
                 )
