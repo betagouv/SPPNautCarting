@@ -75,15 +75,12 @@ class OuvrageSectionManager(models.Manager):
 class OuvrageSection(TreeNode):
     objects = OuvrageSectionManager.from_queryset(TreeQuerySet)()
 
-    bpn_id = models.UUIDField(editable=False, primary_key=True)
-    numero = models.CharField(max_length=20, editable=False)
-    content = models.TextField(editable=False)
-    # FIXME: D'où tu râles pas quand on met toto et instance.full_clean()
-    typology = models.CharField(
-        max_length=25, choices=SectionTypology.choices, editable=False
-    )
-    ouvrage_name = models.CharField(max_length=10, editable=False)
-    geometry = models.GeometryField(null=True, blank=True, default=None, srid=4326)
+    bpn_id = models.UUIDField(primary_key=True)
+    numero = models.CharField(max_length=20)
+    content = models.TextField(blank=True)
+    typology = models.CharField(max_length=25, choices=SectionTypology.choices)
+    ouvrage_name = models.CharField(max_length=10)
+    geometry = models.GeometryField(blank=True, null=True, default=None, srid=4326)
 
     class Meta:
         ordering = ("numero",)
@@ -111,6 +108,8 @@ class OuvrageSection(TreeNode):
         )
 
     def ingest(self):
+        self.clean_fields()
+
         try:
             # This raises if the instance does not exist
             self.save(
