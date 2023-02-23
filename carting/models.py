@@ -134,9 +134,14 @@ class OuvrageSection(TreeNode):
         except DatabaseError:
             self.save()
 
+<<<<<<< HEAD
     def geojson(self) -> str | None:
         if not self.geometry:
             return None
+=======
+    def geojson(self):
+        # FIXME : prevent returning a geojson if geometry field has no value
+>>>>>>> 96980a1 (Fin de de journée)
         return serialize("geojson", [self], fields=("geometry",))
 
     @cached_property
