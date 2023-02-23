@@ -4,7 +4,8 @@
         "watch": "parcel watch"
     },
     "source": [
-        "frontend/map.js"
+        "frontend/map.js",
+        "frontend/application.js"
     ],
     "targets": {
         "default": {
@@ -12,6 +13,8 @@
         }
     },
     "dependencies": {
+        "@hotwired/stimulus": "^3.2.1",
+        "lodash": "^4.17.21",
         "ol": "^7.2.2",
         "parcel": "^2.8.3"
     }

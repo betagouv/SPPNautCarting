@@ -8,14 +8,20 @@ import Vector from "ol/layer/Vector.js";
 import Map from "ol/Map.js";
 import { useGeographic } from "ol/proj.js";
 import { OSM, Vector as VectorSource } from "ol/source.js";
+import { Circle, Fill, Stroke, Style } from "ol/style.js";
 import View from "ol/View.js";
 
 useGeographic();
 
-// FIXME : make the functions of this file in object structure
+const highlightClass = 'sppnaut-bg-color-yellow';
+const defaultCenter = [-2.0, 48.65];
+const defaultZoom = 13;
+const defaultPadding = [100, 100, 100, 100];
+const defaultDuration = 300;
+const defaultHighlightColor = "rgb(255,255,0)";
+const defaultHighlightColorFill = "rgb(255,255,0,0.3)";
 
 const sectionsLayerGroup = new LayerGroup();
-const highlightClass = 'sppnaut-bg-color-yellow';
 const mapElement = document.querySelector("#map");
 const map = new Map({
     layers: [
@@ -26,79 +32,101 @@ const map = new Map({
     ],
     target: mapElement,
     view: new View({
-        center: [-2.0, 48.65],
-        zoom: 12,
+        center: defaultCenter,
+        zoom: defaultZoom,
+    }),
+});
+
+const stroke = new Stroke({
+    color: defaultHighlightColor,
+    width: 4,
+});
+const fill = new Fill({
+    color: defaultHighlightColorFill,
+});
+const selectedStyle = new Style({
+    fill: fill,
+    stroke: stroke,
+    image: new Circle({
+        radius: 5,
+        stroke: stroke,
+        fill: fill,
     }),
 });
 
 map.on('singleclick', function (evt) {
-    let feature = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
-        return feature;
+    const higherLayer = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+        return layer;
     });
-    focusSectionOnText(feature.get('pk'))
+    if (!higherLayer) return;
+    focusSectionOnText(higherLayer.get('bpnID'))
+    fitMapToExtend(higherLayer.getSource().getExtent())
+    highlightSelectedLayer(higherLayer)
 });
 
-const geoSections = document.querySelectorAll("[data-geojson]");
-for (const geoSection of geoSections) {
-    geoSection.addEventListener("click", showGeometry);
+function highlightSelectedLayer(layer) {
+    sectionsLayerGroup.getLayers().forEach(eachLayer => {
+        if (eachLayer.get('selected')) {
+            eachLayer.set('selected', false)
+            eachLayer.setStyle(undefined);
+        }
+    })
+    layer.set('selected', true)
+    layer.setStyle(selectedStyle);
 }
-showAllGeometries(geoSections);
 
-function showGeometry(event) {
+
+export function showGeometry(bpnID, geojson) {
     sectionsLayerGroup.getLayers().clear();
-    const features = new GeoJSON().readFeatures(
-        JSON.parse(event.target.dataset.geojson)
-    )
-    if (features.length > 0) {
-        focusSectionOnText(features[0].get('pk'))
-    }
-    setSectionsLayerGroup(features);
-    fitMap();
+    addGeometryToLayerGroup(bpnID, geojson)
+    focusSectionOnText(bpnID)
+    fitMapToLayerGroup();
 }
 
-function showAllGeometries(sections) {
-    sectionsLayerGroup.getLayers().clear();
-    for (let i = 0; i < sections.length; i++) {
-        let features = new GeoJSON().readFeatures(
-            JSON.parse(sections[i].dataset.geojson)
-        )
-        setSectionsLayerGroup(features);
-    }
-    fitMap();
+export function centerToGeometry(bpnID) {
+    const layer = sectionsLayerGroup.getLayers().getArray().find(layer => layer.get('bpnID') === bpnID)
+    highlightSelectedLayer(layer)
+    fitMapToExtend(layer.getSource().getExtent())
+    focusSectionOnText(bpnID)
 }
 
-function focusSectionOnText(section_pk) {
-    let highlighteds = document.getElementsByClassName(highlightClass)
+export function addGeometryToLayerGroup(bpnID, geojson) {
+    const layer = new Vector({
+        source: new VectorSource({
+            features: new GeoJSON().readFeatures(geojson),
+        }),
+    });
+    const layerArea = getArea(layer.getSource().getExtent())
+    layer.setZIndex(Math.max(10000 - layerArea * 1000, 1))
+    sectionsLayerGroup.getLayers().push(layer);
+
+    layer.set('bpnID', bpnID)
+}
+
+function focusSectionOnText(bpnID) {
+    const highlighteds = document.getElementsByClassName(highlightClass)
     for (let i = 0; i < highlighteds.length; i++) {
         highlighteds[i].classList.remove(highlightClass)
     }
-    const sectionInText = document.getElementById(section_pk)
+
+    const sectionInText = document.getElementById(bpnID)
     sectionInText.scrollIntoView({ behavior: "smooth" });
     sectionInText.classList.add(highlightClass)
 }
 
-function setSectionsLayerGroup(features) {
-    const layer = new Vector({
-        source: new VectorSource({
-            features: features,
-        }),
-    });
-    let layerArea = getArea(layer.getSource().getExtent())
-    layer.setZIndex(Math.max(10000 - layerArea * 1000, 1))
-    sectionsLayerGroup.getLayers().push(layer);
-}
-
-function fitMap() {
+export function fitMapToLayerGroup() {
     let sectionsLayerGroupExtent = createEmpty();
     sectionsLayerGroup.getLayers().forEach(layer => {
         const layerExtent = layer.getSource().getExtent();
         extend(sectionsLayerGroupExtent, layerExtent);
     })
-    if (sectionsLayerGroup.getLayers().getLength() > 0) {
-        map.getView().fit(sectionsLayerGroupExtent, {
-            maxZoom: 13,
-            padding: [100, 100, 100, 100],
-            duration: 300,
-        });
-    }
+    fitMapToExtend(sectionsLayerGroupExtent)
+}
+
+function fitMapToExtend(extent) {
+    map.getView().fit(extent, {
+        maxZoom: defaultZoom,
+        padding: defaultPadding,
+        duration: defaultDuration,
+    });
 }
