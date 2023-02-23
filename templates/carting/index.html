@@ -45,7 +45,7 @@
             <div>
                 <table>
                     {% for section in ancestors|add:descendants %}
-                        <tr id="{{section.pk}}">
+                        <tr id="{{section.pk}}" class="{% if search == section.numero %}sppnaut-bg-color-yellow{% endif %}">
                             <td class="sppnaut-v-align-top">
                                 <div class="fr-grid-row">
                                     <span class="fr-col-12">
