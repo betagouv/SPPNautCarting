@@ -1,6 +1,5 @@
 import "ol/ol.css";
 
-import { getCenter } from "ol/extent.js";
 import GeoJSON from "ol/format/GeoJSON.js";
 import LayerGroup from "ol/layer/Group";
 import TileLayer from "ol/layer/Tile.js";
@@ -51,9 +50,9 @@ function showGeometry(event) {
     sectionsLayerGroup.getLayers().clear();
     sectionsLayerGroup.getLayers().push(layer);
     const layer_extent = layer.getSource().getExtent();
-    map.getView().setCenter(getCenter(layer_extent));
     map.getView().fit(layer_extent, {
         maxZoom: 13,
         padding: [100, 100, 100, 100],
+        duration: 300,
     });
 }
