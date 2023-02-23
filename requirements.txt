@@ -18,9 +18,9 @@ charset-normalizer==2.0.12 \
     --hash=sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597 \
     --hash=sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df
     # via requests
-django==4.1.5 \
-    --hash=sha256:4b214a05fe4c99476e99e2445c8b978c8369c18d4dea8e22ec412862715ad763 \
-    --hash=sha256:ff56ebd7ead0fd5dbe06fe157b0024a7aaea2e0593bb3785fb594cf94dad58ef
+django==4.1.7 \
+    --hash=sha256:44f714b81c5f190d9d2ddad01a532fe502fa01c4cb8faf1d081f4264ed15dcd8 \
+    --hash=sha256:f2f431e75adc40039ace496ad3b9f17227022e8b11566f4b363da44c7e44761e
     # via
     #   -r requirements.in
     #   django-extensions
