@@ -9,16 +9,19 @@
 {% endblock %}
 
 {% block js %}
-<script type="module" src="{% static "map.js" %}"></script>
+<script type="module" src="{% static "application.js" %}"></script>
 {% endblock %}
 
 {% block main %}
 <div class="fr-container--fluid">
-    <div class="fr-grid-row fr-m-1w">
+    <div
+        data-controller="map"
+        class="fr-grid-row fr-m-1w"
+    >
         <div class="fr-col-12 fr-col-lg-6">
             <div
                 id="map"
-                class="fr-p-1w sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
+                class="fr-p-1w sppnaut-min-h-half-screen sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
             >
             </div>
         </div>
@@ -41,7 +44,9 @@
             <div>
                 <table>
                     {% for section in sections %}
-                        <tr>
+                        <tr id="{{section.pk}}"
+                            class="{% if search == section.numero %}sppnaut-bg-yellow{% endif %}"
+                        >
                             <td class="sppnaut-v-align-top">
                                 <div class="fr-grid-row">
                                     <span class="fr-col-12">
@@ -53,10 +58,13 @@
                                             {{ section.numero }}
                                         </a>
                                     </span>
-                                    {% if section.geometry %}
+                                    {% if section.geometry and section.tree_depth >= search_tree_depth %}
                                         <button
+                                            data-map-target="section"
+                                            data-map-geojson-param="{{ section.geojson }}"
+                                            data-map-bpnid-param="{{ section.pk }}"
+                                            data-action="map#showOnMap"
                                             class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line fr-col-12"
-                                            data-geojson="{{ section.geojson }}"
                                         >
                                             Montrer sur la carte
                                         </button>

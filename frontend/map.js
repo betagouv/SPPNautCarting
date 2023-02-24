@@ -1,5 +1,6 @@
 import "ol/ol.css";
 
+import { createEmpty, extend, getArea } from "ol/extent.js";
 import GeoJSON from "ol/format/GeoJSON.js";
 import LayerGroup from "ol/layer/Group";
 import TileLayer from "ol/layer/Tile.js";
@@ -7,9 +8,18 @@ import Vector from "ol/layer/Vector.js";
 import Map from "ol/Map.js";
 import { useGeographic } from "ol/proj.js";
 import { OSM, Vector as VectorSource } from "ol/source.js";
+import { Circle, Fill, Stroke, Style } from "ol/style.js";
 import View from "ol/View.js";
 
 useGeographic();
+
+const highlightClass = 'sppnaut-bg-yellow';
+const defaultCenter = [-2.0, 48.65];
+const defaultZoom = 13;
+const defaultPadding = [100, 100, 100, 100];
+const defaultDuration = 300;
+const defaultHighlightColor = "rgb(255,255,0)";
+const defaultHighlightColorFill = "rgb(255,255,0,0.3)";
 
 const sectionsLayerGroup = new LayerGroup();
 const mapElement = document.querySelector("#map");
@@ -22,37 +32,94 @@ const map = new Map({
     ],
     target: mapElement,
     view: new View({
-        center: [-2.0, 48.65],
-        zoom: 12,
+        center: defaultCenter,
+        zoom: defaultZoom,
     }),
 });
-// Expose map to help debug in the browser
-window.map = map;
+const stroke = new Stroke({
+    color: defaultHighlightColor,
+    width: 4,
+});
+const fill = new Fill({
+    color: defaultHighlightColorFill,
+});
+const selectedStyle = new Style({
+    fill: fill,
+    stroke: stroke,
+    image: new Circle({
+        radius: 5,
+        stroke: stroke,
+        fill: fill,
+    }),
+});
 
-const geoSections = document.querySelectorAll("[data-geojson]");
-for (const geoSection of geoSections) {
-    geoSection.addEventListener("click", showGeometry);
+map.on('singleclick', function (evt) {
+    const higherLayer = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+        return layer;
+    });
+    highlightSelectedLayer(higherLayer)
+    if (!higherLayer) return;
+    focusSectionOnText(higherLayer.get('bpnID'));
+    fitMapToExtend(higherLayer.getSource().getExtent());
+});
+
+function highlightSelectedLayer(layer) {
+    sectionsLayerGroup.getLayers().forEach(eachLayer => {
+        if (eachLayer.get('selected')) {
+            eachLayer.set('selected', false);
+            eachLayer.setStyle(undefined);
+        }
+    })
+    if (layer) {
+        layer.set('selected', true);
+        layer.setStyle(selectedStyle);
+    }
 }
 
-function showGeometry(event) {
-    mapElement.scrollIntoView({ behavior: "smooth" });
+export function centerToGeometry(bpnID) {
+    const layer = sectionsLayerGroup.getLayers().getArray().find(layer => layer.get('bpnID') === bpnID);
+    highlightSelectedLayer(layer);
+    fitMapToExtend(layer.getSource().getExtent());
+    focusSectionOnText(bpnID);
+}
 
-    const source = new VectorSource({
-        features: new GeoJSON().readFeatures(
-            JSON.parse(event.target.dataset.geojson)
-        ),
-    });
-
+export function addGeometryToLayerGroup(bpnID, geojson) {
     const layer = new Vector({
-        source: source,
+        source: new VectorSource({
+            features: new GeoJSON().readFeatures(geojson),
+        }),
     });
-
-    sectionsLayerGroup.getLayers().clear();
+    //FIXME: Voir si on peut faire ça plus proprement
+    const layerArea = getArea(layer.getSource().getExtent());
+    layer.setZIndex(Math.max(10000 - layerArea * 1000, 1));
+    layer.set('bpnID', bpnID);
     sectionsLayerGroup.getLayers().push(layer);
-    const layer_extent = layer.getSource().getExtent();
-    map.getView().fit(layer_extent, {
-        maxZoom: 13,
-        padding: [100, 100, 100, 100],
-        duration: 300,
+}
+
+function focusSectionOnText(bpnID) {
+    const highlighteds = document.getElementsByClassName(highlightClass);
+    for (const highlighted of highlighteds) {
+        highlighted.classList.remove(highlightClass)
+    };
+
+    const sectionInText = document.getElementById(bpnID)
+    sectionInText.scrollIntoView({ behavior: "smooth" });
+    sectionInText.classList.add(highlightClass);
+}
+
+export function fitMapToLayerGroup() {
+    const sectionsLayerGroupExtent = createEmpty();
+    sectionsLayerGroup.getLayers().forEach(layer => {
+        const layerExtent = layer.getSource().getExtent();
+        extend(sectionsLayerGroupExtent, layerExtent);
+    })
+    fitMapToExtend(sectionsLayerGroupExtent);
+}
+
+function fitMapToExtend(extent) {
+    map.getView().fit(extent, {
+        maxZoom: defaultZoom,
+        padding: defaultPadding,
+        duration: defaultDuration,
     });
 }
