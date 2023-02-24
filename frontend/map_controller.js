@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import { addGeometryToLayerGroup, centerToGeometry, fitMapToLayerGroup } from "./map";
 
 export default class extends Controller {
@@ -13,7 +13,6 @@ export default class extends Controller {
 
     showOnMap(event) {
         const geojson = event.params.geojson
-        //showGeometry(event.params.bpnid, geojson)
         centerToGeometry(event.params.bpnid, geojson)
     }
 
