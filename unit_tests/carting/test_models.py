@@ -9,7 +9,12 @@ from django.core.exceptions import ValidationError
 from carting.models import OuvrageSection, SectionTypology
 
 
-# FIXME : tester ingestion de deux ouvrages différents
+# FIXME: Transformer les Arrange en XML fromstring
+# FIXME : tester ingestion de deux ouvrages différents. Mais tester quoi ?
+# FIXME: assert_num_queries
+# FIXME: Tester que si un bpn_id change de place dans le XML, il change de place dans la base ou alors on veut émettre un warning
+# FIXME: Tester que si un bpn_id change de topologie, il change de topologie dans la base ou alors on veut émettre un warning
+# FIXME: Test "integration" qui absorbe un XML plus représentatif et on vérifiera la hiérarchie retournée par .descendants(). Est-ce qu'on l'écrit au niveau de la commande ?
 class TestIngestXMLSubtree:
     @pytest.mark.django_db(transaction=True)
     def test_basic_ouvrage(self):
@@ -158,7 +163,7 @@ class TestIngestXMLSubtree:
         assert section_section.geometry == None
         assert section_section.parent == alinea_section
 
-    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.django_db()
     def test_chapter_without_numero_raises_exception(self):
         fake_bpn_id = uuid4()
 
@@ -173,7 +178,7 @@ class TestIngestXMLSubtree:
             assert len(exception.value) == 1
             assert "numero" in exception.value
 
-    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.django_db()
     def test_ingestion_preserves_geometry(self):
         fake_bpn_id = uuid4()
         OuvrageSection.objects.create(
@@ -189,7 +194,7 @@ class TestIngestXMLSubtree:
 
 
 class TestGeometry:
-    @pytest.mark.django_db(transaction=True)
+    @pytest.mark.django_db()
     def test_geometry_basic(self):
         fake_bpn_id = uuid4()
         section_instance = OuvrageSection(
@@ -212,17 +217,15 @@ class TestGeometry:
         with pytest.raises(GEOSException):
             section_instance.save()
 
-        # FIXME : Tester géométrie irréaliste
-        # unrealistic_geom = '{"type": "Polygon", "coordinates": [[[-2.977, 48.9098333], [-2.9528333, 98.8383333], [-2.9656666, 48.8025],[-2.977, 48.9098333]]] }'
-        # GEOSGeometry(unrealistic_geom)
 
-        # section_instance.geometry = None
-        # section_instance.save()
-        # assert OuvrageSection.objects.get(bpn_id=fake_bpn_id).geometry == None
+# FIXME: À tester parce qu'on a trouvé que c'était un comportement de GeoDjango
+# section_instance.geometry = None
+# section_instance.save()
+# assert OuvrageSection.objects.get(bpn_id=fake_bpn_id).geometry == None
 
-        # section_instance.geometry = ""
-        # section_instance.save()
-        # assert OuvrageSection.objects.get(bpn_id=fake_bpn_id).geometry == None
+# section_instance.geometry = ""
+# section_instance.save()
+# assert OuvrageSection.objects.get(bpn_id=fake_bpn_id).geometry == None
 
 
 class TestContentHtml:
