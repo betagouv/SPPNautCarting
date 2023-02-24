@@ -20,7 +20,10 @@
     >
         <div class="fr-col-12 fr-col-lg-6">
             <div
+
                 id="map"
+                data-action="ol:click->map#focusOnSection
+                             hashchange@window->map#highlightMapSection"
                 class="fr-p-1w sppnaut-min-h-half-screen sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
             >
             </div>
@@ -45,7 +48,8 @@
                 <table>
                     {% for section in sections %}
                         <tr id="{{section.pk}}"
-                            class="{% if search == section.numero %}sppnaut-bg-yellow{% endif %}"
+                            class="section {% if search == section.numero %}sppnaut-bg-color-yellow{% endif %}"
+                            data-bpnid="{{ section.pk }}"
                         >
                             <td class="sppnaut-v-align-top">
                                 <div class="fr-grid-row">

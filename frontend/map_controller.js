@@ -1,9 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
-import debounce from "lodash/debounce"
-import { addGeometryToLayerGroup, centerToGeometry, fitMapToLayerGroup } from "./map"
+import { debounce } from "lodash"
+import {
+    addGeometryToLayerGroup,
+    fitMapToLayerGroup,
+    getHigherLayer,
+    highlightMapSection,
+} from "./map"
 
 export default class extends Controller {
     static targets = ["section"]
+
+    connect() {
+        this.highlightMapSection()
+    }
+
+    #showLayerGroupSoon = debounce(fitMapToLayerGroup)
 
     sectionTargetConnected(sectionTarget) {
         const geojson = JSON.parse(sectionTarget.dataset.mapGeojsonParam)
@@ -13,8 +24,14 @@ export default class extends Controller {
 
     showOnMap(event) {
         const geojson = event.params.geojson
-        centerToGeometry(event.params.bpnid, geojson)
+        location.hash = event.params.bpnid
     }
 
-    #showLayerGroupSoon = debounce(fitMapToLayerGroup)
+    focusOnSection(event) {
+        const layer = getHigherLayer(event.detail.olEvent)
+        location.hash = layer.get("bpnID")
+    }
+    highlightMapSection() {
+        highlightMapSection(location.hash.split("#")[1])
+    }
 }
