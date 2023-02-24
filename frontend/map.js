@@ -13,13 +13,12 @@ import View from "ol/View.js"
 
 useGeographic()
 
-const highlightClass = "sppnaut-bg-yellow"
-const defaultCenter = [-2.0, 48.65]
-const defaultZoom = 13
-const defaultPadding = [100, 100, 100, 100]
-const defaultDuration = 300
-const defaultHighlightColor = "rgb(255,255,0)"
-const defaultHighlightColorFill = "rgb(255,255,0,0.3)"
+const defaultCenter = [-2.0, 48.65];
+const defaultZoom = 13;
+const defaultPadding = [100, 100, 100, 100];
+const defaultDuration = 300;
+const defaultHighlightColor = "rgb(255,255,0)";
+const defaultHighlightColorFill = "rgb(255,255,0,0.3)";
 
 const sectionsLayerGroup = new LayerGroup()
 const mapElement = document.querySelector("#map")
@@ -52,16 +51,31 @@ const selectedStyle = new Style({
         fill: fill,
     }),
 })
-
-map.on("singleclick", function (evt) {
-    const higherLayer = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
-        return layer
-    })
-    highlightSelectedLayer(higherLayer)
-    if (!higherLayer) return
-    focusSectionOnText(higherLayer.get("bpnID"))
-    fitMapToExtend(higherLayer.getSource().getExtent())
+});
+map.on('singleclick', olEvent => {
+    mapElement.dispatchEvent(new CustomEvent('ol:click', {
+        detail: {
+            olEvent: olEvent,
+        }
+    }));
 })
+
+
+export function getHigherLayer(evt) {
+    const higherLayer = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+        return layer;
+    });
+    if (!higherLayer) return;
+    return higherLayer;
+}
+
+export function highlightMapSection(bpnID) {
+    const layer = sectionsLayerGroup.getLayers().getArray().find(layer => layer.get('bpnID') === bpnID)
+    if (!layer) return;
+    fitMapToExtend(layer.getSource().getExtent())
+    highlightSelectedLayer(layer)
+}
+
 
 function highlightSelectedLayer(layer) {
     sectionsLayerGroup.getLayers().forEach((eachLayer) => {
@@ -70,17 +84,20 @@ function highlightSelectedLayer(layer) {
             eachLayer.setStyle(undefined)
         }
     })
-    if (layer) {
-        layer.set("selected", true)
-        layer.setStyle(selectedStyle)
-    }
+    layer.set('selected', true)
+    layer.setStyle(selectedStyle);
+}
+
+
+export function showGeometry(bpnID, geojson) {
+    sectionsLayerGroup.getLayers().clear();
+    addGeometryToLayerGroup(bpnID, geojson)
+    focusSectionOnText(bpnID)
+    fitMapToLayerGroup();
 }
 
 export function centerToGeometry(bpnID) {
-    const layer = sectionsLayerGroup
-        .getLayers()
-        .getArray()
-        .find((layer) => layer.get("bpnID") === bpnID)
+    const layer = sectionsLayerGroup.getLayers().getArray().find(layer => layer.get('bpnID') === bpnID)
     highlightSelectedLayer(layer)
     fitMapToExtend(layer.getSource().getExtent())
     focusSectionOnText(bpnID)
@@ -95,19 +112,9 @@ export function addGeometryToLayerGroup(bpnID, geojson) {
     //FIXME: Voir si on peut faire ça plus proprement
     const layerArea = getArea(layer.getSource().getExtent())
     layer.setZIndex(Math.max(10000 - layerArea * 1000, 1))
-    layer.set("bpnID", bpnID)
-    sectionsLayerGroup.getLayers().push(layer)
-}
+    sectionsLayerGroup.getLayers().push(layer);
 
-function focusSectionOnText(bpnID) {
-    const highlighteds = document.getElementsByClassName(highlightClass)
-    for (const highlighted of highlighteds) {
-        highlighted.classList.remove(highlightClass)
-    }
-
-    const sectionInText = document.getElementById(bpnID)
-    sectionInText.scrollIntoView({ behavior: "smooth" })
-    sectionInText.classList.add(highlightClass)
+    layer.set('bpnID', bpnID)
 }
 
 export function fitMapToLayerGroup() {

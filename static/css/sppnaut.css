@@ -59,6 +59,15 @@
     top: 0;
 }
 
-.sppnaut-bg-yellow {
+/* fixme : ça ne marche pas */
+:has(:not(:target)) .sppnaut-bg-color-yellow {
     background-color: yellow;
+}
+
+.section:target {
+    background-color: yellow;
+}
+
+html{
+    scroll-behavior: smooth;
 }
