@@ -1,6 +1,7 @@
 --constraint=requirements.txt
 
 black
+honcho
 pytest
 pytest-django
 pytest-dotenv

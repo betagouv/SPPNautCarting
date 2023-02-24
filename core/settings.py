@@ -135,16 +135,40 @@ SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", cast=bool)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {
+    "filters": {
+        "skip_staticfiles": {
+            "()": "core.filters.SkipStaticFilter",
+        },
+    },
+    "formatters": {
         "console": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "{levelname}:{name}: {message}",
+            "style": "{",
+        },
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "{message}\n--------",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "django.server": {
             "class": "logging.StreamHandler",
+            "filters": ["skip_staticfiles"],
+            "formatter": "django.server",
         },
     },
     "root": {
-        "handlers": ["console"],
         "level": "WARNING",
     },
+    "loggers": {
+        "django.server": {
+            "handlers": ["django.server"],
+        }
+    },
 }
+
 
 GENERATOR_SERVICE_HOST = config("GENERATOR_SERVICE_HOST")
 GENERATOR_USERNAME = config("GENERATOR_USERNAME")
