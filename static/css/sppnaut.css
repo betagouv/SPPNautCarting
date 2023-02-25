@@ -60,14 +60,19 @@
 }
 
 /* fixme : ça ne marche pas */
-:has(:not(:target)) .sppnaut-bg-color-yellow {
+:has(:not(:target)) .sppnaut-section-searched {
     background-color: yellow;
 }
 
-.section:target {
+.sppnaut-section:target {
     background-color: yellow;
 }
 
-html{
+html,
+body {
     scroll-behavior: smooth;
+}
+
+.sppnaut-scroll-mt-8w {
+    scroll-margin-top: 4rem;
 }
