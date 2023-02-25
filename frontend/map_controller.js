@@ -1,37 +1,50 @@
 import { Controller } from "@hotwired/stimulus"
-import { debounce } from "lodash"
-import {
-    addGeometryToLayerGroup,
-    fitMapToLayerGroup,
-    getHigherLayer,
-    highlightMapSection,
-} from "./map"
+import { SectionMap } from "./section_map"
 
 export default class extends Controller {
-    static targets = ["section"]
+    #map
+
+    static targets = ["map", "section"]
+    static values = {
+        initialCenter: { type: Array, default: [-2.0, 48.65] },
+        maxZoom: { type: Number, default: 13 },
+        padding: { type: Array, default: [100, 100, 100, 100] },
+        duration: { type: Number, default: 300 },
+        selectedStrokeColor: { type: String, default: "#ff0" },
+        selectedFillColor: { type: String, default: "#ff02" },
+    }
+
+    initialize() {
+        this.#map = new SectionMap({
+            target: this.mapTarget,
+            initialCenter: this.initialCenterValue,
+            maxZoom: this.maxZoomValue,
+            padding: this.paddingValue,
+            duration: this.durationValue,
+            selectedFillColor: this.selectedFillColorValue,
+            selectedStrokeColor: this.selectedStrokeColorValue,
+        })
+    }
 
     connect() {
-        this.highlightMapSection()
+        this.#map.fitViewToAllSections()
+        this.selectSectionInMap()
     }
-
-    #showLayerGroupSoon = debounce(fitMapToLayerGroup)
 
     sectionTargetConnected(sectionTarget) {
-        const geojson = JSON.parse(sectionTarget.dataset.mapGeojsonParam)
-        addGeometryToLayerGroup(sectionTarget.dataset.mapBpnidParam, geojson)
-        this.#showLayerGroupSoon()
+        const geojson = JSON.parse(sectionTarget.dataset.geojson)
+        this.#map.addSection(sectionTarget.id, geojson)
     }
 
-    showOnMap(event) {
-        const geojson = event.params.geojson
-        location.hash = event.params.bpnid
+    selectSectionInText(e) {
+        location.hash = e.detail.bpnID
     }
 
-    focusOnSection(event) {
-        const layer = getHigherLayer(event.detail.olEvent)
-        location.hash = layer.get("bpnID")
-    }
-    highlightMapSection() {
-        highlightMapSection(location.hash.split("#")[1])
+    selectSectionInMap() {
+        const bpnID = location.hash.split("#")[1]
+        if (!bpnID) {
+            return
+        }
+        this.#map.selectSection(bpnID)
     }
 }

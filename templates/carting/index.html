@@ -5,25 +5,31 @@
 {% block page_title %}Carting{% endblock%}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static "map.css" %}">
+<link rel="stylesheet" href="{% static "carting.css" %}">
 {% endblock %}
 
 {% block js %}
-<script type="module" src="{% static "application.js" %}"></script>
+<script type="module" src="{% static "carting.js" %}"></script>
 {% endblock %}
 
 {% block main %}
 <div class="fr-container--fluid">
     <div
         data-controller="map"
+        data-action="
+            ol:select->map#selectSectionInText
+            hashchange@window->map#selectSectionInMap
+        "
+        data-map-padding-value="[0,0,0,0]"
+        data-map-duration-value="300"
+        data-map-selected-stroke-color-value="#f00"
+        data-map-selected-fill-color-value="#f003"
         class="fr-grid-row fr-m-1w"
     >
         <div class="fr-col-12 fr-col-lg-6">
             <div
-
                 id="map"
-                data-action="ol:click->map#focusOnSection
-                             hashchange@window->map#highlightMapSection"
+                data-map-target="map"
                 class="fr-p-1w sppnaut-min-h-half-screen sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
             >
             </div>
@@ -48,8 +54,9 @@
                 <table>
                     {% for section in sections %}
                         <tr id="{{section.pk}}"
-                            class="section {% if search == section.numero %}sppnaut-bg-color-yellow{% endif %}"
-                            data-bpnid="{{ section.pk }}"
+                            class="sppnaut-section {% if search == section.numero %}sppnaut-section-searched{% endif %} sppnaut-scroll-mt-8w"
+                            data-map-target="section"
+                            data-geojson="{{ section.geojson }}"
                         >
                             <td class="sppnaut-v-align-top">
                                 <div class="fr-grid-row">
@@ -63,15 +70,11 @@
                                         </a>
                                     </span>
                                     {% if section.geometry and section.tree_depth >= search_tree_depth %}
-                                        <button
-                                            data-map-target="section"
-                                            data-map-geojson-param="{{ section.geojson }}"
-                                            data-map-bpnid-param="{{ section.pk }}"
-                                            data-action="map#showOnMap"
+                                        <a href="#{{ section.pk }}"
                                             class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line fr-col-12"
                                         >
                                             Montrer sur la carte
-                                        </button>
+                                        </a>
                                     {% endif %}
                                 </div>
                             </td>
