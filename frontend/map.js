@@ -1,28 +1,28 @@
-import "ol/ol.css";
+import "ol/ol.css"
 
-import { createEmpty, extend, getArea } from "ol/extent.js";
-import GeoJSON from "ol/format/GeoJSON.js";
-import LayerGroup from "ol/layer/Group";
-import TileLayer from "ol/layer/Tile.js";
-import Vector from "ol/layer/Vector.js";
-import Map from "ol/Map.js";
-import { useGeographic } from "ol/proj.js";
-import { OSM, Vector as VectorSource } from "ol/source.js";
-import { Circle, Fill, Stroke, Style } from "ol/style.js";
-import View from "ol/View.js";
+import { createEmpty, extend, getArea } from "ol/extent.js"
+import GeoJSON from "ol/format/GeoJSON.js"
+import LayerGroup from "ol/layer/Group"
+import TileLayer from "ol/layer/Tile.js"
+import Vector from "ol/layer/Vector.js"
+import Map from "ol/Map.js"
+import { useGeographic } from "ol/proj.js"
+import { OSM, Vector as VectorSource } from "ol/source.js"
+import { Circle, Fill, Stroke, Style } from "ol/style.js"
+import View from "ol/View.js"
 
-useGeographic();
+useGeographic()
 
-const highlightClass = 'sppnaut-bg-yellow';
-const defaultCenter = [-2.0, 48.65];
-const defaultZoom = 13;
-const defaultPadding = [100, 100, 100, 100];
-const defaultDuration = 300;
-const defaultHighlightColor = "rgb(255,255,0)";
-const defaultHighlightColorFill = "rgb(255,255,0,0.3)";
+const highlightClass = "sppnaut-bg-yellow"
+const defaultCenter = [-2.0, 48.65]
+const defaultZoom = 13
+const defaultPadding = [100, 100, 100, 100]
+const defaultDuration = 300
+const defaultHighlightColor = "rgb(255,255,0)"
+const defaultHighlightColorFill = "rgb(255,255,0,0.3)"
 
-const sectionsLayerGroup = new LayerGroup();
-const mapElement = document.querySelector("#map");
+const sectionsLayerGroup = new LayerGroup()
+const mapElement = document.querySelector("#map")
 const map = new Map({
     layers: [
         new TileLayer({
@@ -35,14 +35,14 @@ const map = new Map({
         center: defaultCenter,
         zoom: defaultZoom,
     }),
-});
+})
 const stroke = new Stroke({
     color: defaultHighlightColor,
     width: 4,
-});
+})
 const fill = new Fill({
     color: defaultHighlightColorFill,
-});
+})
 const selectedStyle = new Style({
     fill: fill,
     stroke: stroke,
@@ -51,36 +51,39 @@ const selectedStyle = new Style({
         stroke: stroke,
         fill: fill,
     }),
-});
+})
 
-map.on('singleclick', function (evt) {
+map.on("singleclick", function (evt) {
     const higherLayer = map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
-        return layer;
-    });
+        return layer
+    })
     highlightSelectedLayer(higherLayer)
-    if (!higherLayer) return;
-    focusSectionOnText(higherLayer.get('bpnID'));
-    fitMapToExtend(higherLayer.getSource().getExtent());
-});
+    if (!higherLayer) return
+    focusSectionOnText(higherLayer.get("bpnID"))
+    fitMapToExtend(higherLayer.getSource().getExtent())
+})
 
 function highlightSelectedLayer(layer) {
-    sectionsLayerGroup.getLayers().forEach(eachLayer => {
-        if (eachLayer.get('selected')) {
-            eachLayer.set('selected', false);
-            eachLayer.setStyle(undefined);
+    sectionsLayerGroup.getLayers().forEach((eachLayer) => {
+        if (eachLayer.get("selected")) {
+            eachLayer.set("selected", false)
+            eachLayer.setStyle(undefined)
         }
     })
     if (layer) {
-        layer.set('selected', true);
-        layer.setStyle(selectedStyle);
+        layer.set("selected", true)
+        layer.setStyle(selectedStyle)
     }
 }
 
 export function centerToGeometry(bpnID) {
-    const layer = sectionsLayerGroup.getLayers().getArray().find(layer => layer.get('bpnID') === bpnID);
-    highlightSelectedLayer(layer);
-    fitMapToExtend(layer.getSource().getExtent());
-    focusSectionOnText(bpnID);
+    const layer = sectionsLayerGroup
+        .getLayers()
+        .getArray()
+        .find((layer) => layer.get("bpnID") === bpnID)
+    highlightSelectedLayer(layer)
+    fitMapToExtend(layer.getSource().getExtent())
+    focusSectionOnText(bpnID)
 }
 
 export function addGeometryToLayerGroup(bpnID, geojson) {
@@ -88,32 +91,32 @@ export function addGeometryToLayerGroup(bpnID, geojson) {
         source: new VectorSource({
             features: new GeoJSON().readFeatures(geojson),
         }),
-    });
+    })
     //FIXME: Voir si on peut faire ça plus proprement
-    const layerArea = getArea(layer.getSource().getExtent());
-    layer.setZIndex(Math.max(10000 - layerArea * 1000, 1));
-    layer.set('bpnID', bpnID);
-    sectionsLayerGroup.getLayers().push(layer);
+    const layerArea = getArea(layer.getSource().getExtent())
+    layer.setZIndex(Math.max(10000 - layerArea * 1000, 1))
+    layer.set("bpnID", bpnID)
+    sectionsLayerGroup.getLayers().push(layer)
 }
 
 function focusSectionOnText(bpnID) {
-    const highlighteds = document.getElementsByClassName(highlightClass);
+    const highlighteds = document.getElementsByClassName(highlightClass)
     for (const highlighted of highlighteds) {
         highlighted.classList.remove(highlightClass)
-    };
+    }
 
     const sectionInText = document.getElementById(bpnID)
-    sectionInText.scrollIntoView({ behavior: "smooth" });
-    sectionInText.classList.add(highlightClass);
+    sectionInText.scrollIntoView({ behavior: "smooth" })
+    sectionInText.classList.add(highlightClass)
 }
 
 export function fitMapToLayerGroup() {
-    const sectionsLayerGroupExtent = createEmpty();
-    sectionsLayerGroup.getLayers().forEach(layer => {
-        const layerExtent = layer.getSource().getExtent();
-        extend(sectionsLayerGroupExtent, layerExtent);
+    const sectionsLayerGroupExtent = createEmpty()
+    sectionsLayerGroup.getLayers().forEach((layer) => {
+        const layerExtent = layer.getSource().getExtent()
+        extend(sectionsLayerGroupExtent, layerExtent)
     })
-    fitMapToExtend(sectionsLayerGroupExtent);
+    fitMapToExtend(sectionsLayerGroupExtent)
 }
 
 function fitMapToExtend(extent) {
@@ -121,5 +124,5 @@ function fitMapToExtend(extent) {
         maxZoom: defaultZoom,
         padding: defaultPadding,
         duration: defaultDuration,
-    });
+    })
 }
