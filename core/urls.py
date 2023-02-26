@@ -16,7 +16,11 @@ urlpatterns: URLList = [
     path("carting/", include(("carting.urls", "carting"), namespace="carting")),
 ]
 
+<<<<<<< HEAD
 if "django_browser_reload" in settings.INSTALLED_APPS:
+=======
+if settings.DEBUG:
+>>>>>>> ddf8f61 (Reload tabs when Python code or templates change)
     urlpatterns.extend(
         [
             path("__reload__/", include("django_browser_reload.urls")),
