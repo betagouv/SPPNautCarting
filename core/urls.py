@@ -1,7 +1,6 @@
 import typing
 
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import URLPattern, URLResolver, include, path
@@ -16,3 +15,10 @@ urlpatterns: URLList = [
     path("", include(("home.urls", "users"), namespace="home")),
     path("carting/", include(("carting.urls", "carting"), namespace="carting")),
 ]
+
+if settings.DEBUG:
+    urlpatterns.extend(
+        [
+            path("__reload__/", include("django_browser_reload.urls")),
+        ]
+    )
