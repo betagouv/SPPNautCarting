@@ -1,7 +1,8 @@
 {
     "scripts": {
         "build": "parcel build",
-        "watch": "parcel watch"
+        "watch": "parcel watch",
+        "lint": "prettier --check ."
     },
     "source": [
         "frontend/map.js",
@@ -12,10 +13,25 @@
             "distDir": "./compiled_static"
         }
     },
+    "prettier": {
+        "trailingComma": "all",
+        "printWidth": 88,
+        "tabWidth": 4,
+        "semi": false,
+        "overrides": [
+            {
+                "files": "*yml",
+                "options": {
+                    "tabWidth": 2
+                }
+            }
+        ]
+    },
     "dependencies": {
         "@hotwired/stimulus": "^3.2.1",
         "lodash": "^4.17.21",
         "ol": "^7.2.2",
-        "parcel": "^2.8.3"
+        "parcel": "^2.8.3",
+        "prettier": "^2.8.4"
     }
 }

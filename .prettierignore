@@ -1,0 +1,17 @@
+# Keep in sync with .gitignore until we can use several prettierignore files
+# https://github.com/prettier/prettier/issues/8048
+.DS_Store
+.env
+__pycache__
+.venv
+.parcel-cache
+staticfiles
+compiled_static
+node_modules
+
+# Directories that include a .gitignore
+.*_cache
+
+# Code we don't want to check
+static/dsfr
+*.html

@@ -1,6 +1,6 @@
-import { Controller } from "@hotwired/stimulus";
-import debounce from "lodash/debounce";
-import { addGeometryToLayerGroup, centerToGeometry, fitMapToLayerGroup } from "./map";
+import { Controller } from "@hotwired/stimulus"
+import debounce from "lodash/debounce"
+import { addGeometryToLayerGroup, centerToGeometry, fitMapToLayerGroup } from "./map"
 
 export default class extends Controller {
     static targets = ["section"]
@@ -17,5 +17,4 @@ export default class extends Controller {
     }
 
     #showLayerGroupSoon = debounce(fitMapToLayerGroup)
-
 }
