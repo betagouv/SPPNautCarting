@@ -1,5 +1,5 @@
 # Keep in sync with .prettierignore until we can use several prettierignore files
-# https://github.com/prettier/prettier/issues/8048Contenu_du_mac
+# https://github.com/prettier/prettier/issues/8048
 .DS_Store
 .env
 __pycache__
