@@ -1,6 +1,7 @@
 --constraint=requirements.txt
 
 black
+django-browser-reload
 honcho
 pytest
 pytest-django

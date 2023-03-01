@@ -36,6 +36,13 @@ INSTALLED_APPS = [
     "carting",
 ]
 
+if DEBUG:
+    INSTALLED_APPS.extend(
+        [
+            "django_browser_reload",
+        ]
+    )
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -46,6 +53,12 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+if "django_browser_reload" in INSTALLED_APPS:
+    MIDDLEWARE.extend(
+        [
+            "django_browser_reload.middleware.BrowserReloadMiddleware",
+        ]
+    )
 
 ROOT_URLCONF = "core.urls"
 
