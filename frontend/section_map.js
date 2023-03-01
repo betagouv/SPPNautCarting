@@ -10,7 +10,7 @@ import LayerGroup from "ol/layer/Group"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
 import { useGeographic } from "ol/proj.js"
-import { OSM, Vector as VectorSource } from "ol/source.js"
+import { OSM, TileWMS, Vector as VectorSource } from "ol/source.js"
 import ImageWMS from "ol/source/ImageWMS.js"
 import { Circle, Fill, Stroke, Style } from "ol/style.js"
 
@@ -55,25 +55,32 @@ export class SectionMap {
             }),
         })
 
-        const rasterMarineLayer = new ImageLayer({
-            source: new ImageWMS({
-                url: "/carting/proxy",
-                // params: { LAYERS: "RASTER_MARINE_20_WMSR_3857" }, // 20, 50, 150, 400
-                params: { LAYERS: "RASTER_MARINE_50_WMSR_3857" }, // 20, 50, 150, 400
-                // params: { LAYERS: "RASTER_MARINE_150_WMSR_3857" }, // 20, 50, 150, 400
-                // params: { LAYERS: "RASTER_MARINE_400_WMSR_3857" }, // 20, 50, 150, 400
-                // params: { LAYERS: "RASTER_MARINE_1M_3857_WMSR" }, // 20, 50, 150, 400
-                ratio: 1,
-                serverType: "geoserver",
-                crossOrigin: "anonymous",
-            }),
+        const layerPerZoom = [
+            { layer: "RASTER_MARINE_1M_3857_WMSR", maxZoom: 7 },
+            { layer: "RASTER_MARINE_400_WMSR_3857", minZoom: 7, maxZoom: 10 },
+            { layer: "RASTER_MARINE_150_WMSR_3857", minZoom: 10, maxZoom: 11 },
+            { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 11, maxZoom: 13 },
+            { layer: "RASTER_MARINE_20_WMSR_3857", minZoom: 13 },
+        ]
+        const rasterMarineLayers = layerPerZoom.map(({ layer, minZoom, maxZoom }) => {
+            return new TileLayer({
+                source: new TileWMS({
+                    url: "/carting/proxy",
+                    params: { LAYERS: layer },
+                    serverType: "geoserver",
+                }),
+                maxZoom: maxZoom,
+                minZoom: minZoom,
+            })
         })
         this.#map = new OLMap({
             target,
             view,
             layers: [
                 //osmLayer,
-                rasterMarineLayer,
+                // rasterMarineLayer,
+                // rasterMarineTileLayer,
+                ...rasterMarineLayers,
                 // epavesLayer,
                 this.#sectionsLayerGroup,
             ],
