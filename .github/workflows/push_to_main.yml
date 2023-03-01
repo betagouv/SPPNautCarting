@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - stumulus_style # ⚠️ FIXME Remove before merging
 
 jobs:
   build_and_test:
