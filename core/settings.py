@@ -53,7 +53,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-if DEBUG:
+if "django_browser_reload" in INSTALLED_APPS:
     MIDDLEWARE.extend(
         [
             "django_browser_reload.middleware.BrowserReloadMiddleware",
