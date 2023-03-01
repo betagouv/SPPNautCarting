@@ -9,7 +9,7 @@ import LayerGroup from "ol/layer/Group"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
 import { useGeographic } from "ol/proj.js"
-import { OSM, Vector as VectorSource } from "ol/source.js"
+import { OSM, TileWMS, Vector as VectorSource } from "ol/source.js"
 import { Circle, Fill, Stroke, Style } from "ol/style.js"
 
 useGeographic()
@@ -43,11 +43,28 @@ export class SectionMap {
             zoom: maxZoom,
         })
         const osmSource = new OSM()
-        const tileLayer = new TileLayer({ source: osmSource })
+        const osmLayer = new TileLayer({ source: osmSource })
+
+        const rasterMarineLayer = new TileLayer({
+            source: new TileWMS({
+                url: "https://services.data.shom.fr/INSPIRE/wms/r?version=1.3.0",
+                serverType:'geoserver',
+                // params: {'LAYERS', }
+            }),
+        })
+        // new ImageLayer({
+        //     extent: [-13884991, 2870341, -7455066, 6338219],
+        //     source: new ImageWMS({
+        //       url: 'https://ahocevar.com/geoserver/wms',
+        //       params: {'LAYERS': 'topp:states'},
+        //       ratio: 1,
+        //       serverType: 'geoserver',
+        //     }),
+        //   }),
         this.#map = new OLMap({
             target,
             view,
-            layers: [tileLayer, this.#sectionsLayerGroup],
+            layers: [osmLayer, rasterMarineLayer, this.#sectionsLayerGroup],
         })
 
         this.#selectInteraction = new Select({
