@@ -2,7 +2,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, Http404, HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET
 
 from carting.models import OuvrageSection
@@ -12,6 +12,9 @@ from carting.models import OuvrageSection
 @require_GET
 def index(request: HttpRequest) -> HttpResponse:
     search = request.GET.get("search", "")
+    if not search:
+        # FIXME: À faire plus joli?
+        return redirect("/carting?search=4.1.")
 
     ouvrage, _, numero = search.rpartition("/")
     if not numero:

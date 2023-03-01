@@ -59,13 +59,8 @@
     top: 0;
 }
 
-/* fixme : ça ne marche pas */
-:has(:not(:target)) .sppnaut-section-searched {
-    background-color: yellow;
-}
-
 .sppnaut-section:target {
-    background-color: yellow;
+    background-color: #ececfe;
 }
 
 html,
@@ -75,4 +70,13 @@ body {
 
 .sppnaut-scroll-mt-8w {
     scroll-margin-top: 4rem;
+}
+
+/* FIXME */
+.sppnaut-prout h2,
+.sppnaut-prout h3,
+.sppnaut-prout h4,
+.sppnaut-prout h5,
+.sppnaut-prout h6 {
+    margin-top: 1rem;
 }

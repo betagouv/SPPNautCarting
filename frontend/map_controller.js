@@ -8,10 +8,10 @@ export default class extends Controller {
     static values = {
         initialCenter: { type: Array, default: [-2.0, 48.65] },
         maxZoom: { type: Number, default: 13 },
-        padding: { type: Array, default: [100, 100, 100, 100] },
+        padding: { type: Array, default: [20, 20, 20, 20] },
         duration: { type: Number, default: 300 },
-        selectedStrokeColor: { type: String, default: "#ff0" },
-        selectedFillColor: { type: String, default: "#ff02" },
+        selectedStrokeColor: { type: String, default: "#000091" },
+        selectedFillColor: { type: String, default: "#00009108" },
     }
 
     initialize() {

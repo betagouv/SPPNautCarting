@@ -20,13 +20,13 @@
             ol:select->map#selectSectionInText
             hashchange@window->map#selectSectionInMap
         "
-        data-map-padding-value="[0,0,0,0]"
+        {% comment %} data-map-padding-value="[0,0,0,0]"
         data-map-duration-value="300"
         data-map-selected-stroke-color-value="#f00"
-        data-map-selected-fill-color-value="#f003"
+        data-map-selected-fill-color-value="#f003" {% endcomment %}
         class="fr-grid-row fr-m-1w"
     >
-        <div class="fr-col-12 fr-col-lg-6">
+        <div class="fr-col-12 fr-col-lg-7">
             <div
                 id="map"
                 data-map-target="map"
@@ -34,7 +34,7 @@
             >
             </div>
         </div>
-        <div class="fr-col-12 fr-col-lg-6 fr-p-1w">
+        <div class="fr-col-12 fr-col-lg-5 fr-p-1w">
             <form>
                 <div class="fr-search-bar" role="search">
                     <input
@@ -51,39 +51,29 @@
             </form>
             <hr/>
             <div>
-                <table>
-                    {% for section in sections %}
-                        <tr id="{{section.pk}}"
-                            class="sppnaut-section {% if search == section.numero %}sppnaut-section-searched{% endif %} sppnaut-scroll-mt-8w"
-                            data-map-target="section"
-                            data-geojson="{{ section.geojson }}"
-                        >
-                            <td class="sppnaut-v-align-top">
-                                <div class="fr-grid-row">
-                                    <span class="fr-col-12">
-                                        <a
-                                            href="{% url 'carting:index' %}?search={{ section.numero }}"
-                                            class="fr-link"
-                                            title="{{ section.get_typology_display }}"
-                                        >
-                                            {{ section.numero }}
-                                        </a>
-                                    </span>
-                                    {% if section.geometry and section.tree_depth >= search_tree_depth %}
-                                        <a href="#{{ section.pk }}"
-                                            class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line fr-col-12"
-                                        >
-                                            Montrer sur la carte
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td class="sppnaut-v-align-top">
-                                {{ section.content_html }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                {% for section in sections %}
+                    <div id="{{section.pk}}"
+                        class="sppnaut-section sppnaut-scroll-mt-8w
+                        {% comment %} fr-grid-row fr-grid-row--gutters {% endcomment %}
+                        "
+                        data-map-target="section"
+                        data-geojson="{{ section.geojson }}"
+                        style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
+                    >
+                        <span style="min-width: 2.5rem">
+                        {% if section.geometry and section.tree_depth >= search_tree_depth %}
+                            <a href="#{{ section.pk }}"
+                                class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line"
+                            >
+                                Montrer sur la carte
+                            </a>
+                        {% endif %}
+                        </span>
+                        <div class="sppnaut-prout">
+                            {{ section.content_html }}
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

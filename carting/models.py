@@ -44,6 +44,16 @@ class SectionTypology(models.TextChoices):
         }
         return to_ingester[self]
 
+    def tag_name(self) -> str | None:
+        to_tag_name = {
+            self.CHAPTER: "h2",
+            self.SUBCHAPTER: "h3",
+            self.PARAGRAPH: "h4",
+            self.SUBPARAGRAPH: "h5",
+            self.SUBSUBPARAGRAPH: "h6",
+        }
+        return to_tag_name.get(self, None)
+
 
 class OuvrageSectionManager(models.Manager):
     def ingest_xml_subtree(
@@ -131,7 +141,16 @@ class OuvrageSection(TreeNode):
     def content_html(self):
         if not self.content:
             return ""
-        return mark_safe(xslt_transform(ET.fromstring(self.content)))
+
+        # FIXME: À retirer pour la prod
+        xslt_transform = ET.XSLT(ET.parse("carting/xslt/ouvrage_section_html.xslt"))
+        inner_html = xslt_transform(ET.fromstring(self.content))
+
+        tag_name = SectionTypology[self.typology].tag_name()
+
+        if tag_name:
+            inner_html = f"<{tag_name}>{inner_html}</{tag_name}>"
+        return mark_safe(inner_html)
 
 
 class SectionIngester(NamedTuple):

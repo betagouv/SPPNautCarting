@@ -3,7 +3,11 @@
     <xsl:output method="html" indent="yes"/>
 
     <xsl:template match="
-        titre/nmrAlinea|
+        titre/nmrAlinea
+    ">
+    </xsl:template>
+
+    <xsl:template match="
         alinea/nmrAlinea
     ">
         <span class="fr-text--xs fr-pr-1w">

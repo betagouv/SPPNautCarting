@@ -58,7 +58,11 @@ export class SectionMap {
         const rasterMarineLayer = new ImageLayer({
             source: new ImageWMS({
                 url: "/carting/proxy",
-                params: { LAYERS: "RASTER_MARINE_400_WMSR_3857" }, // 20, 50, 150, 400
+                // params: { LAYERS: "RASTER_MARINE_20_WMSR_3857" }, // 20, 50, 150, 400
+                params: { LAYERS: "RASTER_MARINE_50_WMSR_3857" }, // 20, 50, 150, 400
+                // params: { LAYERS: "RASTER_MARINE_150_WMSR_3857" }, // 20, 50, 150, 400
+                // params: { LAYERS: "RASTER_MARINE_400_WMSR_3857" }, // 20, 50, 150, 400
+                // params: { LAYERS: "RASTER_MARINE_1M_3857_WMSR" }, // 20, 50, 150, 400
                 ratio: 1,
                 serverType: "geoserver",
                 crossOrigin: "anonymous",
@@ -70,7 +74,7 @@ export class SectionMap {
             layers: [
                 //osmLayer,
                 rasterMarineLayer,
-                epavesLayer,
+                // epavesLayer,
                 this.#sectionsLayerGroup,
             ],
         })
@@ -90,8 +94,8 @@ export class SectionMap {
         const hoverInteraction = new Select({
             condition: pointerMove,
             style: this.#style({
-                strokeColor: "#3399CC",
-                fillColor: "rgba(255,255,255,0.25)",
+                strokeColor: "#6a6af4",
+                fillColor: "transparent",
                 width: 2,
             }),
         })
@@ -104,8 +108,8 @@ export class SectionMap {
                 features: new GeoJSON().readFeatures(geojson),
             }),
             style: this.#style({
-                strokeColor: "#3399CC",
-                fillColor: "rgba(255,255,255,0.2)",
+                strokeColor: "#6a6af4",
+                fillColor: "transparent",
             }),
         })
         // FIXME: Voir si on peut faire ça plus proprement
