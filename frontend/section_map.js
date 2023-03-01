@@ -83,11 +83,17 @@ export class SectionMap {
                 fillColor: "rgba(255,255,255,0.2)",
             }),
         })
-        // FIXME: Voir si on peut faire ça plus proprement
-        const layerArea = extent.getArea(layer.getSource().getExtent())
-        layer.setZIndex(Math.max(10000 - layerArea * 1000, 1))
-        layer.set("bpnID", bpnID)
 
+        const layerArea = extent.getArea(layer.getSource().getExtent())
+
+        if (!layerArea) {
+            // FIXME : les objets sans géométrie retournent un geojson vide au lieu de
+            // ne rien retourner. Voir côté backend pour ne rien retourner dans ce cas.
+            return
+        }
+
+        layer.setZIndex(1 / layerArea)
+        layer.set("bpnID", bpnID)
         this.#sectionsLayerGroup.getLayers().push(layer)
     }
 
