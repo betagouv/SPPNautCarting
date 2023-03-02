@@ -8,10 +8,6 @@ export default class extends Controller {
     static values = {
         initialCenter: { type: Array, default: [-2.0, 48.65] },
         maxZoom: { type: Number, default: 13 },
-        padding: { type: Array, default: [20, 20, 20, 20] },
-        duration: { type: Number, default: 300 },
-        selectedStrokeColor: { type: String, default: "#000091" },
-        selectedFillColor: { type: String, default: "#00009108" },
     }
 
     initialize() {
@@ -19,16 +15,12 @@ export default class extends Controller {
             target: this.mapTarget,
             initialCenter: this.initialCenterValue,
             maxZoom: this.maxZoomValue,
-            padding: this.paddingValue,
-            duration: this.durationValue,
-            selectedFillColor: this.selectedFillColorValue,
-            selectedStrokeColor: this.selectedStrokeColorValue,
         })
     }
 
     connect() {
         this.#map.fitViewToAllSections()
-        this.selectSectionInMap()
+        this.selectSectionInMapFromHash()
     }
 
     sectionTargetConnected(sectionTarget) {
@@ -36,11 +28,11 @@ export default class extends Controller {
         this.#map.addSection(sectionTarget.dataset.bpnId, geojson)
     }
 
-    selectSectionInText(e) {
-        location.hash = e.detail.bpnID
+    selectSectionInText(event) {
+        location.hash = event.detail.bpnID
     }
 
-    selectSectionInMap() {
+    selectSectionInMapFromHash() {
         const bpnID = location.hash.split("#")[1]
         if (!bpnID) {
             return

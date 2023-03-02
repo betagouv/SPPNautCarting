@@ -18,12 +18,8 @@
         data-controller="map"
         data-action="
             ol:select->map#selectSectionInText
-            hashchange@window->map#selectSectionInMap
+            hashchange@window->map#selectSectionInMapFromHash
         "
-        {% comment %} data-map-padding-value="[0,0,0,0]"
-        data-map-duration-value="300"
-        data-map-selected-stroke-color-value="#f00"
-        data-map-selected-fill-color-value="#f003" {% endcomment %}
         class="fr-grid-row fr-m-1w"
     >
         <div class="fr-col-12 fr-col-lg-7">
@@ -55,20 +51,23 @@
                 {% with plop='TOPONYME REFERENCE' %}
                     {% if section.typology in plop.split %}
                         <meta
-                            data-map-target="section"
-                            data-bpn-id="{{ section.pk }}"
-                            data-geojson="{{ section.geojson }}"
+                            {% if section.geojson %}
+                                data-map-target="section"
+                                data-bpn-id="{{section.pk}}"
+                                data-geojson="{{ section.geojson }}"
+                            {% endif %}
                         >
                     {% else %}
                         <div
                             id="{{section.pk}}"
-                            data-bpn-id="{{section.pk}}"
-                            class="sppnaut-section sppnaut-scroll-mt-8w
-                            {% comment %} fr-grid-row fr-grid-row--gutters {% endcomment %}
-                            "
-                            data-map-target="section"
-                            data-geojson="{{ section.geojson }}"
                             style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
+                            class="sppnaut-section sppnaut-scroll-mt-8w
+                            "
+                            {% if section.geojson %}
+                                data-map-target="section"
+                                data-bpn-id="{{section.pk}}"
+                                data-geojson="{{ section.geojson }}"
+                            {% endif %}
                         >
                             <span style="min-width: 2.5rem">
                                 {% if section.geometry and section.tree_depth >= search_tree_depth %}

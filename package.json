@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "build": "parcel build",
+        "build": "rm -rf compiled_static && parcel build",
         "watch": "rm -rf compiled_static && parcel watch",
         "lint": "prettier --check ."
     },

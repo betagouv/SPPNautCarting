@@ -22,21 +22,13 @@ export class SectionMap {
     #selectInteraction
 
     #maxZoom
-    #padding
-    #duration
+    #padding = [20, 20, 20, 20]
+    #duration = 300
+    #selectedStrokeColor = "#000091"
+    #selectedFillColor = "#00009108"
 
-    constructor({
-        target,
-        initialCenter,
-        maxZoom,
-        padding,
-        duration,
-        selectedFillColor,
-        selectedStrokeColor,
-    }) {
+    constructor({ target, initialCenter, maxZoom }) {
         this.#maxZoom = maxZoom
-        this.#padding = padding
-        this.#duration = duration
 
         this.#sectionsLayerGroup = new LayerGroup()
 
@@ -90,8 +82,8 @@ export class SectionMap {
             condition: (mapBrowserEvent) =>
                 click(mapBrowserEvent) && noModifierKeys(mapBrowserEvent),
             style: this.#style({
-                strokeColor: selectedStrokeColor,
-                fillColor: selectedFillColor,
+                strokeColor: this.#selectedStrokeColor,
+                fillColor: this.#selectedFillColor,
                 width: 2,
             }),
         })
@@ -119,11 +111,10 @@ export class SectionMap {
                 fillColor: "transparent",
             }),
         })
-        // FIXME: Voir si on peut faire ça plus proprement
         const layerArea = extent.getArea(layer.getSource().getExtent())
-        layer.setZIndex(Math.max(10000 - layerArea * 1000, 1))
-        layer.set("bpnID", bpnID)
 
+        layer.setZIndex(1 / layerArea)
+        layer.set("bpnID", bpnID)
         this.#sectionsLayerGroup.getLayers().push(layer)
     }
 
