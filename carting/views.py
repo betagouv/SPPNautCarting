@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
-from carting.models import OuvrageSection
+from carting.models import OuvrageSection, SectionTypology
 
 
 # FIXME : Les sections commençant par '0.' ne devraient pas être affichées (pas de géométrie attachée); les illustrations en '0.' sont mal ordonnées
@@ -16,6 +16,9 @@ def index(request: HttpRequest) -> HttpResponse:
     if not search:
         return redirect(reverse("carting:index") + "?search=4.1.")
 
+    if not search.endswith("."):
+        return redirect(reverse("carting:index") + f"?search={search}.")
+
     ouvrage, _, numero = search.rpartition("/")
     if not numero:
         return render(
@@ -23,7 +26,15 @@ def index(request: HttpRequest) -> HttpResponse:
             "carting/index.html",
         )
 
-    sections = OuvrageSection.objects.all().with_tree_fields()
+    sections = OuvrageSection.objects.exclude(
+        typology__in=[
+            SectionTypology.ALINEA,
+            SectionTypology.ILLUSTRATION,
+            SectionTypology.REFERENCE,
+            SectionTypology.TABLE,
+            SectionTypology.TOPONYME,
+        ]
+    ).with_tree_fields()
     if ouvrage:
         sections = sections.filter(ouvrage_name=ouvrage)
     try:

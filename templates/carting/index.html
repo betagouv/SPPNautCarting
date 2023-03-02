@@ -48,21 +48,11 @@
             <hr/>
             <div>
                 {% for section in sections %}
-                {% with plop='TOPONYME REFERENCE' %}
-                    {% if section.typology in plop.split %}
-                        <meta
-                            {% if section.geojson %}
-                                data-map-target="section"
-                                data-bpn-id="{{section.pk}}"
-                                data-geojson="{{ section.geojson }}"
-                            {% endif %}
-                        >
-                    {% else %}
+                    {% if section.should_display %}
                         <div
                             id="{{section.pk}}"
                             style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
-                            class="sppnaut-section sppnaut-scroll-mt-20vh
-                            "
+                            class="sppnaut-section sppnaut-scroll-mt-20vh"
                             {% if section.geojson %}
                                 data-map-target="section"
                                 data-bpn-id="{{section.pk}}"
@@ -78,12 +68,19 @@
                                     </a>
                                 {% endif %}
                             </span>
-                            <div class="sppnaut-prout">
+                            <div>
                                 {{ section.content_html }}
                             </div>
                         </div>
+                    {% else %}
+                        {% if section.geojson %}
+                            <meta
+                                data-map-target="section"
+                                data-bpn-id="{{section.pk}}"
+                                data-geojson="{{ section.geojson }}"
+                            >
+                        {% endif %}
                     {% endif %}
-                {% endwith %}
                 {% endfor %}
             </div>
         </div>

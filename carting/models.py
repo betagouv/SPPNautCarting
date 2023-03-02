@@ -144,15 +144,21 @@ class OuvrageSection(TreeNode):
         if not self.content:
             return ""
 
-        # FIXME: À retirer pour la prod
-        xslt_transform = ET.XSLT(ET.parse("carting/xslt/ouvrage_section_html.xslt"))
         inner_html = xslt_transform(ET.fromstring(self.content))
 
         tag_name = SectionTypology[self.typology].tag_name()
 
         if tag_name:
-            inner_html = f"<{tag_name}>{inner_html}</{tag_name}>"
+            # FIXME : extraire dans un templatetag django
+            inner_html = f'<{tag_name} class="fr-mt-2w">{inner_html}</{tag_name}>'
         return mark_safe(inner_html)
+
+    @property
+    def should_display(self):
+        return self.typology not in [
+            SectionTypology.REFERENCE,
+            SectionTypology.TOPONYME,
+        ]
 
 
 class SectionIngester(NamedTuple):

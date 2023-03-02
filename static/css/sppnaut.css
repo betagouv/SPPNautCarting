@@ -71,12 +71,3 @@ body {
 .sppnaut-scroll-mt-20vh {
     scroll-margin-top: 20vh;
 }
-
-/* FIXME */
-.sppnaut-prout h2,
-.sppnaut-prout h3,
-.sppnaut-prout h4,
-.sppnaut-prout h5,
-.sppnaut-prout h6 {
-    margin-top: 1rem;
-}

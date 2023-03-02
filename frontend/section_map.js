@@ -14,6 +14,16 @@ import { Circle, Fill, Stroke, Style } from "ol/style.js"
 
 useGeographic()
 
+function buildStyle({ strokeColor, fillColor, width }) {
+    const stroke = new Stroke({ color: strokeColor, width })
+    const fill = new Fill({ color: fillColor })
+    return new Style({
+        fill,
+        stroke,
+        image: new Circle({ radius: 5, stroke, fill }),
+    })
+}
+
 export class SectionMap {
     #map
     #sectionsLayerGroup
@@ -22,14 +32,28 @@ export class SectionMap {
     #maxZoom
     #padding = [20, 20, 20, 20]
     #duration = 300
-    #selectedStrokeColor = "#000091"
+
+    #initialStrokeColor = "red"
+    #initialFillColor = "transparent"
+    #initialWidth = 1.5
+
+    #hoveredStrokeColor = "red"
+    #hoveredFillColor = "transparent"
+    #hoveredWidth = 3
+
+    #selectedStrokeColor = "red"
     #selectedFillColor = "#00009108"
+    #selectedWidth = 2
 
     constructor({ target, initialCenter, maxZoom }) {
         this.#maxZoom = maxZoom
-
         this.#sectionsLayerGroup = new LayerGroup()
+        this.#map = this.#initMap(maxZoom, initialCenter, target)
+        this.#initHoverInteraction()
+        this.#selectInteraction = this.#initSelectInteraction()
+    }
 
+    #initMap(maxZoom, initialCenter, target) {
         const view = new View({
             center: initialCenter,
             zoom: maxZoom,
@@ -39,7 +63,7 @@ export class SectionMap {
             { layer: "RASTER_MARINE_1M_3857_WMSR", maxZoom: 7 },
             { layer: "RASTER_MARINE_400_WMSR_3857", minZoom: 7, maxZoom: 10 },
             { layer: "RASTER_MARINE_150_WMSR_3857", minZoom: 10, maxZoom: 11 },
-            { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 11, maxZoom: 13 },
+            { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 11 },
             { layer: "RASTER_MARINE_20_WMSR_3857", minZoom: 13 },
         ]
         const rasterMarineLayers = layerPerZoom.map(({ layer, minZoom, maxZoom }) => {
@@ -50,41 +74,45 @@ export class SectionMap {
                     params: { LAYERS: layer },
                     serverType: "geoserver",
                 }),
+                preload: Infinity,
                 maxZoom,
                 minZoom,
             })
         })
-        this.#map = new OLMap({
+
+        return new OLMap({
             target,
             view,
             layers: [...rasterMarineLayers, this.#sectionsLayerGroup],
         })
+    }
 
-        this.#map.on("moveend", () =>
-            // FIXME : enlever
-            console.log("Zoom", this.#map.getView().getZoom()),
-        )
-
-        this.#selectInteraction = new Select({
+    #initSelectInteraction() {
+        const selectInteraction = new Select({
             condition: (mapBrowserEvent) =>
                 click(mapBrowserEvent) && noModifierKeys(mapBrowserEvent),
-            style: this.#style({
+            style: buildStyle({
                 strokeColor: this.#selectedStrokeColor,
                 fillColor: this.#selectedFillColor,
-                width: 2,
+                width: this.#selectedWidth,
             }),
         })
-        this.#selectInteraction.on("select", this.#dispatchBpnID)
-        this.#map.addInteraction(this.#selectInteraction)
+        selectInteraction.on("select", this.#dispatchBpnID)
+        this.#map.addInteraction(selectInteraction)
 
+        return selectInteraction
+    }
+
+    #initHoverInteraction() {
         const hoverInteraction = new Select({
             condition: pointerMove,
-            style: this.#style({
-                strokeColor: "#6a6af4",
-                fillColor: "transparent",
-                width: 2,
+            style: buildStyle({
+                strokeColor: this.#hoveredStrokeColor,
+                fillColor: this.#hoveredFillColor,
+                width: this.#hoveredWidth,
             }),
         })
+
         this.#map.addInteraction(hoverInteraction)
     }
 
@@ -93,9 +121,10 @@ export class SectionMap {
             source: new VectorSource({
                 features: new GeoJSON().readFeatures(geojson),
             }),
-            style: this.#style({
-                strokeColor: "#6a6af4",
-                fillColor: "transparent",
+            style: buildStyle({
+                strokeColor: this.#initialStrokeColor,
+                fillColor: this.#initialFillColor,
+                width: this.#initialWidth,
             }),
         })
         const layerArea = extent.getArea(layer.getSource().getExtent())
@@ -136,11 +165,11 @@ export class SectionMap {
         })
     }
 
-    #dispatchBpnID = (e) => {
-        const selectedFeature = e.target.getFeatures().item(0)
+    #dispatchBpnID = (olEvent) => {
+        const selectedFeature = olEvent.target.getFeatures().item(0)
         let bpnID = ""
         if (selectedFeature) {
-            const layer = e.target.getLayer(selectedFeature)
+            const layer = olEvent.target.getLayer(selectedFeature)
             bpnID = layer.get("bpnID")
         }
         this.#map.getTargetElement().dispatchEvent(
@@ -149,15 +178,5 @@ export class SectionMap {
                 bubbles: true,
             }),
         )
-    }
-
-    #style({ strokeColor, fillColor, width }) {
-        const stroke = new Stroke({ color: strokeColor, width })
-        const fill = new Fill({ color: fillColor })
-        return new Style({
-            fill,
-            stroke,
-            image: new Circle({ radius: 5, stroke, fill }),
-        })
     }
 }
