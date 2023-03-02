@@ -52,27 +52,39 @@
             <hr/>
             <div>
                 {% for section in sections %}
-                    <div id="{{section.pk}}"
-                        class="sppnaut-section sppnaut-scroll-mt-8w
-                        {% comment %} fr-grid-row fr-grid-row--gutters {% endcomment %}
-                        "
-                        data-map-target="section"
-                        data-geojson="{{ section.geojson }}"
-                        style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
-                    >
-                        <span style="min-width: 2.5rem">
-                        {% if section.geometry and section.tree_depth >= search_tree_depth %}
-                            <a href="#{{ section.pk }}"
-                                class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line"
-                            >
-                                Montrer sur la carte
-                            </a>
-                        {% endif %}
-                        </span>
-                        <div class="sppnaut-prout">
-                            {{ section.content_html }}
+                {% with plop='TOPONYME REFERENCE' %}
+                    {% if section.typology in plop.split %}
+                        <meta
+                            data-map-target="section"
+                            data-bpn-id="{{ section.pk }}"
+                            data-geojson="{{ section.geojson }}"
+                        >
+                    {% else %}
+                        <div
+                            id="{{section.pk}}"
+                            data-bpn-id="{{section.pk}}"
+                            class="sppnaut-section sppnaut-scroll-mt-8w
+                            {% comment %} fr-grid-row fr-grid-row--gutters {% endcomment %}
+                            "
+                            data-map-target="section"
+                            data-geojson="{{ section.geojson }}"
+                            style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
+                        >
+                            <span style="min-width: 2.5rem">
+                                {% if section.geometry and section.tree_depth >= search_tree_depth %}
+                                    <a href="#{{ section.pk }}"
+                                        class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line"
+                                    >
+                                        Montrer sur la carte
+                                    </a>
+                                {% endif %}
+                            </span>
+                            <div class="sppnaut-prout">
+                                {{ section.content_html }}
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
+                {% endwith %}
                 {% endfor %}
             </div>
         </div>

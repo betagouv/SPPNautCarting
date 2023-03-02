@@ -45,7 +45,11 @@
         principal|
         reference
     ">
-        <a href="#">
+        <a
+            id="{@bpn_id}"
+            href="#{@bpn_id}"
+            class="sppnaut-scroll-mt-8w"
+        >
             <xsl:apply-templates />
         </a>
     </xsl:template>

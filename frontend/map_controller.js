@@ -33,7 +33,7 @@ export default class extends Controller {
 
     sectionTargetConnected(sectionTarget) {
         const geojson = JSON.parse(sectionTarget.dataset.geojson)
-        this.#map.addSection(sectionTarget.id, geojson)
+        this.#map.addSection(sectionTarget.dataset.bpnId, geojson)
     }
 
     selectSectionInText(e) {
