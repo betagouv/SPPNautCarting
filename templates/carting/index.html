@@ -5,27 +5,32 @@
 {% block page_title %}Carting{% endblock%}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static "map.css" %}">
+<link rel="stylesheet" href="{% static "carting.css" %}">
 {% endblock %}
 
 {% block js %}
-<script type="module" src="{% static "application.js" %}"></script>
+<script type="module" src="{% static "carting.js" %}"></script>
 {% endblock %}
 
 {% block main %}
 <div class="fr-container--fluid">
     <div
         data-controller="map"
+        data-action="
+            ol:select->map#selectSectionInText
+            hashchange@window->map#selectSectionInMapFromHash
+        "
         class="fr-grid-row fr-m-1w"
     >
-        <div class="fr-col-12 fr-col-lg-6">
+        <div class="fr-col-12 fr-col-lg-7">
             <div
                 id="map"
+                data-map-target="map"
                 class="fr-p-1w sppnaut-min-h-half-screen sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
             >
             </div>
         </div>
-        <div class="fr-col-12 fr-col-lg-6 fr-p-1w">
+        <div class="fr-col-12 fr-col-lg-5 fr-p-1w">
             <form>
                 <div class="fr-search-bar" role="search">
                     <input
@@ -42,41 +47,41 @@
             </form>
             <hr/>
             <div>
-                <table>
-                    {% for section in sections %}
-                        <tr id="{{section.pk}}"
-                            class="{% if search == section.numero %}sppnaut-bg-yellow{% endif %}"
+                {% for section in sections %}
+                    {% if section.should_display %}
+                        <div
+                            id="{{section.pk}}"
+                            style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
+                            class="sppnaut-section sppnaut-scroll-mt-20vh"
+                            {% if section.geojson %}
+                                data-map-target="section"
+                                data-bpn-id="{{section.pk}}"
+                                data-geojson="{{ section.geojson }}"
+                            {% endif %}
                         >
-                            <td class="sppnaut-v-align-top">
-                                <div class="fr-grid-row">
-                                    <span class="fr-col-12">
-                                        <a
-                                            href="{% url 'carting:index' %}?search={{ section.numero }}"
-                                            class="fr-link"
-                                            title="{{ section.get_typology_display }}"
-                                        >
-                                            {{ section.numero }}
-                                        </a>
-                                    </span>
-                                    {% if section.geometry and section.tree_depth >= search_tree_depth %}
-                                        <button
-                                            data-map-target="section"
-                                            data-map-geojson-param="{{ section.geojson }}"
-                                            data-map-bpnid-param="{{ section.pk }}"
-                                            data-action="map#showOnMap"
-                                            class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line fr-col-12"
-                                        >
-                                            Montrer sur la carte
-                                        </button>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td class="sppnaut-v-align-top">
+                            <span style="min-width: 2.5rem">
+                                {% if section.geometry and section.tree_depth >= search_tree_depth %}
+                                    <a href="#{{ section.pk }}"
+                                        class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line"
+                                    >
+                                        Montrer sur la carte
+                                    </a>
+                                {% endif %}
+                            </span>
+                            <div>
                                 {{ section.content_html }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        {% if section.geojson %}
+                            <meta
+                                data-map-target="section"
+                                data-bpn-id="{{section.pk}}"
+                                data-geojson="{{ section.geojson }}"
+                            >
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>

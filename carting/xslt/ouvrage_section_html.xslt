@@ -2,10 +2,11 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="html" indent="yes"/>
 
-    <xsl:template match="
-        titre/nmrAlinea|
-        alinea/nmrAlinea
-    ">
+    <xsl:template match="titre/nmrAlinea">
+        <!-- Hide chapter/paragraph numbers -->
+    </xsl:template>
+
+    <xsl:template match="alinea/nmrAlinea">
         <span class="fr-text--xs fr-pr-1w">
             <xsl:apply-templates />
         </span>
@@ -15,15 +16,6 @@
         <span class="sppnaut-bold fr-pr-1w">
             <xsl:apply-templates />
         </span>
-    </xsl:template>
-
-    <xsl:template match="
-        titre/texte/txt|
-        alinea/texte|
-        illustration|
-        tableau
-    ">
-        <xsl:apply-templates />
     </xsl:template>
 
     <xsl:template match="
@@ -41,7 +33,11 @@
         principal|
         reference
     ">
-        <a href="#">
+        <a
+            id="{@bpn_id}"
+            href="#{@bpn_id}"
+            class="sppnaut-scroll-mt-20vh"
+        >
             <xsl:apply-templates />
         </a>
     </xsl:template>

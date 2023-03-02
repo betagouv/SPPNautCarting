@@ -1,20 +1,42 @@
 import { Controller } from "@hotwired/stimulus"
-import debounce from "lodash/debounce"
-import { addGeometryToLayerGroup, centerToGeometry, fitMapToLayerGroup } from "./map"
+import { SectionMap } from "./section_map"
 
 export default class extends Controller {
-    static targets = ["section"]
+    #map
+
+    static targets = ["map", "section"]
+    static values = {
+        initialCenter: { type: Array, default: [-2.0, 48.65] },
+        maxZoom: { type: Number, default: 13 },
+    }
+
+    initialize() {
+        this.#map = new SectionMap({
+            target: this.mapTarget,
+            initialCenter: this.initialCenterValue,
+            maxZoom: this.maxZoomValue,
+        })
+    }
+
+    connect() {
+        this.#map.fitViewToAllSections()
+        this.selectSectionInMapFromHash()
+    }
 
     sectionTargetConnected(sectionTarget) {
-        const geojson = JSON.parse(sectionTarget.dataset.mapGeojsonParam)
-        addGeometryToLayerGroup(sectionTarget.dataset.mapBpnidParam, geojson)
-        this.#showLayerGroupSoon()
+        const geojson = JSON.parse(sectionTarget.dataset.geojson)
+        this.#map.addSection(sectionTarget.dataset.bpnId, geojson)
     }
 
-    showOnMap(event) {
-        const geojson = event.params.geojson
-        centerToGeometry(event.params.bpnid, geojson)
+    selectSectionInText(event) {
+        location.hash = event.detail.bpnID
     }
 
-    #showLayerGroupSoon = debounce(fitMapToLayerGroup)
+    selectSectionInMapFromHash() {
+        const bpnID = location.hash.replace("#", "")
+        if (!bpnID) {
+            return
+        }
+        this.#map.selectSection(bpnID)
+    }
 }

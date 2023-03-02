@@ -44,6 +44,16 @@ class SectionTypology(models.TextChoices):
         }
         return to_ingester[self]
 
+    def tag_name(self) -> str | None:
+        to_tag_name = {
+            self.CHAPTER: "h2",
+            self.SUBCHAPTER: "h3",
+            self.PARAGRAPH: "h4",
+            self.SUBPARAGRAPH: "h5",
+            self.SUBSUBPARAGRAPH: "h6",
+        }
+        return to_tag_name.get(self, None)
+
 
 class OuvrageSectionManager(models.Manager):
     def ingest_xml_subtree(
@@ -124,14 +134,31 @@ class OuvrageSection(TreeNode):
         except DatabaseError:
             self.save()
 
-    def geojson(self):
+    def geojson(self) -> str | None:
+        if not self.geometry:
+            return None
         return serialize("geojson", [self], fields=("geometry",))
 
     @cached_property
     def content_html(self):
         if not self.content:
             return ""
-        return mark_safe(xslt_transform(ET.fromstring(self.content)))
+
+        inner_html = xslt_transform(ET.fromstring(self.content))
+
+        tag_name = SectionTypology[self.typology].tag_name()
+
+        if tag_name:
+            # FIXME : extraire dans un templatetag django
+            inner_html = f'<{tag_name} class="fr-mt-2w">{inner_html}</{tag_name}>'
+        return mark_safe(inner_html)
+
+    @property
+    def should_display(self):
+        return self.typology not in [
+            SectionTypology.REFERENCE,
+            SectionTypology.TOPONYME,
+        ]
 
 
 class SectionIngester(NamedTuple):

@@ -60,7 +60,7 @@ some_geom = {
         "4.1.1.1.0.41": '{"type": "Point", "coordinates": [-1.9005, 48.73017] }',  # iso alinea
         "4.1.1.1.0.45": '{"type": "Point", "coordinates": [-1.94033, 48.7282] }',  # iso alinea
         "4.1.1.1.0.57": '{"type": "Point", "coordinates": [-2.24783, 48.7082] }',  # iso alinea
-        "4.1.2.2.0.25": '{"type": "Point", "coordinates": [-2.9205, 48.89167] }',
+        # "4.1.2.2.0.25": '{"type": "Point", "coordinates": [-2.9205, 48.89167] }',
         "4.5.1.1.0.37": '{"type": "Point", "coordinates": [-2.64183, 48.5565] }',
         "4.5.1.3.0.25": '{"type": "Point", "coordinates": [-2.749, 48.62283] }',
         "4.5.2.0.49": '{"type": "Point", "coordinates": [-2.48833, 48.64533] }',

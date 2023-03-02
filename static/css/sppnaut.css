@@ -59,6 +59,15 @@
     top: 0;
 }
 
-.sppnaut-bg-yellow {
-    background-color: yellow;
+.sppnaut-section:target {
+    background-color: #ececfe;
+}
+
+html,
+body {
+    scroll-behavior: smooth;
+}
+
+.sppnaut-scroll-mt-20vh {
+    scroll-margin-top: 20vh;
 }
