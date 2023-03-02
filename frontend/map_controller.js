@@ -33,7 +33,7 @@ export default class extends Controller {
     }
 
     selectSectionInMapFromHash() {
-        const bpnID = location.hash.split("#")[1]
+        const bpnID = location.hash.replace("#", "")
         if (!bpnID) {
             return
         }

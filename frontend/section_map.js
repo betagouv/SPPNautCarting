@@ -5,13 +5,11 @@ import { click, noModifierKeys, pointerMove } from "ol/events/condition.js"
 import * as extent from "ol/extent"
 import GeoJSON from "ol/format/GeoJSON.js"
 import Select from "ol/interaction/Select.js"
-import { Image as ImageLayer } from "ol/layer.js"
 import LayerGroup from "ol/layer/Group"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
 import { useGeographic } from "ol/proj.js"
-import { OSM, TileWMS, Vector as VectorSource } from "ol/source.js"
-import ImageWMS from "ol/source/ImageWMS.js"
+import { TileWMS, Vector as VectorSource } from "ol/source.js"
 import { Circle, Fill, Stroke, Style } from "ol/style.js"
 
 useGeographic()
@@ -36,16 +34,6 @@ export class SectionMap {
             center: initialCenter,
             zoom: maxZoom,
         })
-        const osmSource = new OSM()
-        const osmLayer = new TileLayer({ source: osmSource })
-        const epavesLayer = new ImageLayer({
-            source: new ImageWMS({
-                url: "https://services.data.shom.fr/INSPIRE/wms/r?version=1.3.0",
-                params: { LAYERS: "EPAVES_PYR-PNG_WLD_3857_WMSR" },
-                ratio: 1,
-                serverType: "geoserver",
-            }),
-        })
 
         const layerPerZoom = [
             { layer: "RASTER_MARINE_1M_3857_WMSR", maxZoom: 7 },
@@ -57,26 +45,25 @@ export class SectionMap {
         const rasterMarineLayers = layerPerZoom.map(({ layer, minZoom, maxZoom }) => {
             return new TileLayer({
                 source: new TileWMS({
+                    // FIXME : ne pas hardcoder cette url dans le JS mais la définir côté router
                     url: "/carting/proxy",
                     params: { LAYERS: layer },
                     serverType: "geoserver",
                 }),
-                maxZoom: maxZoom,
-                minZoom: minZoom,
+                maxZoom,
+                minZoom,
             })
         })
         this.#map = new OLMap({
             target,
             view,
-            layers: [
-                //osmLayer,
-                // rasterMarineLayer,
-                // rasterMarineTileLayer,
-                ...rasterMarineLayers,
-                // epavesLayer,
-                this.#sectionsLayerGroup,
-            ],
+            layers: [...rasterMarineLayers, this.#sectionsLayerGroup],
         })
+
+        this.#map.on("moveend", () =>
+            // FIXME : enlever
+            console.log("Zoom", this.#map.getView().getZoom()),
+        )
 
         this.#selectInteraction = new Select({
             condition: (mapBrowserEvent) =>
