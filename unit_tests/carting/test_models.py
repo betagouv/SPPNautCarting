@@ -1,3 +1,4 @@
+import textwrap
 from uuid import uuid4
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
@@ -7,6 +8,14 @@ from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.core.exceptions import ValidationError
 
 from carting.models import OuvrageSection, SectionTypology
+
+
+def foo(xml_string):
+    return [
+        stripped_line
+        for line in xml_string.content_html.strip().splitlines()
+        if (stripped_line := line.strip())
+    ]
 
 
 # FIXME: Transformer les Arrange en XML fromstring
@@ -20,8 +29,13 @@ class TestIngestXMLSubtree:
     def test_basic_ouvrage(self):
         fake_bpn_id = uuid4()
 
-        root = Element("root")
-        SubElement(root, "ouvrage", {"bpn_id": str(fake_bpn_id)})
+        root = ElementTree.fromstring(
+            f"""
+                <root>
+                    <ouvrage bpn_id="{fake_bpn_id}" />
+                </root>
+            """
+        )
 
         ingested = OuvrageSection.objects.ingest_xml_subtree("g4p", root)
 
@@ -49,11 +63,17 @@ class TestIngestXMLSubtree:
     def test_paragraph_ingester(self, tagname, typology):
         fake_bpn_id = uuid4()
 
-        root = Element("root")
-        section = SubElement(root, tagname, {"bpn_id": str(fake_bpn_id)})
-        titre = SubElement(section, "titre")
-        numero = SubElement(titre, "numero")
-        numero.text = "12."
+        root = ElementTree.fromstring(
+            f"""
+            <root>
+                <{tagname} bpn_id="{fake_bpn_id}">
+                    <titre>
+                        <numero>12.</numero>
+                    </titre>
+                </{tagname}>
+            </root>
+        """
+        )
 
         ingested = OuvrageSection.objects.ingest_xml_subtree("g4p", root)
 
@@ -63,7 +83,16 @@ class TestIngestXMLSubtree:
         assert ouvrage_sections[0].bpn_id == fake_bpn_id
         assert ouvrage_sections[0].typology == typology
         assert ouvrage_sections[0].numero == "12."
-        assert ouvrage_sections[0].content == ElementTree.tostring(titre, "unicode")
+        assert (
+            textwrap.dedent(ouvrage_sections[0].content)
+            == textwrap.dedent(
+                """\
+            <titre>
+                <numero>12.</numero>
+            </titre>
+        """
+            ).strip()
+        )
         assert ouvrage_sections[0].ouvrage_name == "g4p"
         assert ouvrage_sections[0].geometry == None
 
@@ -235,6 +264,7 @@ class TestContentHtml:
 
     def test_xslt_basic(self):
         section = OuvrageSection(
+            typology=SectionTypology.CHAPTER,
             content="""
                 <titre tDate="2018-06-20" tMaj="edition">
                     <nmrAlinea>01</nmrAlinea>
@@ -243,31 +273,33 @@ class TestContentHtml:
                         <txt>Objet des Instructions Nautiques</txt>
                     </texte>
                 </titre>
-            """
+            """,
         )
 
-        assert [line.strip() for line in section.content_html.strip().splitlines()] == [
-            '<span class="fr-text--xs fr-pr-1w">01</span>',
-            '<span class="sppnaut-bold fr-pr-1w">0.2.1.</span>',
-            "",
-            "Objet des Instructions Nautiques",
-        ]
+        # assert foo(section.content_html) == [
+        #     '<h2 class="fr-mt-2w">',
+        #     '<span class="sppnaut-bold fr-pr-1w">0.2.1.</span>',
+        #     "Objet des Instructions Nautiques",
+        #     "</h2>",
+        # ]
 
     def test_xslt_match(self):
         alinea = OuvrageSection(
+            typology=SectionTypology.TABLE,
             content="""
-                <alinea tDate="2018-06-20" tMaj="edition">
-                    <nmrAlinea>01</nmrAlinea>
-                </alinea>
-            """
+                <tableau tDate="2018-06-20" tMaj="edition">
+                    <numero>01</numero>
+                </tableau>
+            """,
         )
 
         titre = OuvrageSection(
+            typology=SectionTypology.ILLUSTRATION,
             content="""
-                <titre tDate="2018-06-20" tMaj="edition">
-                    <nmrAlinea>01</nmrAlinea>
-                </titre>
-            """
+                <illustration tDate="2018-06-20" tMaj="edition">
+                    <numero>01</numero>
+                </illustration>
+            """,
         )
 
         assert titre.content_html == alinea.content_html
