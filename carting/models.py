@@ -26,8 +26,8 @@ class SectionTypology(models.TextChoices):
     ALINEA = "ALINEA", "alinea"
     TABLE = "TABLE", "tableau"
     ILLUSTRATION = "ILLUSTRATION", "illustration"
-    TOPONYME = "TOPONYME", "principal"
-    REFERENCE = "REFERENCE", "reference"
+    TOPONYME = "TOPONYME", "texte/principal|liste/texte/principal"
+    REFERENCE = "REFERENCE", "texte/reference|liste/texte/reference"
 
     def ingester(self) -> type[SectionIngester]:
         to_ingester = {
@@ -46,12 +46,8 @@ class SectionTypology(models.TextChoices):
         return to_ingester[self]
 
     def iterable(self, element):
-        if self in (SectionTypology.TOPONYME, SectionTypology.REFERENCE):
-            return itertools.chain(
-                element.iterfind("texte/" + self.label),
-                element.iterfind("liste/texte/" + self.label),
-            )
-        return element.iterfind(self.label)
+        for xpath in self.label.split("|"):
+            yield from element.iterfind(xpath)
 
     def tag_name(self) -> str | None:
         to_tag_name = {
@@ -105,7 +101,7 @@ class OuvrageSection(TreeNode):
         ordering = ("numero",)
 
     def __str__(self):
-        return f"{self.numero} - {SectionTypology[self.typology].label}"
+        return f"{self.numero} - {SectionTypology[self.typology].name}"
 
     @classmethod
     def from_xml(
