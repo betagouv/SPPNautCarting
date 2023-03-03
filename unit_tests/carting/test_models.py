@@ -1,29 +1,28 @@
-import textwrap
 from uuid import uuid4
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
 
 import pytest
-from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.contrib.gis.geos import GEOSException
 from django.core.exceptions import ValidationError
 
 from carting.models import OuvrageSection, SectionTypology
 
 
-def foo(xml_string):
+def normalize_multiline_string(xml_string):
     return [
         stripped_line
-        for line in xml_string.content_html.strip().splitlines()
+        for line in xml_string.strip().splitlines()
         if (stripped_line := line.strip())
     ]
 
 
-# FIXME: Transformer les Arrange en XML fromstring
 # FIXME : tester ingestion de deux ouvrages différents. Mais tester quoi ?
 # FIXME: assert_num_queries
 # FIXME: Tester que si un bpn_id change de place dans le XML, il change de place dans la base ou alors on veut émettre un warning
 # FIXME: Tester que si un bpn_id change de topologie, il change de topologie dans la base ou alors on veut émettre un warning
-# FIXME: Test "integration" qui absorbe un XML plus représentatif et on vérifiera la hiérarchie retournée par .descendants(). Est-ce qu'on l'écrit au niveau de la commande ?
+# FIXME: Test "integration" qui absorbe un XML plus représentatif et on vérifiera la hiérarchie retournée par .descendants().
+# Est-ce qu'on l'écrit au niveau de la commande ?
 class TestIngestXMLSubtree:
     @pytest.mark.django_db(transaction=True)
     def test_basic_ouvrage(self):
@@ -62,17 +61,20 @@ class TestIngestXMLSubtree:
     @pytest.mark.django_db(transaction=True)
     def test_paragraph_ingester(self, tagname, typology):
         fake_bpn_id = uuid4()
+        content = """
+            <titre>
+                <numero>12.</numero>
+            </titre>
+        """
 
         root = ElementTree.fromstring(
             f"""
-            <root>
-                <{tagname} bpn_id="{fake_bpn_id}">
-                    <titre>
-                        <numero>12.</numero>
-                    </titre>
-                </{tagname}>
-            </root>
-        """
+                <root>
+                    <{tagname} bpn_id="{fake_bpn_id}">
+                        {content}
+                    </{tagname}>
+                </root>
+            """
         )
 
         ingested = OuvrageSection.objects.ingest_xml_subtree("g4p", root)
@@ -83,16 +85,9 @@ class TestIngestXMLSubtree:
         assert ouvrage_sections[0].bpn_id == fake_bpn_id
         assert ouvrage_sections[0].typology == typology
         assert ouvrage_sections[0].numero == "12."
-        assert (
-            textwrap.dedent(ouvrage_sections[0].content)
-            == textwrap.dedent(
-                """\
-            <titre>
-                <numero>12.</numero>
-            </titre>
-        """
-            ).strip()
-        )
+        assert normalize_multiline_string(
+            ouvrage_sections[0].content
+        ) == normalize_multiline_string(content)
         assert ouvrage_sections[0].ouvrage_name == "g4p"
         assert ouvrage_sections[0].geometry == None
 
@@ -100,17 +95,26 @@ class TestIngestXMLSubtree:
     def test_alinea_ingester(self):
         fake_parent_bpn_id = uuid4()
         fake_bpn_id = uuid4()
+        content = f"""
+            <alinea bpn_id="{fake_bpn_id}">
+                <nmrAlinea>42</nmrAlinea>
+            </alinea>
+        """
 
-        root = Element("root")
+        root = ElementTree.fromstring(
+            f"""
+                <root>
+                    <chapitre bpn_id="{fake_parent_bpn_id}">
+                        <titre>
+                            <numero>12.</numero>
+                        </titre>
+                        {content}
+                    </chapitre>
+                </root>
+            """
+        )
+
         # FIXME: Doit on parametriser ?
-        section = SubElement(root, "chapitre", {"bpn_id": str(fake_parent_bpn_id)})
-        titre = SubElement(section, "titre")
-        numero = SubElement(titre, "numero")
-        numero.text = "12."
-
-        alinea = SubElement(section, "alinea", {"bpn_id": str(fake_bpn_id)})
-        nmrAlinea = SubElement(alinea, "nmrAlinea")
-        nmrAlinea.text = "42"
 
         ingested = OuvrageSection.objects.ingest_xml_subtree("g4p", root)
         assert ingested == 2
@@ -120,7 +124,9 @@ class TestIngestXMLSubtree:
         assert alinea_section.bpn_id == fake_bpn_id
         assert alinea_section.typology == SectionTypology.ALINEA
         assert alinea_section.numero == "12.0.42"
-        assert alinea_section.content == ElementTree.tostring(alinea, "unicode")
+        assert normalize_multiline_string(
+            alinea_section.content
+        ) == normalize_multiline_string(content)
         assert alinea_section.ouvrage_name == "g4p"
         assert alinea_section.parent == section_section
         assert alinea_section.geometry == None
@@ -136,10 +142,19 @@ class TestIngestXMLSubtree:
     def test_figure_ingester(self, tagname, typology):
         fake_bpn_id = uuid4()
 
-        root = Element("root")
-        section = SubElement(root, tagname, {"bpn_id": str(fake_bpn_id)})
-        numero = SubElement(section, "numero")
-        numero.text = "12."
+        content = f"""
+            <{tagname} bpn_id="{fake_bpn_id}">
+                <numero>12.</numero>
+            </{tagname}>
+        """
+
+        root = ElementTree.fromstring(
+            f"""
+                <root>
+                    {content}
+                </root>
+            """
+        )
 
         ingested = OuvrageSection.objects.ingest_xml_subtree("g4p", root)
 
@@ -149,7 +164,9 @@ class TestIngestXMLSubtree:
         assert ouvrage_sections[0].bpn_id == fake_bpn_id
         assert ouvrage_sections[0].typology == typology
         assert ouvrage_sections[0].numero == "12."
-        assert ouvrage_sections[0].content == ElementTree.tostring(section, "unicode")
+        assert normalize_multiline_string(
+            ouvrage_sections[0].content
+        ) == normalize_multiline_string(content)
         assert ouvrage_sections[0].ouvrage_name == "g4p"
         assert ouvrage_sections[0].geometry == None
 
@@ -165,20 +182,24 @@ class TestIngestXMLSubtree:
         fake_parent_bpn_id = uuid4()
         fake_bpn_id = uuid4()
 
-        root = Element("root")
+        root = ElementTree.fromstring(
+            f"""
+                <root>
+                    <chapitre bpn_id="{uuid4()}">
+                        <titre>
+                            <numero>12.</numero>
+                        </titre>
+                        <alinea bpn_id="{fake_parent_bpn_id}">
+                            <nmrAlinea>42</nmrAlinea>
+                            <texte>
+                                <{tagname} bpn_id="{fake_bpn_id}" />
+                            </texte>
+                        </alinea>
+                    </chapitre>
+                </root>
 
-        chapitre = SubElement(root, "chapitre", {"bpn_id": str(uuid4())})
-        titre = SubElement(chapitre, "titre")
-
-        numero = SubElement(titre, "numero")
-        numero.text = "12."
-
-        alinea = SubElement(chapitre, "alinea", {"bpn_id": str(fake_parent_bpn_id)})
-        nmrAlinea = SubElement(alinea, "nmrAlinea")
-        nmrAlinea.text = "42"
-
-        texte = SubElement(alinea, "texte")
-        section = SubElement(texte, tagname, {"bpn_id": str(fake_bpn_id)})
+            """
+        )
 
         ingested = OuvrageSection.objects.ingest_xml_subtree("g4p", root)
 
@@ -187,7 +208,9 @@ class TestIngestXMLSubtree:
         assert section_section.bpn_id == fake_bpn_id
         assert section_section.typology == typology
         assert section_section.numero == "12.0.42"
-        assert section_section.content == ElementTree.tostring(section, "unicode")
+        assert (
+            section_section.content.strip() == f'<{tagname} bpn_id="{fake_bpn_id}" />'
+        )
         assert section_section.ouvrage_name == "g4p"
         assert section_section.geometry == None
         assert section_section.parent == alinea_section
@@ -196,10 +219,19 @@ class TestIngestXMLSubtree:
     def test_chapter_without_numero_raises_exception(self):
         fake_bpn_id = uuid4()
 
-        root = Element("root")
-        section = SubElement(root, "chapitre", {"bpn_id": str(fake_bpn_id)})
-        titre = SubElement(section, "titre")
-        numero = SubElement(titre, "numero")
+        root = ElementTree.fromstring(
+            f"""
+                <root>
+                    <chapitre bpn_id="{fake_bpn_id}">
+
+                        <titre>
+                            <numero />
+                        </titre>
+                    </chapitre>
+                </root>
+
+            """
+        )
 
         with pytest.raises(ValidationError) as exception:
             OuvrageSection.objects.ingest_xml_subtree("g4p", root)
@@ -226,11 +258,11 @@ class TestGeometry:
     @pytest.mark.django_db()
     def test_geometry_basic(self):
         fake_bpn_id = uuid4()
-        section_instance = OuvrageSection(
+        OuvrageSection.objects.create(
             bpn_id=fake_bpn_id,
             geometry='{"type": "Point", "coordinates": [-2.04, 48.65]}',
         )
-        section_instance.save()
+
         assert (
             OuvrageSection.objects.get(bpn_id=fake_bpn_id).geojson()
             == '{"type": "FeatureCollection", "crs": {"type": "name", "properties": {"name": "EPSG:4326"}}, "features": [{"type": "Feature", "properties": {}, "geometry": {"type": "Point", "coordinates": [-2.04, 48.65]}}]}'
@@ -276,12 +308,16 @@ class TestContentHtml:
             """,
         )
 
-        # assert foo(section.content_html) == [
-        #     '<h2 class="fr-mt-2w">',
-        #     '<span class="sppnaut-bold fr-pr-1w">0.2.1.</span>',
-        #     "Objet des Instructions Nautiques",
-        #     "</h2>",
-        # ]
+        assert normalize_multiline_string(
+            section.content_html
+        ) == normalize_multiline_string(
+            """
+            <h2 class="fr-mt-2w">
+                <span class="sppnaut-bold fr-pr-1w">0.2.1.</span>
+                Objet des Instructions Nautiques
+            </h2>
+        """
+        )
 
     def test_xslt_match(self):
         alinea = OuvrageSection(
