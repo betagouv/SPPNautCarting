@@ -13,6 +13,18 @@
 {% endblock %}
 
 {% block main %}
+<div class="fr-container">
+    <div class="fr-alert fr-alert--info fr-mt-2w fr-mb-1w">
+        <h3 class="fr-alert__title">Cette page est en construction, elle s'améliore grâce à vous.</h3>
+        <p>
+            Envoyez-nous vos idées et commentaires sur
+            <a href="mailto:equipe@sppnaut.beta.gouv.fr">
+                equipe@sppnaut.beta.gouv.fr
+            </a>.
+        </p>
+    </div>
+</div>
+
 <div class="fr-container--fluid">
     <div
         data-controller="map"
@@ -22,7 +34,7 @@
         "
         class="fr-grid-row fr-m-1w"
     >
-        <div class="fr-col-12 fr-col-lg-7">
+        <div class="fr-col-12 fr-col-md-7">
             <div
                 id="map"
                 data-map-target="map"
@@ -30,7 +42,7 @@
             >
             </div>
         </div>
-        <div class="fr-col-12 fr-col-lg-5 fr-p-1w">
+        <div class="fr-col-12 fr-col-md-5 fr-p-1w">
             <form>
                 <div class="fr-search-bar" role="search">
                     <input
