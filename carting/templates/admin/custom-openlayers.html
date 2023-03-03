@@ -4,3 +4,14 @@
 options['map_epsg'] = '{{ map_epsg }}';
 options['dataset_epsg'] = '{{ dataset_epsg }}';
 {% endblock %}
+
+{% block base_layer %}
+var base_layer = new ol.layer.Tile({
+    source: new ol.source.TileWMS({
+        // FIXME : ne pas hardcoder cette url dans le JS mais la définir côté router
+        url: "/carting/proxy",
+        params: { LAYERS: "RASTER_MARINE_50_WMSR_3857" },
+        serverType: "geoserver",
+    }),
+})
+{% endblock base_layer %}
