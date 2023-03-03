@@ -178,7 +178,7 @@ class TestIngestXMLSubtree:
         ],
     )
     @pytest.mark.django_db(transaction=True)
-    def test_section_ingester(self, tagname, typology):
+    def test_toponyme_reference_ingester(self, tagname, typology):
         fake_parent_bpn_id = uuid4()
         fake_bpn_id = uuid4()
 
