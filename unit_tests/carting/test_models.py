@@ -215,6 +215,40 @@ class TestIngestXMLSubtree:
         assert section_section.geometry == None
         assert section_section.parent == alinea_section
 
+    @pytest.mark.parametrize(
+        "tagname,typology",
+        [
+            ("principal", SectionTypology.TOPONYME),
+            ("reference", SectionTypology.REFERENCE),
+        ],
+    )
+    @pytest.mark.django_db(transaction=True)
+    def test_toponyme_reference_can_be_found_in_nested_liste(self, tagname, typology):
+        root = ElementTree.fromstring(
+            f"""
+                <root>
+                    <chapitre bpn_id="{uuid4()}">
+                        <titre>
+                            <numero>12.</numero>
+                        </titre>
+                        <alinea bpn_id="{uuid4()}">
+                            <nmrAlinea>42</nmrAlinea>
+                            <liste>
+                                <texte>
+                                    <{tagname} bpn_id="{uuid4()}" />
+                                </texte>
+                            </liste>
+                            <texte>
+                                <{tagname} bpn_id="{uuid4()}" />
+                            </texte>
+                        </alinea>
+                    </chapitre>
+                </root>
+            """
+        )
+        OuvrageSection.objects.ingest_xml_subtree("g4p", root)
+        assert OuvrageSection.objects.filter(typology=typology).count() == 2
+
     @pytest.mark.django_db()
     def test_chapter_without_numero_raises_exception(self):
         fake_bpn_id = uuid4()
