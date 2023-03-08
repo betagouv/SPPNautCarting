@@ -15,6 +15,43 @@ from tree_queries.models import TreeNode, TreeQuerySet
 xslt_transform = ET.XSLT(ET.parse("carting/xslt/ouvrage_section_html.xslt"))
 
 
+class SectionIngester(NamedTuple):
+    element: ElementTree.Element
+    ouvrage_name: str
+
+    def numero(self, parent: OuvrageSection) -> str:
+        return parent.numero
+
+    def content(self) -> str:
+        return ElementTree.tostring(self.element, encoding="unicode")
+
+
+class AlineaIngester(SectionIngester):
+    def numero(self, parent: OuvrageSection) -> str:
+        return f"{parent.numero}0.{self.element.find('nmrAlinea').text}"
+
+
+class FigureIngester(SectionIngester):
+    def numero(self, parent: OuvrageSection) -> str:
+        return self.element.find("numero").text
+
+
+class ParagraphIngester(SectionIngester):
+    def numero(self, parent: OuvrageSection) -> str:
+        return self.element.find("titre/numero").text
+
+    def content(self) -> str:
+        return ElementTree.tostring(self.element.find("titre"), encoding="unicode")
+
+
+class OuvrageIngester(SectionIngester):
+    def numero(self, parent: None) -> str:
+        return self.ouvrage_name
+
+    def content(self) -> str:
+        return ""
+
+
 class SectionTypology(models.TextChoices):
     OUVRAGE = "OUVRAGE", "ouvrage"
     CHAPTER = "CHAPTER", "chapitre"
@@ -171,40 +208,3 @@ class OuvrageSection(TreeNode):
             SectionTypology.REFERENCE,
             SectionTypology.TOPONYME,
         ]
-
-
-class SectionIngester(NamedTuple):
-    element: ElementTree.Element
-    ouvrage_name: str
-
-    def numero(self, parent: OuvrageSection) -> str:
-        return parent.numero
-
-    def content(self) -> str:
-        return ElementTree.tostring(self.element, encoding="unicode")
-
-
-class AlineaIngester(SectionIngester):
-    def numero(self, parent: OuvrageSection) -> str:
-        return f"{parent.numero}0.{self.element.find('nmrAlinea').text}"
-
-
-class FigureIngester(SectionIngester):
-    def numero(self, parent: OuvrageSection) -> str:
-        return self.element.find("numero").text
-
-
-class ParagraphIngester(SectionIngester):
-    def numero(self, parent: OuvrageSection) -> str:
-        return self.element.find("titre/numero").text
-
-    def content(self) -> str:
-        return ElementTree.tostring(self.element.find("titre"), encoding="unicode")
-
-
-class OuvrageIngester(SectionIngester):
-    def numero(self, parent: None) -> str:
-        return self.ouvrage_name
-
-    def content(self) -> str:
-        return ""
