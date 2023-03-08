@@ -4,28 +4,22 @@ import { SectionMap } from "./section_map"
 export default class extends Controller {
     #map
 
-    static targets = ["map", "section"]
+    static targets = ["map", "geojson"]
     static values = {
         initialCenter: { type: Array, default: [-2.0, 48.65] },
         maxZoom: { type: Number, default: 13 },
     }
 
-    initialize() {
+    connect() {
         this.#map = new SectionMap({
             target: this.mapTarget,
             initialCenter: this.initialCenterValue,
             maxZoom: this.maxZoomValue,
+            geojson: this.geojsonTarget.textContent,
         })
-    }
 
-    connect() {
         this.#map.fitViewToAllSections()
         this.selectSectionInMapFromHash()
-    }
-
-    sectionTargetConnected(sectionTarget) {
-        const geojson = JSON.parse(sectionTarget.dataset.geojson)
-        this.#map.addSection(sectionTarget.dataset.bpnId, geojson)
     }
 
     selectSectionInText(event) {

@@ -34,6 +34,9 @@
         "
         class="fr-grid-row fr-m-1w"
     >
+        <script type="application/geojson" data-map-target="geojson">
+            {{ geojson|safe }}
+        </script>
         <div class="fr-col-12 fr-col-md-7">
             <div
                 id="map"
@@ -65,11 +68,6 @@
                             id="{{section.pk}}"
                             style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
                             class="sppnaut-section sppnaut-scroll-mt-20vh"
-                            {% if section.geojson %}
-                                data-map-target="section"
-                                data-bpn-id="{{section.pk}}"
-                                data-geojson="{{ section.geojson }}"
-                            {% endif %}
                         >
                             <span style="min-width: 2.5rem">
                                 {% if section.geometry and section.tree_depth >= search_tree_depth %}
@@ -84,14 +82,6 @@
                                 {{ section.content_html }}
                             </div>
                         </div>
-                    {% else %}
-                        {% if section.geojson %}
-                            <meta
-                                data-map-target="section"
-                                data-bpn-id="{{section.pk}}"
-                                data-geojson="{{ section.geojson }}"
-                            >
-                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </div>
