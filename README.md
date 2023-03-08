@@ -15,17 +15,17 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 
 1. Installation des librairies nécessaire à GeoDjango (Carting)
 
-Sur Debian/ubuntu,
+    Sur Debian/ubuntu,
 
-```sh
-sudo apt-get install binutils libproj-dev gdal-bin
-```
+    ```sh
+    sudo apt-get install binutils libproj-dev gdal-bin
+    ```
 
-Sur MacOS,
+    Sur MacOS,
 
-```
-brew install gdal
-```
+    ```
+    brew install gdal
+    ```
 
 1. Création et activation de votre environnement virtuel. Par exemple via ces commandes :
 
