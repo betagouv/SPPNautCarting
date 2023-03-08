@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import NamedTuple
+from typing import Iterator, NamedTuple
 from xml.etree import ElementTree
 
 import lxml.etree as ET
@@ -25,8 +25,12 @@ class SectionTypology(models.TextChoices):
     ALINEA = "ALINEA", "alinea"
     TABLE = "TABLE", "tableau"
     ILLUSTRATION = "ILLUSTRATION", "illustration"
-    TOPONYME = "TOPONYME", "texte/principal"
-    REFERENCE = "REFERENCE", "texte/reference"
+    TOPONYME = "TOPONYME", "texte/principal|liste/texte/principal"
+    REFERENCE = "REFERENCE", "texte/reference|liste/texte/reference"
+
+    @property
+    def xpath(self):
+        return self.label
 
     def ingester(self) -> type[SectionIngester]:
         to_ingester = {
@@ -55,6 +59,15 @@ class SectionTypology(models.TextChoices):
         return to_tag_name.get(self, None)
 
 
+def find_ingestable_child_elements(
+    element: ElementTree.Element,
+) -> Iterator[tuple[SectionTypology, ElementTree.Element]]:
+    for typology in SectionTypology:
+        for xpath in typology.xpath.split("|"):
+            for child_element in element.iterfind(xpath):
+                yield typology, child_element
+
+
 class OuvrageSectionManager(models.Manager):
     def ingest_xml_subtree(
         self,
@@ -63,22 +76,21 @@ class OuvrageSectionManager(models.Manager):
         ouvrage_section: OuvrageSection | None = None,
     ) -> int:
         ingested = 0
-        for typology in SectionTypology:
-            for child_element in element.iterfind(typology.label):
-                child_ouvrage_section = OuvrageSection.from_xml(
-                    child_element, ouvrage_section, typology, ouvrage_name
-                )
-                child_ouvrage_section.ingest()
+        for typology, child_element in find_ingestable_child_elements(element):
+            child_ouvrage_section = OuvrageSection.from_xml(
+                child_element, ouvrage_section, typology, ouvrage_name
+            )
+            child_ouvrage_section.ingest()
 
-                logging.info(
-                    "Section %s ingérée avec l'id %s",
-                    typology.label,
-                    child_ouvrage_section.bpn_id,
-                )
-                ingested += 1
-                ingested += self.ingest_xml_subtree(
-                    ouvrage_name, child_element, child_ouvrage_section
-                )
+            logging.info(
+                "Section %s ingérée avec l'id %s",
+                typology.name,
+                child_ouvrage_section.bpn_id,
+            )
+            ingested += 1
+            ingested += self.ingest_xml_subtree(
+                ouvrage_name, child_element, child_ouvrage_section
+            )
         return ingested
 
 
@@ -96,7 +108,7 @@ class OuvrageSection(TreeNode):
         ordering = ("numero",)
 
     def __str__(self):
-        return f"{self.numero} - {SectionTypology[self.typology].label}"
+        return f"{self.numero} - {SectionTypology[self.typology].name}"
 
     @classmethod
     def from_xml(
