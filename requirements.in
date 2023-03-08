@@ -1,5 +1,6 @@
 Django
 django-extensions
+django-gisserver
 django-tree-queries
 lxml
 natsort

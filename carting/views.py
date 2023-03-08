@@ -87,3 +87,35 @@ def proxy(request):
         if header in response.headers:
             http_response.headers[header] = response.headers[header]
     return http_response
+
+
+from gisserver.features import FeatureType, ServiceDescription
+from gisserver.geometries import CRS, WGS84
+from gisserver.views import WFSView
+
+# RD_NEW = CRS.from_srid(28992)
+
+
+class OuvrageSectionWFSView(WFSView):
+    """An simple view that uses the WFSView against our test model."""
+
+    xml_namespace = "http://example.org/gisserver"
+
+    # The service metadata
+    service_description = ServiceDescription(
+        title="OuvrageSection",
+        abstract="Unittesting",
+        keywords=["django-gisserver"],
+        provider_name="Django",
+        provider_site="https://www.example.com/",
+        contact_person="django-gisserver",
+    )
+
+    # Each Django model is listed here as a feature.
+    feature_types = [
+        FeatureType(
+            OuvrageSection.objects.exclude(geometry=None),
+            fields="__all__",
+            # other_crs=[RD_NEW],
+        ),
+    ]
