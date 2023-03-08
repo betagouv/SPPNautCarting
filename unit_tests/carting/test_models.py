@@ -42,7 +42,7 @@ class TestIngestXMLSubtree:
         ouvrage_sections = OuvrageSection.objects.all()
         assert len(ouvrage_sections) == 1
         assert ouvrage_sections[0].bpn_id == fake_bpn_id
-        assert ouvrage_sections[0].typology == SectionTypology.OUVRAGE
+        assert ouvrage_sections[0].typology_object == SectionTypology.OUVRAGE
         assert ouvrage_sections[0].numero == "g4p"
         assert ouvrage_sections[0].content == ""
         assert ouvrage_sections[0].ouvrage_name == "g4p"
@@ -83,7 +83,7 @@ class TestIngestXMLSubtree:
         ouvrage_sections = OuvrageSection.objects.all()
         assert len(ouvrage_sections) == 1
         assert ouvrage_sections[0].bpn_id == fake_bpn_id
-        assert ouvrage_sections[0].typology == typology
+        assert ouvrage_sections[0].typology_object == typology
         assert ouvrage_sections[0].numero == "12."
         assert normalize_multiline_string(
             ouvrage_sections[0].content
@@ -122,7 +122,7 @@ class TestIngestXMLSubtree:
         assert len(ouvrage_sections) == 2
         section_section, alinea_section = ouvrage_sections
         assert alinea_section.bpn_id == fake_bpn_id
-        assert alinea_section.typology == SectionTypology.ALINEA
+        assert alinea_section.typology_object == SectionTypology.ALINEA
         assert alinea_section.numero == "12.0.42"
         assert normalize_multiline_string(
             alinea_section.content
@@ -162,7 +162,7 @@ class TestIngestXMLSubtree:
         ouvrage_sections = OuvrageSection.objects.all()
         assert len(ouvrage_sections) == 1
         assert ouvrage_sections[0].bpn_id == fake_bpn_id
-        assert ouvrage_sections[0].typology == typology
+        assert ouvrage_sections[0].typology_object == typology
         assert ouvrage_sections[0].numero == "12."
         assert normalize_multiline_string(
             ouvrage_sections[0].content
@@ -206,7 +206,7 @@ class TestIngestXMLSubtree:
         assert ingested == 3
         _, alinea_section, section_section = OuvrageSection.objects.all()
         assert section_section.bpn_id == fake_bpn_id
-        assert section_section.typology == typology
+        assert section_section.typology_object == typology
         assert section_section.numero == "12.0.42"
         assert (
             section_section.content.strip() == f'<{tagname} bpn_id="{fake_bpn_id}" />'
@@ -247,7 +247,7 @@ class TestIngestXMLSubtree:
             """
         )
         OuvrageSection.objects.ingest_xml_subtree("g4p", root)
-        assert OuvrageSection.objects.filter(typology=typology).count() == 2
+        assert OuvrageSection.objects.filter(typology=typology.name).count() == 2
 
     @pytest.mark.django_db()
     def test_chapter_without_numero_raises_exception(self):
@@ -335,7 +335,7 @@ class TestContentHtml:
 
     def test_xslt_basic(self):
         section = OuvrageSection(
-            typology=SectionTypology.CHAPTER,
+            typology=SectionTypology.CHAPTER.name,
             content="""
                 <titre tDate="2018-06-20" tMaj="edition">
                     <nmrAlinea>01</nmrAlinea>
@@ -359,8 +359,8 @@ class TestContentHtml:
         )
 
     def test_xslt_match(self):
-        alinea = OuvrageSection(
-            typology=SectionTypology.TABLE,
+        tableau = OuvrageSection(
+            typology=SectionTypology.TABLE.name,
             content="""
                 <tableau tDate="2018-06-20" tMaj="edition">
                     <numero>01</numero>
@@ -368,8 +368,8 @@ class TestContentHtml:
             """,
         )
 
-        titre = OuvrageSection(
-            typology=SectionTypology.ILLUSTRATION,
+        illustration = OuvrageSection(
+            typology=SectionTypology.ILLUSTRATION.name,
             content="""
                 <illustration tDate="2018-06-20" tMaj="edition">
                     <numero>01</numero>
@@ -377,4 +377,4 @@ class TestContentHtml:
             """,
         )
 
-        assert titre.content_html == alinea.content_html
+        assert illustration.content_html == tableau.content_html

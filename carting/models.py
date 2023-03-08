@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from enum import Enum
 from functools import cached_property
 from typing import Iterator, NamedTuple
 from xml.etree import ElementTree
@@ -52,55 +53,55 @@ class OuvrageIngester(SectionIngester):
         return ""
 
 
-class SectionTypology(models.TextChoices):
-    OUVRAGE = "OUVRAGE", "ouvrage"
-    CHAPTER = "CHAPTER", "chapitre"
-    SUBCHAPTER = "SUBCHAPTER", "sChapitre"
-    PARAGRAPH = "PARAGRAPH", "para"
-    SUBPARAGRAPH = "SUBPARAGRAPH", "sPara"
-    SUBSUBPARAGRAPH = "SUBSUBPARAGRAPH", "ssPara"
-    ALINEA = "ALINEA", "alinea"
-    TABLE = "TABLE", "tableau"
-    ILLUSTRATION = "ILLUSTRATION", "illustration"
-    TOPONYME = "TOPONYME", "texte/principal|liste/texte/principal"
-    REFERENCE = "REFERENCE", "texte/reference|liste/texte/reference"
+class SectionTypology(Enum):
+    _ignore_ = "Definition"
+
+    class Definition(NamedTuple):
+        xpaths: list[str]
+        ingester: type[SectionIngester]
+        html_tag: str | None = None
+
+    OUVRAGE = Definition(["ouvrage"], OuvrageIngester)
+    CHAPTER = Definition(["chapitre"], ParagraphIngester, "h2")
+    SUBCHAPTER = Definition(["sChapitre"], ParagraphIngester, "h3")
+    PARAGRAPH = Definition(["para"], ParagraphIngester, "h4")
+    SUBPARAGRAPH = Definition(["sPara"], ParagraphIngester, "h5")
+    SUBSUBPARAGRAPH = Definition(["ssPara"], ParagraphIngester, "h6")
+    ALINEA = Definition(["alinea"], AlineaIngester)
+    TABLE = Definition(["tableau"], FigureIngester)
+    ILLUSTRATION = Definition(["illustration"], FigureIngester)
+    TOPONYME = Definition(["texte/principal", "liste/texte/principal"], SectionIngester)
+    REFERENCE = Definition(
+        ["texte/reference", "liste/texte/reference"], SectionIngester
+    )
 
     @property
-    def xpath(self):
-        return self.label
+    def label(self) -> str:
+        return self.name.capitalize()
 
+    @property
+    def xpaths(self) -> list[str]:
+        return self.value.xpaths
+
+    @property
+    def html_tag(self) -> str:
+        return self.value.html_tag
+
+    @property
     def ingester(self) -> type[SectionIngester]:
-        to_ingester = {
-            self.OUVRAGE: OuvrageIngester,
-            self.CHAPTER: ParagraphIngester,
-            self.SUBCHAPTER: ParagraphIngester,
-            self.PARAGRAPH: ParagraphIngester,
-            self.SUBPARAGRAPH: ParagraphIngester,
-            self.SUBSUBPARAGRAPH: ParagraphIngester,
-            self.ALINEA: AlineaIngester,
-            self.TABLE: FigureIngester,
-            self.ILLUSTRATION: FigureIngester,
-            self.TOPONYME: SectionIngester,
-            self.REFERENCE: SectionIngester,
-        }
-        return to_ingester[self]
+        return self.value.ingester
 
-    def tag_name(self) -> str | None:
-        to_tag_name = {
-            self.CHAPTER: "h2",
-            self.SUBCHAPTER: "h3",
-            self.PARAGRAPH: "h4",
-            self.SUBPARAGRAPH: "h5",
-            self.SUBSUBPARAGRAPH: "h6",
-        }
-        return to_tag_name.get(self, None)
+    @classmethod
+    @property
+    def choices(cls) -> list[tuple[str, str]]:
+        return [(member.name, member.label) for member in cls]
 
 
 def find_ingestable_child_elements(
     element: ElementTree.Element,
 ) -> Iterator[tuple[SectionTypology, ElementTree.Element]]:
     for typology in SectionTypology:
-        for xpath in typology.xpath.split("|"):
+        for xpath in typology.xpaths:
             for child_element in element.iterfind(xpath):
                 yield typology, child_element
 
@@ -145,7 +146,11 @@ class OuvrageSection(TreeNode):
         ordering = ("numero",)
 
     def __str__(self):
-        return f"{self.numero} - {SectionTypology[self.typology].name}"
+        return f"{self.numero} - {self.typology_object.label}"
+
+    @property
+    def typology_object(self) -> SectionTypology:
+        return SectionTypology[self.typology]
 
     @classmethod
     def from_xml(
@@ -155,13 +160,13 @@ class OuvrageSection(TreeNode):
         typology: SectionTypology,
         ouvrage_name: str,
     ) -> "OuvrageSection":
-        ingester = typology.ingester()(element, ouvrage_name)
+        ingester = typology.ingester(element, ouvrage_name)
 
         return cls(
             bpn_id=element.attrib["bpn_id"],
             numero=ingester.numero(parent),
             content=ingester.content(),
-            typology=typology,
+            typology=typology.name,
             ouvrage_name=ouvrage_name,
             parent=parent,
         )
@@ -195,16 +200,16 @@ class OuvrageSection(TreeNode):
 
         inner_html = xslt_transform(ET.fromstring(self.content))
 
-        tag_name = SectionTypology[self.typology].tag_name()
+        html_tag = self.typology_object.html_tag
 
-        if tag_name:
+        if html_tag:
             # FIXME : extraire dans un templatetag django
-            inner_html = f'<{tag_name} class="fr-mt-2w">{inner_html}</{tag_name}>'
+            inner_html = f'<{html_tag} class="fr-mt-2w">{inner_html}</{html_tag}>'
         return mark_safe(inner_html)
 
     @property
     def should_display(self):
-        return self.typology not in [
+        return self.typology_object not in [
             SectionTypology.REFERENCE,
             SectionTypology.TOPONYME,
         ]

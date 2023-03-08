@@ -28,11 +28,11 @@ def index(request: HttpRequest) -> HttpResponse:
 
     sections = OuvrageSection.objects.exclude(
         typology__in=[
-            SectionTypology.ALINEA,
-            SectionTypology.ILLUSTRATION,
-            SectionTypology.REFERENCE,
-            SectionTypology.TABLE,
-            SectionTypology.TOPONYME,
+            SectionTypology.ALINEA.name,
+            SectionTypology.ILLUSTRATION.name,
+            SectionTypology.REFERENCE.name,
+            SectionTypology.TABLE.name,
+            SectionTypology.TOPONYME.name,
         ]
     ).with_tree_fields()
     if ouvrage:
