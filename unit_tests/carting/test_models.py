@@ -281,8 +281,13 @@ class TestIngestXMLSubtree:
             geometry='{"type": "Point", "coordinates": [-2.04, 48.65]}',
         )
 
-        root = Element("root")
-        SubElement(root, "ouvrage", {"bpn_id": str(fake_bpn_id)})
+        root = ElementTree.fromstring(
+            f"""
+                <root>
+                    <ouvrage bpn_id="{fake_bpn_id}" />
+                </root>
+            """
+        )
         OuvrageSection.objects.ingest_xml_subtree("g4p", root)
 
         assert OuvrageSection.objects.get(bpn_id=fake_bpn_id).geometry
