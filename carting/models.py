@@ -211,7 +211,7 @@ class OuvrageSection(TreeNode):
 
 class BDGS(models.Model):
     inspire_id = models.CharField(max_length=20, primary_key=True)
-    category = models.CharField(max_length=50)
+    category = models.CharField(max_length=255)
     raw = models.JSONField(null=True)
     geometry = models.GeometryField(srid=4326)
 
