@@ -13,7 +13,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "wednesday"
-      timezone: "06:00" # UTC
+      time: "06:00" # UTC
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
