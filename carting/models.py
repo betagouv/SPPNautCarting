@@ -207,3 +207,22 @@ class OuvrageSection(TreeNode):
             SectionTypology.REFERENCE,
             SectionTypology.TOPONYME,
         ]
+
+
+class BDGS(models.Model):
+    inspire_id = models.CharField(max_length=20, primary_key=True)
+    category = models.CharField(max_length=50)
+    raw = models.JSONField(null=True)
+    geometry = models.GeometryField(srid=4326)
+
+    def __str__(self):
+        return f"{self.inspire_id} - {self.category}"
+
+    def geojson(self) -> str | None:
+        if not self.geometry:
+            return None
+        return serialize("geojson", [self], fields=("geometry",))
+
+    class Meta:
+        verbose_name_plural = "BDGS"
+        verbose_name = "BDGS"

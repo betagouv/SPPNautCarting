@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.html import format_html_join
 from tree_queries.models import TreeNode
 
-from .models import OuvrageSection
+from .models import BDGS, OuvrageSection
 from .widgets import CustomOSMWidget
 
 logger = logging.getLogger(__name__)
@@ -63,3 +63,12 @@ class OuvrageSectionAdmin(GISModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(BDGS)
+class BDGSAdmin(GISModelAdmin):
+    # ordering = ("numero",)
+    list_display = ("inspire_id", "category")
+    search_fields = ("inspire_id", "category")
+
+    # readonly_fields = ("inspire_id",)
