@@ -68,6 +68,7 @@ class OuvrageSectionAdmin(GISModelAdmin):
 @admin.register(BDGS)
 class BDGSAdmin(GISModelAdmin):
     # ordering = ("numero",)
+    gis_widget = CustomOSMWidget
     list_display = ("inspire_id", "category")
     search_fields = ("inspire_id", "category")
 
