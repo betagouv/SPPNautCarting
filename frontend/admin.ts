@@ -13,7 +13,6 @@ export class Map {
     #source
     #target
     #view
-    #selectedInspireId
 
     constructor() {
         this.#target = "map"
@@ -49,18 +48,12 @@ export class Map {
                 minZoom,
             })
         })
-        // const layers = [
-        //     new TileLayer({
-        //         source: new OSM(),
-        //     }),
-        // ]
+
         const LAYERS = "BALISAGE_BDD_WMSV"
         this.#source = new TileWMS({
             url: "/carting/proxy/wms",
             params: { TILED: true, LAYERS },
             serverType: "geoserver",
-            // Countries have transparency, so do not fade tiles:
-            // transition: 0,
         })
         const WMSLayer = new TileLayer({
             source: this.#source,
@@ -75,7 +68,7 @@ export class Map {
 
     #initListeners() {
         this.map.on("click", (event) => {
-            const url = this.#source.getFeatureInfoUrl(
+            const jsonUrl = this.#source.getFeatureInfoUrl(
                 event.coordinate,
                 0.0001,
                 "EPSG:4326",
@@ -84,21 +77,43 @@ export class Map {
                 },
             )
 
-            console.log({ url, coords: event.coordinate })
-
-            fetch(url)
+            const htmlUrl = this.#source.getFeatureInfoUrl(
+                event.coordinate,
+                0.0001,
+                "EPSG:4326",
+                {
+                    INFO_FORMAT: "text/html",
+                },
+            )
+            fetch(jsonUrl)
                 .then((response) => response.text())
                 .then((jsonString) => {
-                    console.log(jsonString)
-                    const json = JSON.parse(jsonString)
-                    this.#setInspireIdOnForm(json.features[0].properties.inspireid)
+                    this.#setInspireId(jsonString)
+                })
+
+            fetch(htmlUrl)
+                .then((response) => response.text())
+                .then((html) => {
+                    this.#setWMSFeatureContent(html)
                 })
         })
     }
 
-    #setInspireIdOnForm(inspireId) {
-        console.log("set inspire id", inspireId)
-        document.getElementById("id_bdgs_object").value = inspireId
+    #setWMSFeatureContent(html) {
+        document.getElementById("wms-feature").innerHTML = html
+    }
+
+    #setInspireId(jsonString) {
+        const inspireId = JSON.parse(jsonString).features[0]?.properties.inspireid
+        if (inspireId) {
+            document.getElementById("id_bdgs_object").value = inspireId
+        } else {
+            this.#setWMSFeatureContent(`
+            <div>
+                <h2>Aucun objet trouvé à cet emplacement</h2>
+            </div>
+            `)
+        }
     }
 }
 
