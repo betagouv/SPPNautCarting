@@ -5,15 +5,15 @@ def menu(request):
     return {
         "menu": {
             "Liste des ouvrages": {
-                "Par nom": reverse("home:ouvrages_by_name"),
-                "Par date": reverse("home:ouvrages_by_date"),
+                "Par nom": reverse("spo:ouvrages_by_name"),
+                "Par date": reverse("spo:ouvrages_by_date"),
             },
             "Génération": {
-                "Génération de tableaux": reverse("home:tableau"),
+                "Génération de tableaux": reverse("spo:tableau"),
                 "Génération d'ouvrage en préparation": reverse(
-                    "home:publication_referentiel"
+                    "spo:publication_referentiel"
                 ),
-                "Génération d'ouvrage téléversé": reverse("home:publication_upload"),
+                "Génération d'ouvrage téléversé": reverse("spo:publication_upload"),
             },
             "Carting": {
                 "Démo": reverse("carting:index"),

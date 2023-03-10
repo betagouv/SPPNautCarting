@@ -12,7 +12,7 @@ urlpatterns: URLList = [
     path("admin/", admin.site.urls),
     path("accounts/login/", auth_views.LoginView.as_view()),
     path("accounts/logout/", auth_views.logout_then_login, name="logout"),
-    path("", include(("home.urls", "users"), namespace="home")),
+    path("", include(("spo.urls", "users"), namespace="spo")),
     path("carting/", include(("carting.urls", "carting"), namespace="carting")),
 ]
 

@@ -1,5 +1,5 @@
 """
-Views for home module
+Views for spo module
 """
 import uuid
 from base64 import b64encode
@@ -79,7 +79,7 @@ class PublicationReferentiel(LoginRequiredMixin, FormView):
         generation_id = json_response["generation_id"]
 
         return redirect(
-            "home:publication_generation_in_progress", generation_id=generation_id
+            "spo:publication_generation_in_progress", generation_id=generation_id
         )
 
 
@@ -92,7 +92,7 @@ def publication_generation_in_progress(request, generation_id):
     response = generator.get(publication_url)
 
     if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-        return redirect("home:publication_generation_ended", generation_id)
+        return redirect("spo:publication_generation_ended", generation_id)
 
     if response.status_code == HTTPStatus.OK:
         # When a HTTP or HTML redirect triggers a download, the browser keeps displaying the last page.
@@ -123,7 +123,7 @@ def publication_generation_ended(request, generation_id):
     response = generator.get(publication_url)
 
     if response.status_code == HTTPStatus.NOT_FOUND:
-        return redirect("home:publication_generation_in_progress", generation_id)
+        return redirect("spo:publication_generation_in_progress", generation_id)
 
     if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
         return render(
@@ -169,7 +169,7 @@ class OuvragesByDate(LoginRequiredMixin, FormView):
         generation_id = json_response["generation_id"]
 
         return redirect(
-            "home:publication_generation_in_progress", generation_id=generation_id
+            "spo:publication_generation_in_progress", generation_id=generation_id
         )
 
     def get_context_data(self, **kwargs):

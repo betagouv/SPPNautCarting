@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from carting.models import OuvrageSection
-from home import generator
+from spo import generator
 
 
 class Command(BaseCommand):

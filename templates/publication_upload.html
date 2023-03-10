@@ -7,7 +7,7 @@
 
 <h1>Génération d'ouvrage téléversé</h1>
 
-<form id="uploadForm" action="{% url 'home:publication_generation_in_progress' generation_id %}">
+<form id="uploadForm" action="{% url 'spo:publication_generation_in_progress' generation_id %}">
     <input type="hidden" name="auth_token" value="{{auth_token}}" />
     <input type="hidden" name="upload_url" value="{{upload_url}}" />
     <input
