@@ -1,12 +1,40 @@
+{% extends "admin/change_form.html" %}
 {% load static %}
-{% include "django/forms/widgets/input.html" %}
-
-<script type="module" src="{% static "admin.js" %}"></script>
-<link rel="stylesheet" href="{% static "carting.css" %}">
 
 {% comment %}
 FIXME : split verticalement
 {% endcomment %}
-<div style="height: 600px;width: 100vw;" id="map">
-</div>
-<div id="wms-feature" style="width: 100vw; background: pink;"></div>
+
+{% block extrahead %}
+    {{ block.super }}
+    <script type="module" src="{% static "admin.js" %}"></script>
+{% endblock%}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "carting.css" %}">
+    {% comment %}
+    FIXME : mieux gérer les styles plus tard
+    {% endcomment %}
+{% endblock%}
+
+{% block content %}
+    <div style="display:grid;height:50vh;grid-template-columns:auto 30%">
+        <div id="map" style=""></div>
+        <div>
+            <div id="layer-selector">
+                <label for="layer-select">Choisissez votre layer : </label>
+                <select id="layer-select">
+                    <option value="BALISAGE_BDD_WMSV">Balisage</option>
+                    <option value="INFORMATIONS_PORTUAIRES_BDD_WMSV">Ports</option>
+                </select>
+            </div>
+            {{ original.bdgs_object.geometry.json|json_script:"bdgs_geometry" }}
+            <div id="wms-feature" style="overflow-y:auto;overflow-x:hidden;"></div>
+        </div>
+    </div>
+    <div style="margin-top:80px;">
+        {{ block.super }}
+    </div>
+{% endblock%}
+

@@ -1,18 +1,40 @@
 import "ol/ol.css"
 
 import { Map as OLMap, View } from "ol"
+import GeoJSON from "ol/format/GeoJSON.js"
 import TileLayer from "ol/layer/Tile"
+import VectorLayer from "ol/layer/Vector"
 import { useGeographic } from "ol/proj.js"
 import { TileWMS } from "ol/source"
+import VectorSource from "ol/source/Vector"
+import { Circle, Fill, Stroke, Style } from "ol/style.js"
+
 
 useGeographic()
+
+function buildStyle({ strokeColor, fillColor, width }) {
+    const stroke = new Stroke({ color: strokeColor, width })
+    const fill = new Fill({ color: fillColor })
+    return new Style({
+        fill,
+        stroke,
+        image: new Circle({ radius: 5, stroke, fill }),
+    })
+}
 
 export class Map {
     map
     #initialCenter
+    #geojsonLayer
     #source
     #target
     #view
+
+    #initialStrokeColor = "red"
+    #initialFillColor = "transparent"
+    #initialWidth = 3
+
+    #layerSelect = document.getElementById("layer-select")
 
     constructor() {
         this.#target = "map"
@@ -20,13 +42,23 @@ export class Map {
         this.map = this.#initMap()
         this.#initListeners()
         // FIXME : récupérer la géométrie existante sur l'objet bdgs lié et zommer dedans
-        // FIXME : ajouter un sélecteur de layer
     }
 
     #initMap() {
         this.#view = new View({
             center: this.#initialCenter,
             zoom: 13,
+        })
+
+        this.#geojsonLayer = new VectorLayer({
+            source: new VectorSource({
+                features: new GeoJSON().readFeatures(JSON.parse(document.getElementById("bdgs_geometry")!.textContent!)),
+            }),
+            style: buildStyle({
+                strokeColor: this.#initialStrokeColor,
+                fillColor: this.#initialFillColor,
+                width: this.#initialWidth,
+            }),
         })
 
         const layerPerZoom = [
@@ -51,8 +83,7 @@ export class Map {
             })
         })
 
-        // const LAYERS = "BALISAGE_BDD_WMSV"
-        const LAYERS = "ESPACES_MARITIMES_BDD_WMSV"
+        const LAYERS = this.#layerSelect.value
         this.#source = new TileWMS({
             url: "/carting/proxy/wms",
             params: { TILED: true, LAYERS },
@@ -65,7 +96,7 @@ export class Map {
         return new OLMap({
             target: this.#target,
             view: this.#view,
-            layers: [...rasterMarineLayers, WMSLayer],
+            layers: [...rasterMarineLayers, WMSLayer, this.#geojsonLayer],
         })
     }
 
@@ -99,6 +130,12 @@ export class Map {
                 .then((html) => {
                     this.#setWMSFeatureContent(html)
                 })
+        })
+
+        this.#layerSelect?.addEventListener("change", (event) => {
+            console.log(event)
+            this.#source.updateParams({ TILED: true, LAYERS: event.target.value })
+            this.#setWMSFeatureContent("")
         })
     }
 
