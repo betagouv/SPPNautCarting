@@ -2,10 +2,9 @@ import "ol/ol.css"
 
 import { Map as OLMap, View } from "ol"
 import { click, noModifierKeys, pointerMove } from "ol/events/condition.js"
-import * as extent from "ol/extent"
+import { getArea, isEmpty } from "ol/extent"
 import GeoJSON from "ol/format/GeoJSON.js"
 import Select from "ol/interaction/Select.js"
-import LayerGroup from "ol/layer/Group"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
 import { useGeographic } from "ol/proj.js"
@@ -26,7 +25,7 @@ function buildStyle({ strokeColor, fillColor, width }) {
 
 export class SectionMap {
     #map
-    #sectionsLayerGroup
+    #geojsonLayer
     #selectInteraction
 
     #maxZoom
@@ -45,15 +44,31 @@ export class SectionMap {
     #selectedFillColor = "#00009108"
     #selectedWidth = 2
 
-    constructor({ target, initialCenter, maxZoom }) {
+    constructor({ target, initialCenter, maxZoom, geojson }) {
         this.#maxZoom = maxZoom
-        this.#sectionsLayerGroup = new LayerGroup()
-        this.#map = this.#initMap(maxZoom, initialCenter, target)
+        this.#map = this.#initMap(maxZoom, initialCenter, target, geojson)
         this.#initHoverInteraction()
         this.#selectInteraction = this.#initSelectInteraction()
     }
 
-    #initMap(maxZoom, initialCenter, target) {
+    #initMap(maxZoom, initialCenter, target, geojson) {
+        this.#geojsonLayer = new VectorLayer({
+            source: new VectorSource({
+                features: new GeoJSON().readFeatures(geojson),
+            }),
+            style: buildStyle({
+                strokeColor: this.#initialStrokeColor,
+                fillColor: this.#initialFillColor,
+                width: this.#initialWidth,
+            }),
+            renderOrder: (a, b) => {
+                return (
+                    getArea(b.getGeometry().getExtent()) -
+                    getArea(a.getGeometry().getExtent())
+                )
+            },
+        })
+
         const view = new View({
             center: initialCenter,
             zoom: maxZoom,
@@ -83,7 +98,7 @@ export class SectionMap {
         return new OLMap({
             target,
             view,
-            layers: [...rasterMarineLayers, this.#sectionsLayerGroup],
+            layers: [...rasterMarineLayers, this.#geojsonLayer],
         })
     }
 
@@ -116,46 +131,27 @@ export class SectionMap {
         this.#map.addInteraction(hoverInteraction)
     }
 
-    addSection(bpnID, geojson) {
-        const layer = new VectorLayer({
-            source: new VectorSource({
-                features: new GeoJSON().readFeatures(geojson),
-            }),
-            style: buildStyle({
-                strokeColor: this.#initialStrokeColor,
-                fillColor: this.#initialFillColor,
-                width: this.#initialWidth,
-            }),
-        })
-        const layerArea = extent.getArea(layer.getSource().getExtent())
-
-        layer.setZIndex(1 / layerArea)
-        layer.set("bpnID", bpnID)
-        this.#sectionsLayerGroup.getLayers().push(layer)
-    }
-
     selectSection(bpnID) {
-        const layer = this.#sectionsLayerGroup
-            .getLayers()
-            .getArray()
-            .find((layer) => layer.get("bpnID") == bpnID)
+        const sectionFeature = this.#geojsonLayer.getSource().getFeatureById(bpnID)
+        if (!sectionFeature) {
+            console.debug(`No geometry associated to window hash: "${bpnID}"`)
+            return
+        }
         const selectedFeatures = this.#selectInteraction.getFeatures()
         selectedFeatures.clear()
-        selectedFeatures.push(layer.getSource().getFeatures()[0])
-        this.#fitMapToExtent(layer.getSource().getExtent())
+        selectedFeatures.push(sectionFeature)
+        this.#fitMapToExtent(sectionFeature.getGeometry().getExtent())
     }
 
     fitViewToAllSections() {
-        const sectionsLayerGroupExtent = extent.createEmpty()
-        this.#sectionsLayerGroup.getLayers().forEach((layer) => {
-            const layerExtent = layer.getSource().getExtent()
-            extent.extend(sectionsLayerGroupExtent, layerExtent)
-        })
-
-        this.#fitMapToExtent(sectionsLayerGroupExtent)
+        this.#fitMapToExtent(this.#geojsonLayer.getSource().getExtent())
     }
 
     #fitMapToExtent(extent) {
+        if (isEmpty(extent)) {
+            console.debug("Cannot fit empty extent provided as 'geometry'")
+            return
+        }
         const view = this.#map.getView()
         view.cancelAnimations()
         view.fit(extent, {
@@ -169,8 +165,7 @@ export class SectionMap {
         const selectedFeature = olEvent.target.getFeatures().item(0)
         let bpnID = ""
         if (selectedFeature) {
-            const layer = olEvent.target.getLayer(selectedFeature)
-            bpnID = layer.get("bpnID")
+            bpnID = selectedFeature.getId()
         }
         this.#map.getTargetElement().dispatchEvent(
             new CustomEvent("ol:select", {

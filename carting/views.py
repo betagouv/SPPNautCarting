@@ -1,5 +1,6 @@
 import requests
 from django.conf import settings
+from django.core import serializers
 from django.http import FileResponse, Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -48,13 +49,25 @@ def index(request: HttpRequest) -> HttpResponse:
         raise Http404(
             "Probably we won't fix it : Multiple OuvrageSections match the given query."
         )
-    sections = list(section.ancestors()) + list(section.descendants(include_self=True))
+    sections = [*section.ancestors(), *section.descendants(include_self=True)]
+
+    GeoJSONSerializer = serializers.get_serializer("geojson")
+
+    # https://stackoverflow.com/questions/34556679/geodjango-serialize-geojson-skipping-id-field
+    class Serializer(GeoJSONSerializer):
+        def get_dump_object(self, obj):
+            data = super(Serializer, self).get_dump_object(obj)
+            data.update(id=obj.pk)
+            return data
+
+    geojson = Serializer().serialize(s for s in sections if s.geometry)
 
     return render(
         request,
         "carting/index.html",
         {
             "sections": sections,
+            "geojson": geojson,
             "search_tree_depth": section.tree_depth,
             "search": search,
         },

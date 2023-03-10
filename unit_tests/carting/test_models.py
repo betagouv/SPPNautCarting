@@ -294,19 +294,6 @@ class TestIngestXMLSubtree:
 
 
 class TestGeometry:
-    @pytest.mark.django_db()
-    def test_geometry_basic(self):
-        fake_bpn_id = uuid4()
-        OuvrageSection.objects.create(
-            bpn_id=fake_bpn_id,
-            geometry='{"type": "Point", "coordinates": [-2.04, 48.65]}',
-        )
-
-        assert (
-            OuvrageSection.objects.get(bpn_id=fake_bpn_id).geojson()
-            == '{"type": "FeatureCollection", "crs": {"type": "name", "properties": {"name": "EPSG:4326"}}, "features": [{"type": "Feature", "properties": {}, "geometry": {"type": "Point", "coordinates": [-2.04, 48.65]}}]}'
-        )
-
     def test_unclosed_geometry(self):
         fake_bpn_id = uuid4()
         section_instance = OuvrageSection(

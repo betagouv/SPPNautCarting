@@ -8,7 +8,6 @@ from xml.etree import ElementTree
 
 import lxml.etree as ET
 from django.contrib.gis.db import models
-from django.core.serializers import serialize
 from django.db import DatabaseError
 from django.utils.safestring import mark_safe
 from tree_queries.models import TreeNode, TreeQuerySet
@@ -187,11 +186,6 @@ class OuvrageSection(TreeNode):
             )
         except DatabaseError:
             self.save()
-
-    def geojson(self) -> str | None:
-        if not self.geometry:
-            return None
-        return serialize("geojson", [self], fields=("geometry",))
 
     @cached_property
     def content_html(self):
