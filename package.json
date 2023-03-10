@@ -6,7 +6,8 @@
     },
     "source": [
         "frontend/carting.js",
-        "frontend/sppnaut.css"
+        "frontend/sppnaut.css",
+        "frontend/admin.ts"
     ],
     "targets": {
         "default": {

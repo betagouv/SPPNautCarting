@@ -140,6 +140,9 @@ class OuvrageSection(TreeNode):
     typology = models.CharField(max_length=25, choices=SectionTypology.choices)
     ouvrage_name = models.CharField(max_length=10)
     geometry = models.GeometryField(blank=True, null=True, default=None, srid=4326)
+    bdgs_object = models.ForeignKey(
+        "carting.BDGS", on_delete=models.SET_NULL, null=True
+    )
 
     class Meta:
         ordering = ("numero",)

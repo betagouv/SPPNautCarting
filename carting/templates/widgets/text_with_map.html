@@ -1,0 +1,9 @@
+{% load static %}
+{% include "django/forms/widgets/input.html" %}
+
+<script type="module" src="{% static "admin.js" %}"></script>
+<link rel="stylesheet" href="{% static "carting.css" %}">
+
+<div style="height: 600px;width: 100vw;" id="map">
+</div>
+<div id="wms-feature" style="width: 100vw; background: pink;"></div>
