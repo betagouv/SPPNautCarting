@@ -4,7 +4,7 @@ from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
-    path("", RedirectView.as_view(pattern_name="home:ouvrages_by_name")),
+    path("", RedirectView.as_view(pattern_name="spo:ouvrages_by_name")),
     path(
         "tableau/",
         views.tableau,

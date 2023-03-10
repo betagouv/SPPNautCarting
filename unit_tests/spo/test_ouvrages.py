@@ -1,6 +1,6 @@
 import datetime
 
-from home.ouvrages import Ouvrage, OuvrageFile
+from spo.ouvrages import Ouvrage, OuvrageFile
 
 
 class TestOuvrage:
