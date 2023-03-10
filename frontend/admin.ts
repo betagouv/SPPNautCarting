@@ -19,6 +19,8 @@ export class Map {
         this.#initialCenter = [-2.0, 48.65]
         this.map = this.#initMap()
         this.#initListeners()
+        // FIXME : récupérer la géométrie existante sur l'objet bdgs lié et zommer dedans
+        // FIXME : ajouter un sélecteur de layer
     }
 
     #initMap() {
@@ -49,7 +51,8 @@ export class Map {
             })
         })
 
-        const LAYERS = "BALISAGE_BDD_WMSV"
+        // const LAYERS = "BALISAGE_BDD_WMSV"
+        const LAYERS = "ESPACES_MARITIMES_BDD_WMSV"
         this.#source = new TileWMS({
             url: "/carting/proxy/wms",
             params: { TILED: true, LAYERS },

@@ -41,6 +41,7 @@ class OuvrageSectionForm(forms.ModelForm):
     #     children,
     #     "parent",
     # )
+
     class Meta:
         model = OuvrageSection
         widgets = {"bdgs_object": TextInputWithMap}
