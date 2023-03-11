@@ -73,7 +73,7 @@ EXTENDED_GEO_CLASSES = {
 class ExtendedOGRGeomType(OGRGeomType):
     # Copy paste of original types dictionnary from GeoDjango implementation
     # https://github.com/django/django/blob/main/django/contrib/gis/gdal/geomtype.py#L9
-    # FIXME : remove when issue XYZ merged
+    # FIXME : remove when issue https://code.djangoproject.com/ticket/34406 is resolved
     _types = {
         0: "Unknown",
         1: "Point",
