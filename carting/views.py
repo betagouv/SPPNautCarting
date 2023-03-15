@@ -99,16 +99,16 @@ from gisserver.views import WFSView
 class OuvrageSectionWFSView(WFSView):
     """An simple view that uses the WFSView against our test model."""
 
-    xml_namespace = "http://example.org/gisserver"
+    xml_namespace = "http://localhost:8000/carting/wfs/sections/"
 
     # The service metadata
     service_description = ServiceDescription(
-        title="OuvrageSection",
-        abstract="Unittesting",
-        keywords=["django-gisserver"],
-        provider_name="Django",
-        provider_site="https://www.example.com/",
-        contact_person="django-gisserver",
+        title="Instructions nautiques",
+        abstract="Testons !",
+        keywords=["instruction nautique", "section"],
+        provider_name="SPPNAUT",
+        provider_site="http://localhost:8000",
+        contact_person="equipe@sppnaut.beta.gouv.fr",
     )
 
     # Each Django model is listed here as a feature.
