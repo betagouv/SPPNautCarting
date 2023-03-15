@@ -18,23 +18,19 @@ FIXME : split verticalement
     {% endcomment %}
 {% endblock%}
 
-{% block content %}
-    <div style="display:grid;height:50vh;grid-template-columns:auto 30%">
-        <div id="map" style=""></div>
-        <div>
-            <div id="layer-selector">
-                <label for="layer-select">Choisissez votre layer : </label>
-                <select id="layer-select">
-                    <option value="BALISAGE_BDD_WMSV">Balisage</option>
-                    <option value="INFORMATIONS_PORTUAIRES_BDD_WMSV">Ports</option>
-                </select>
-            </div>
-            {{ original.bdgs_object.geometry.json|json_script:"bdgs_geometry" }}
-            <div id="wms-feature" style="overflow-y:auto;overflow-x:hidden;"></div>
+{% block field_sets %}
+    <div style="display:grid; height: 50vh; max-height:50vh; grid-template-columns:auto 30%; gap: 1rem;">
+        <div id="map" style="grid-row: span 2"></div>
+        <div id="layer-selector">
+            <label for="layer-select">Choisissez votre layer : </label>
+            <select id="layer-select">
+                <option value="BALISAGE_BDD_WMSV">Balisage</option>
+                <option value="INFORMATIONS_PORTUAIRES_BDD_WMSV">Ports</option>
+            </select>
         </div>
+        {{ original.bdgs_object.geometry.json|json_script:"bdgs_geometry" }}
+        <div id="wms-feature" style="overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain"></div>
     </div>
-    <div style="margin-top:80px;">
-        {{ block.super }}
-    </div>
-{% endblock%}
 
+    {{ block.super }}
+{% endblock field_sets %}

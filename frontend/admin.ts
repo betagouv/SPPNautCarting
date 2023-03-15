@@ -9,7 +9,6 @@ import { TileWMS } from "ol/source"
 import VectorSource from "ol/source/Vector"
 import { Circle, Fill, Stroke, Style } from "ol/style.js"
 
-
 useGeographic()
 
 function buildStyle({ strokeColor, fillColor, width }) {
@@ -28,57 +27,39 @@ export class Map {
     #geojsonLayer
     #source
     #target
-    #view
 
     #initialStrokeColor = "red"
     #initialFillColor = "transparent"
     #initialWidth = 3
 
-    #layerSelect = document.getElementById("layer-select")
+    #layerSelect = document.getElementById("layer-select") as HTMLSelectElement
 
     constructor() {
         this.#target = "map"
         this.#initialCenter = [-2.0, 48.65]
         this.map = this.#initMap()
-        this.#initListeners()
-        // FIXME : récupérer la géométrie existante sur l'objet bdgs lié et zommer dedans
+        this.map.on("click", (event) => this.#readWMSAtCoordinate(event.coordinate))
+        this.#layerSelect?.addEventListener("change", (event) => {
+            console.log(event)
+            this.#source.updateParams({ TILED: true, LAYERS: event.target.value })
+            this.#setWMSFeatureContent("")
+        })
     }
 
     #initMap() {
-        this.#view = new View({
-            center: this.#initialCenter,
-            zoom: 13,
-        })
-
-        this.#geojsonLayer = new VectorLayer({
-            source: new VectorSource({
-                features: new GeoJSON().readFeatures(JSON.parse(document.getElementById("bdgs_geometry")!.textContent!)),
-            }),
-            style: buildStyle({
-                strokeColor: this.#initialStrokeColor,
-                fillColor: this.#initialFillColor,
-                width: this.#initialWidth,
-            }),
-        })
-
         const layerPerZoom = [
-            { layer: "RASTER_MARINE_1M_3857_WMSR", maxZoom: 7 },
-            { layer: "RASTER_MARINE_400_WMSR_3857", minZoom: 7, maxZoom: 10 },
-            { layer: "RASTER_MARINE_150_WMSR_3857", minZoom: 10, maxZoom: 11 },
-            { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 11 },
-            { layer: "RASTER_MARINE_20_WMSR_3857", minZoom: 13 },
+            // We keep RASTER_MARINE_50_WMSR_3857 because RASTER_MARINE_3857_WMSR is missing tiles at high zoom levels
+            { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 13 },
+            { layer: "RASTER_MARINE_3857_WMSR" },
         ]
-
-        const rasterMarineLayers = layerPerZoom.map(({ layer, minZoom, maxZoom }) => {
+        const rasterMarineLayers = layerPerZoom.map(({ layer, minZoom }) => {
             return new TileLayer({
                 source: new TileWMS({
-                    // FIXME : ne pas hardcoder cette url dans le JS mais la définir côté router
-                    url: "/carting/proxy",
+                    url: "https://services.data.shom.fr/u2kejlcaaf2ar8v69kvvqef6/wms/r",
                     params: { LAYERS: layer },
                     serverType: "geoserver",
                 }),
                 preload: Infinity,
-                maxZoom,
                 minZoom,
             })
         })
@@ -93,50 +74,70 @@ export class Map {
             source: this.#source,
         })
 
+        const layers = [...rasterMarineLayers, WMSLayer]
+
+        const view = new View({
+            center: this.#initialCenter,
+            zoom: 13,
+        })
+        const geojson = JSON.parse(
+            document.getElementById("bdgs_geometry")!.textContent!,
+        )
+        if (geojson) {
+            this.#geojsonLayer = new VectorLayer({
+                source: new VectorSource({
+                    features: new GeoJSON().readFeatures(geojson),
+                }),
+                style: buildStyle({
+                    strokeColor: this.#initialStrokeColor,
+                    fillColor: this.#initialFillColor,
+                    width: this.#initialWidth,
+                }),
+            })
+            layers.push(this.#geojsonLayer)
+
+            view.fit(this.#geojsonLayer.getSource().getExtent(), {
+                maxZoom: 13,
+            })
+            this.#readWMSAtCoordinate(view.getCenter())
+        }
+
         return new OLMap({
             target: this.#target,
-            view: this.#view,
-            layers: [...rasterMarineLayers, WMSLayer, this.#geojsonLayer],
+            view,
+            layers,
         })
     }
 
-    #initListeners() {
-        this.map.on("click", (event) => {
-            const jsonUrl = this.#source.getFeatureInfoUrl(
-                event.coordinate,
-                0.0001,
-                "EPSG:4326",
-                {
-                    INFO_FORMAT: "application/json",
-                },
-            )
+    #readWMSAtCoordinate = (coordinate) => {
+        const jsonUrl = this.#source.getFeatureInfoUrl(
+            coordinate,
+            0.0001,
+            "EPSG:4326",
+            {
+                INFO_FORMAT: "application/json",
+            },
+        )
 
-            const htmlUrl = this.#source.getFeatureInfoUrl(
-                event.coordinate,
-                0.0001,
-                "EPSG:4326",
-                {
-                    INFO_FORMAT: "text/html",
-                },
-            )
-            fetch(jsonUrl)
-                .then((response) => response.text())
-                .then((jsonString) => {
-                    this.#setInspireId(jsonString)
-                })
+        const htmlUrl = this.#source.getFeatureInfoUrl(
+            coordinate,
+            0.0001,
+            "EPSG:4326",
+            {
+                INFO_FORMAT: "text/html",
+            },
+        )
+        fetch(jsonUrl)
+            .then((response) => response.text())
+            .then((jsonString) => {
+                this.#setInspireId(jsonString)
+            })
 
-            fetch(htmlUrl)
-                .then((response) => response.text())
-                .then((html) => {
-                    this.#setWMSFeatureContent(html)
-                })
-        })
-
-        this.#layerSelect?.addEventListener("change", (event) => {
-            console.log(event)
-            this.#source.updateParams({ TILED: true, LAYERS: event.target.value })
-            this.#setWMSFeatureContent("")
-        })
+        fetch(htmlUrl)
+            .then((response) => response.text())
+            .then((html) => {
+                this.#setWMSFeatureContent(html)
+            })
     }
 
     #setWMSFeatureContent(html) {

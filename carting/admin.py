@@ -47,13 +47,13 @@ class OuvrageSectionAdmin(GISModelAdmin):
     )
 
     fields = (
+        "bdgs_object",
+        "content",
         "numero",
         "bpn_id",
         "parent",
         children,
-        "bdgs_object",
         "geometry",
-        "content",
     )
 
     raw_id_fields = ("bdgs_object",)
@@ -62,6 +62,7 @@ class OuvrageSectionAdmin(GISModelAdmin):
     list_filter = (
         ("geometry", admin.EmptyFieldListFilter),
         ("bdgs_object", admin.EmptyFieldListFilter),
+        "typology",
     )
     search_fields = ("bpn_id", "numero", "content")
     change_form_template = "widgets/text_with_map.html"
