@@ -1,3 +1,4 @@
+import requests
 from django.core import serializers
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -70,3 +71,15 @@ def index(request: HttpRequest) -> HttpResponse:
             "search": search,
         },
     )
+
+
+# Needed until https://github.com/betagouv/SPPNautInterface/issues/185 is closed
+@require_GET
+def wms_proxy(request, wms_url):
+    response = requests.get(url=wms_url, params=request.GET.dict())
+    http_response = HttpResponse(response)
+    headers_to_forward = ["Content-Type", "Content-Length"]
+    for header in headers_to_forward:
+        if header in response.headers:
+            http_response.headers[header] = response.headers[header]
+    return http_response
