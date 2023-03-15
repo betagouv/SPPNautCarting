@@ -1,7 +1,5 @@
-import requests
-from django.conf import settings
 from django.core import serializers
-from django.http import FileResponse, Http404, HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
@@ -72,18 +70,3 @@ def index(request: HttpRequest) -> HttpResponse:
             "search": search,
         },
     )
-
-
-@require_GET
-def proxy(request):
-    response = requests.get(
-        url="https://services.data.shom.fr/" + settings.DATASHOM_WMS_KEY + "/wms/r",
-        auth=(settings.DATASHOM_WMS_USERNAME, settings.DATASHOM_WMS_PASSWORD),
-        params=(request.GET.dict()),
-    )
-    http_response = FileResponse(response)
-    headers_to_forward = ["Content-Type", "Content-Length"]
-    for header in headers_to_forward:
-        if header in response.headers:
-            http_response.headers[header] = response.headers[header]
-    return http_response

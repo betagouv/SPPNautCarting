@@ -143,6 +143,7 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+SECURE_REFERRER_POLICY = "origin"
 SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", cast=bool)
 
 LOGGING = {

@@ -134,9 +134,12 @@ ol.inherits(GeometryTypeControl, ol.control.Control)
     }
 
     MapWidget.prototype.createMap = function () {
+        const layers = Array.isArray(this.options.base_layer)
+            ? this.options.base_layer
+            : [this.options.base_layer]
         const map = new ol.Map({
             target: this.options.map_id,
-            layers: [this.options.base_layer],
+            layers: layers,
             view: new ol.View({
                 zoom: this.options.default_zoom,
             }),

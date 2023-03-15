@@ -6,12 +6,20 @@ options['dataset_epsg'] = '{{ dataset_epsg }}';
 {% endblock %}
 
 {% block base_layer %}
-var base_layer = new ol.layer.Tile({
-    source: new ol.source.TileWMS({
-        // FIXME : ne pas hardcoder cette url dans le JS mais la définir côté router
-        url: "/carting/proxy",
-        params: { LAYERS: "RASTER_MARINE_50_WMSR_3857" },
-        serverType: "geoserver",
-    }),
+const layerPerZoom = [
+    // We keep RASTER_MARINE_50_WMSR_3857 because RASTER_MARINE_3857_WMSR is missing tiles at high zoom levels
+    { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 13 },
+    { layer: "RASTER_MARINE_3857_WMSR" },
+]
+const base_layer = layerPerZoom.map(({ layer, minZoom }) => {
+    return new ol.layer.Tile({
+        source: new ol.source.TileWMS({
+            url: "https://services.data.shom.fr/u2kejlcaaf2ar8v69kvvqef6/wms/r",
+            params: { LAYERS: layer },
+            serverType: "geoserver",
+        }),
+        preload: Infinity,
+        minZoom,
+    })
 })
 {% endblock base_layer %}
