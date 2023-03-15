@@ -141,7 +141,7 @@ class OuvrageSection(TreeNode):
     ouvrage_name = models.CharField(max_length=10)
     geometry = models.GeometryField(blank=True, null=True, default=None, srid=4326)
     bdgs_object = models.ForeignKey(
-        "carting.BDGS", on_delete=models.SET_NULL, null=True
+        "carting.BDGS", on_delete=models.SET_NULL, null=True, blank=True
     )
 
     class Meta:
