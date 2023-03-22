@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../schemas/S127/1.0.0/20181129/S127Basic.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<S127:Dataset xmlns:S127="http://www.iho.int/S127/gml/cs0/1.0"
+    xsi:schemaLocation="http://www.iho.int/S127/gml/cs0/1.0 ../../../schemas/S127/1.0.0/20181129/S127.xsd
+                        "
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:S100="http://www.iho.int/s100gml/1.0"
+    xmlns:s100_profile="http://www.iho.int/S-100/profile/s100_gmlProfile"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <member>
+        <S127:PilotageDistrict gml:id="FR.PILDST.01">
+            <featureName>
+                <name>Zone de pilotage du port de Saint-Malo</name>
+            </featureName>
+            <textContent>
+                <information>
+                    <language>fr</language>
+                    <text>Zone de pilotage</text>
+                </information>
+            </textContent>
+            <permission xlink:href="#FR.APPLIC.PERM.01" />
+            <permission xlink:href="#FR.APPLIC.PERM.02" />
+            <consistsOf xlink:href="#FR.PILBOP.01" />
+            <serviceProvider xlink:href="#FR.PLTSRV.01" />
+            <theRxN xlink:href="#FR.REGLTS.01" />
+            <theRxN xlink:href="#FR.REGLTS.02" />
+            <geometry>
+                <S100:surfaceProperty>
+                    <S100:Polygon gml:id="FR.AreaA.01">
+                        <!-- ID décidé arbitrairement, préfixé de FR (identifiant du SHOM) -->
+                        <gml:exterior>
+                            <gml:LinearRing>
+                                <gml:posList> -2.2 48.6 -2.2 49.0 -1.77 49.0 -1.77 48.6 -2.2 48.6</gml:posList>
+                            </gml:LinearRing>
+                        </gml:exterior>
+                    </S100:Polygon>
+                </S100:surfaceProperty>
+            </geometry>
+        </S127:PilotageDistrict>
+    </member>
+
+    <imember>
+        <S127:Regulations gml:id="FR.REGLTS.01">
+            <S100:invInformationAssociation gml:id="I.FR.REGLTS.01"
+                xlink:href="#FR.PILDST.01" xlink:title="appliesInLocation" />
+            <textContent>
+                <categoryOfText>extract</categoryOfText>
+                <information>
+                    <headline>Arrêté n°2014-7986 (DIRM n°1/2014) du Préfet de la Région
+                        Bretagne, Préfet d’Ille-et-Vilaine du 06 janvier 2014.</headline>
+                </information>
+            </textContent>
+        </S127:Regulations>
+    </imember>
+
+    <imember>
+        <S127:Regulations gml:id="FR.REGLTS.02">
+            <S100:invInformationAssociation gml:id="I.FR.REGLTS.02"
+                xlink:href="#FR.PILDST.02" xlink:title="appliesInLocation" />
+            <textContent>
+                <categoryOfText>extract</categoryOfText>
+                <information>
+                    <headline>Arrêté n°2018-17083 (DIRM n°75/2018) (annexe tarifaire) du Préfet
+                        de la Région Bretagne, Préfet d’Ille-et-Vilaine du 27 décembre 2018.</headline>
+                </information>
+            </textContent>
+        </S127:Regulations>
+    </imember>
+
+    <member>
+        <S127:PilotBoardingPlace gml:id="FR.PILBOP.01">
+            <FeatureName>
+                <name>Saint-Malo (embarquement du pilote)</name>
+            </FeatureName>
+
+            <textContent>
+                <information>
+                    <text>
+                        A proximité de la bouée d’atterrage
+                    </text>
+                </information>
+            </textContent>
+            <geometry>
+                <S100:pointProperty>
+                    <S100:Point gml:id="FR.PILBOP.P.01" srsDimension="2"
+                        srsName="urn:ogc:def:crs:EPSG::4326">
+                        <gml:pos>-2.1 48.70</gml:pos>
+                    </S100:Point>
+                </S100:pointProperty>
+            </geometry>
+            <communicationChannel>12</communicationChannel>
+            <categoryOfVessel>
+
+            </categoryOfVessel>
+        </S127:PilotBoardingPlace>
+    </member>
+
+    <member>
+        <S127:PilotService gml:id="FR.PLTSRV.01">
+            <remotePilot>0</remotePilot>
+            <pilotRequest>
+                Obligation de pilotage : Obligatoire pour les navires de LHT > 45 m et les navires
+                transportant des hydrocarbures ou des marchandises dangereuses.
+
+                Embarquement du pilote : A proximité de la bouée d’atterrage (48° 42,4' N - 2°
+                07,3' W).
+
+                Communication HPA : 6 h avant l’HPA.
+
+                Communication HPD : Demande 2 h avant l’HPD, avant 1800 (h. locale) pour un départ
+                entre 2000 et 0800 (h. locale).
+
+                Communication mouvements : 1 h avant le changement de poste.
+
+                Notes : Sous certaines conditions, les capitaines de navires peuvent obtenir une
+                licence de « Capitaine-Pilote » les dispensant de l’assistance d’un pilote.
+                Lors de l’approche et dans la zone de pilotage, les navires doivent assurer une
+                veille permanente VHF Can. 16 et 12.
+                Cette station fournit également des pilotes pour St Cast, Le Guildo, Dinard, la
+                Rance, Cancale et Port Barrier.
+            </pilotRequest>
+            <geometry>
+                <S100:surfaceProperty nilReason="unknown" />
+            </geometry>
+        </S127:PilotService>
+    </member>
+
+    <imember>
+        <S127:ShipReport gml:id="FR.SHPREP.01">
+            <categoryOfShipReport>sailing plan</categoryOfShipReport>
+            <imoFormatForReporting>1</imoFormatForReporting>
+            <reportTo xlink:href="#FR.AUTORI.01" />
+            <noticeTime>
+                <noticeTimeHours>6</noticeTimeHours>
+                <noticeTimeText>Avant HPA</noticeTimeText>
+            </noticeTime>
+            <noticeTime>
+                <noticeTimeHours>2</noticeTimeHours>
+                <noticeTimeText>avant l’HPD, avant 1800 (h. locale) pour un départ entre 2000 et
+                    0800 (h. locale).</noticeTimeText>
+            </noticeTime>
+            <noticeTime>
+                <noticeTimeHours>1</noticeTimeHours>
+                <noticeTimeText>avant le changement de poste.</noticeTimeText>
+            </noticeTime>
+        </S127:ShipReport>
+    </imember>
+
+    <imember>
+        <S127:Applicability gml:id="FR.APPLIC.01">
+            <information>
+                <text>Obligatoire pour les navires de LHT > 45m</text>
+            </information>
+            <vesselsMeasurements>
+                <comparisonOperator>greater than</comparisonOperator>
+                <vesselsCharacteristics>length overall</vesselsCharacteristics>
+                <vesselsCharacteristicsValue>45</vesselsCharacteristicsValue>
+                <vesselsCharacteristicsUnit>metre</vesselsCharacteristicsUnit>
+            </vesselsMeasurements>
+            <theShipReport xlink:href="#FR.SHPREP.01" />
+        </S127:Applicability>
+    </imember>
+
+    <imember>
+        <S127:Applicability gml:id="FR.APPLIC.02">
+            <categoryOfCargo>dangerous or hazardous</categoryOfCargo>
+        </S127:Applicability>
+    </imember>
+
+    <imember>
+        <S127:PermissionType gml:id="FR.APPLIC.PERM.01">
+            <S100:invInformationAssociation gml:id="FR.APPLIC.PERM.01.I"
+                xlink:href="#FR.PILDST.01" xlink:arcrole="vslLocation" />
+            <categoryOfRelationship>required</categoryOfRelationship>
+            <permission xlink:href="#FR.APPLIC.01" xlink:arcrole="permission" />
+        </S127:PermissionType>
+    </imember>
+
+    <imember>
+        <S127:PermissionType gml:id="FR.APPLIC.PERM.02">
+            <S100:invInformationAssociation gml:id="FR.APPLIC.PERM.02.I" xlink:href="#FR.PILDST.01"
+                xlink:arcrole="vslLocation" />
+            <categoryOfRelationship>required</categoryOfRelationship>
+            <permission xlink:href="#FR.APPLIC.02" xlink:arcrole="permission" />
+        </S127:PermissionType>
+    </imember>
+
+    <imember>
+        <S127:Authority gml:id="FR.AUTORI.01">
+            <featureName>
+                <name>Pilotage du Port de Saint-Malo</name>
+            </featureName>
+            <categoryOfAuthority>maritime</categoryOfAuthority>
+            <theContactDetails xlink:href="#FR.CONDET.01" />
+        </S127:Authority>
+    </imember>
+
+    <imember>
+        <S127:ContactDetails gml:id="FR.CONDET.01">
+            <featureName>
+                <name>Pilotage du Port de Saint-Malo</name>
+            </featureName>
+            <callSign>Pilotes Saint-Malo</callSign>
+            <communicationChannel>12</communicationChannel>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 2 99 81 61 66</telecommunicationIdentifier>
+                <telecommunicationService>voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 2 99 81 61 26</telecommunicationIdentifier>
+                <telecommunicationService>facsimile</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>pilotes.sm@orange.fr</telecommunicationIdentifier>
+                <telecommunicationService>email</telecommunicationService>
+            </telecommunications>
+            <theAuthority xlink:href="#FR.AUTORI.01" />
+        </S127:ContactDetails>
+    </imember>
+</S127:Dataset>

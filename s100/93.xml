@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../schemas/S123/1.0/20170831/S123Basic.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<S123:Dataset xmlns:S123="http://www.iho.int/S123/gml/1.0"
+	xsi:schemaLocation="http://www.iho.int/S-123/gml/1.0 ../../../schemas/S123/1.0/20170831/S123.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:gml="http://www.opengis.net/gml/3.2"
+	xmlns:S100="http://www.iho.int/s100gml/1.0"
+	xmlns:s100_profile="http://www.iho.int/S-100/profile/s100_gmlProfile"
+	xmlns:xlink="http://www.w3.org/1999/xlink"  gml:id="JSNPI123EX_A0001">
+	<member>
+        <!-- Attention aux versions,
+            Par exemple la norme s-123 est compatible avec la norme s-100 version 3.0.0-20170331
+            Alors que la vrsion s-131 que nous avons récupéré est compatible avec la norme s-100 version 5.0.0-20220630 -->
+        <!-- Roderic : Pas de xsd les normes 101 ? juste un featue caalog, et-ce qu'on a récupéré toutes les sources de cette norme -->
+
+        <!-- Roderic : L'object RadioServiceArea est-il approprié pour décrire le tableau ?
+            Roderic : Comment représenter un port ? par rapport aux radio-signaux
+            Plutôt votre le tableau comm un ensemble d'objet de differente norme.
+            Par exemple : Pilotage service + radio station + HarbourAreaAdministrative
+        -->
+        <!-- ReferenceType : lien xlink:href= vers un gml:id -->
+
+		<S123:RadioServiceArea gml:id="JS.RDOSVC.01">
+            <S100:featureObjectIdentifier>
+                <!--
+                https://registry.iho.int/producercode/list2.do > S57 > France
+
+                Register Identifier	IHO MS
+                Country Name	France
+                Country Code	FR
+                Agency Name	Service Hydrographique et Océanographique de la Marine (SHOM)
+                Agency Code Num	170
+                Agency Code Alpha	FR
+                Date Accepted	2008-10-16
+                -->
+				<S100:agency>FR<!--Agency Code Alpha--></S100:agency>
+        		<!-- Roderic : on essaye ici de lié des objets de différentes normes s-101 s-123
+                    Comment connaître l'identifiant d'un port côté SHOM ?
+                    Est-ce que la base de données des objets Shom à la norme s1xy existe et est accéssible ?
+                    est-ce que l'identfiant featureIdentificationNumber est un pointeur sur ces objets ?
+                -->
+				<S100:featureIdentificationNumber>1</S100:featureIdentificationNumber>
+        		<!-- Roderic : est-ce qu'on peut mettre tout le temps 1 ? À quoi cela correspond ? -->
+				<S100:featureIdentificationSubdivision>1</S100:featureIdentificationSubdivision>
+			</S100:featureObjectIdentifier>
+
+			<featureName>
+				<name>Saint-Malo – Pilotage</name>
+			</featureName>
+			<textContent>
+				<!-- A priori pas nécessaire <categoryOfText>full text</categoryOfText> -->
+				<!-- Roderic: Nous avons pris le partie de mettre le titre de la section comme le premier information->text -->
+				<information>
+					<text>Arrêtés</text>
+				</information>
+				<information>
+					<text>Arrêté n°2014-7986 (DIRM n°1/2014) du Préfet de la Région Bretagne, Préfet d’Ille-et-Vilaine du 06 janvier 2014.</text>
+				</information>
+				<information>
+					<text>Arrêté n°2018-17083 (DIRM n°75/2018) (annexe tarifaire) du Préfet de la Région Bretagne, Préfet d’Ille-et-Vilaine du 27 décembre 2018.</text>
+				</information>
+				<!-- Roderic : nous avons ajouté la sourceIndictation->categoryAuthority = maritime pour les Arrêtés
+                    Authorité maritime : liste restrictive, "maritime" est le choix le plus proche trouvé. A voir si c'est pertinent d'ajouter des optioon côté OHI.
+                -->
+				<sourceIndication>
+					<categoryOfAuthority>maritime</categoryOfAuthority>
+				</sourceIndication>
+			</textContent>
+			<!-- controlAuthority ? -->
+			<textContent>
+				<!-- description de la zone géographique -->
+				<!-- <categoryOfText>full text</categoryOfText> -->
+				<!-- Roderic : nous n'avons pas trouvé de structure spécific pour la description de la zone géographique -->
+				<information>
+					<text>Zone de pilotage</text>
+				</information>
+				<information>
+					<text>A l’Est, par le méridien du Mont Dol (1° 46,0' W).</text>
+				</information>
+				<information>
+					<text>Au Nord, par le parallèle du Grand Léjon.</text>
+				</information>
+				<information>
+					<text>A l’Ouest, par la ligne joignant le Cap d’Erquy (48° 38,7' N — 2° 29,3' W) au phare du Grand Léjon (48° 45,0' N — 2° 39,9' W).</text>
+				</information>
+			</textContent>
+			<textContent>
+				<information>
+					<text>Procédure</text>
+				</information>
+				<information>
+					<headline>Obligation de pilotage</headline>
+					<text>Obligatoire pour les navires de LHT > 45 m et les navires transportant des hydrocarbures ou des marchandises dangereuses.</text>
+				</information>
+				<information>
+					<headline>Embarquement du pilote</headline>
+					<text>A proximité de la bouée d’atterrage (48° 42,4' N - 2° 07,3' W).</text>
+				</information>
+				<information>
+					<headline>…</headline>
+					<text>…</text>
+				</information>
+			</textContent>
+			<!-- Roderic: est-ce que on doit considérer ce RadioServiceArea comme commercial, si oui, pourquoi ? -->
+			<categoryOfBroadcastCommunication>public</categoryOfBroadcastCommunication>
+			<geometry>
+                <!-- A quoi sert cette balise surfaceProperty ? -->
+				<S100:surfaceProperty>
+                    <!-- Roderic : qu'est-ce que c'est que ce gml:id ?
+                        est-ce une référence vers d'autres objet ou est-ce arbitraire ?
+                        A quoi ça sert ?
+                        est-ce qu'il y a des règles à suivre pour l'attribution d'ID ?
+                        comment préfixer si préfix il y a ?
+                    -->
+                    <!-- GML Geographic Markup Language -->
+					<S100:Polygon gml:id="AreaB.72">
+						<gml:exterior>
+							<gml:LinearRing>
+								<!-- interprété selon les coordonnées trouvé dans l'IN mais pas sur que nous respection le système métrique:
+									A l’Est, par le méridien du Mont Dol (1° 46,0' W).
+									A l’Ouest, par la ligne joignant le Cap d’Erquy (48° 38,7' N — 2° 29,3' W) au phare du Grand Léjon (48° 45,0' N — 2° 39,9' W).
+									Au Nord, par le parallèle du Grand Léjon.
+									Roderic : est-ce que cela te semble correct ?
+
+                                    Correspond à la zone couverte par le radio signal
+                                    RadioStation geometry : point de l'antenne
+                                    Pilotage Area : pas trouvé mais pourrait être la zone de pilotage requis autour du port
+								-->
+								<gml:posList> -2.2 48.6 -2.2 49.0 -1.77 49.0 -1.77 48.6 -2.2 48.6 </gml:posList>
+							</gml:LinearRing>
+						</gml:exterior>
+					</S100:Polygon>
+				</S100:surfaceProperty>
+			</geometry>
+		</S123:RadioServiceArea>
+	</member>
+</S123:Dataset>

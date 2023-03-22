@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<S124:DataSet
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.iho.int/S124/gml/1.0"
+        xmlns:S124="http://www.iho.int/S124/gml/1.0"
+        xmlns:gml="http://www.opengis.net/gml/3.2"
+        xmlns:S100="http://www.iho.int/s100gml/1.0"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        gml:id="NW.CA.CCG.Q.1604.19">
+    <imember>
+        <NWPreamble gml:id="NW.CA.CCG.Q.1604.19.0">
+            <affectedChartPublications>
+                <chartAffected>
+                    <chartNumber>4001</chartNumber>
+                    <editionDate>2018-01-01</editionDate>
+                </chartAffected>
+            </affectedChartPublications>
+            <generalArea>
+                <locationName>
+                    <text>Maritimes</text>
+                </locationName>
+            </generalArea>
+            <locality>
+                <localityIdentifier>urn:mrn:area:stlawrence</localityIdentifier>
+                <locationName>
+                    <language>eng</language>
+                    <text>St. Lawrence</text>
+                </locationName>
+            </locality>
+            <messageSeriesIdentifier>
+                <country>CA</country>
+                <nameOfSeries>Canadian NavWarn Quebec</nameOfSeries>
+                <productionAgency>XXX</productionAgency>
+                <warningNumber>1604</warningNumber>
+                <warningType>local navigational warning</warningType>
+                <year>19</year>
+            </messageSeriesIdentifier>
+            <title>
+                <text>Waterway Information - North Atlantic Right Whale</text>
+            </title>
+            <publicationDate>2019-09-02T10:00:00</publicationDate>
+
+            <theWarningPart xlink:href="#NW.CA.CCG.Q.1604.19.1"/>
+            <theWarningPart xlink:href="#NW.CA.CCG.Q.1604.19.2"/>
+        </NWPreamble>
+    </imember>
+    <S124:member>
+        <NavigationalWarningFeaturePart gml:id="NW.CA.CCG.Q.1604.19.1">
+            <geometry>
+                <S100:surfaceProperty>
+                    <S100:Polygon gml:id="NW.CA.CCG.Q.1604.19.1.1" srsDimension="2" srsName="EPSG:4326">
+                        <gml:exterior>
+                            <gml:LinearRing>
+                                <gml:posList>50.33333 -65 49.21667 -65 48.66667 -64.21667 48.66667 -62.66667 48.05
+                                    -61.125 47.96833 -61.05833 48 -61 49.06667 -61 49.06667 -62 49.71667 -63 50.33333
+                                    -63 50.33333 -65
+                                </gml:posList>
+                            </gml:LinearRing>
+                        </gml:exterior>
+                    </S100:Polygon>
+                </S100:surfaceProperty>
+            </geometry>
+            <warningInformation>
+                <language>eng</language>
+                <text>Effective 090400 UTC Sep 2019, in order to promote navigation safety and protection of the marine
+                    environment due to an increased presence of North Atlantic Right Whales, a speed restriction area
+                    has been established and applies to all vessels above 13m or more in length overall (LOA):
+
+                    Within the Northern static zone, bounded by 50° 20’ N 065° 00’ W, 49° 13’ N 065° 00’ W, 48° 40’ N
+                    064° 13’ W, 48° 40’ N 062° 40’ W, 48° 03’ N 061° 07.5’ W, 47° 58.1’ N 061° 03.5’ W, 48° 00’ N 061°
+                    00’ W, 49° 04’ N 061° 00’ W, 49° 04’ N 062° 00’ W, 49° 43’ N 063° 00’ W, 50° 20’ N 063° 00’ W:
+                    Vessels are instructed to proceed at a speed not exceeding 10.0kts over the ground.
+                </text>
+            </warningInformation>
+            <warningHazardType>marine mammals</warningHazardType>
+            <header xlink:href="#NW.CA.CCG.Q.1604.19.0"/>
+        </NavigationalWarningFeaturePart>
+    </S124:member>
+    <S124:member>
+        <S124:NavigationalWarningFeaturePart gml:id="NW.CA.CCG.Q.1604.19.2">
+            <geometry>
+                <S100:surfaceProperty>
+                    <S100:Polygon gml:id="NW.CA.CCG.Q.1604.19.2.1" srsDimension="2" srsName="EPSG:4326">
+                        <gml:exterior>
+                            <gml:LinearRing>
+                                <gml:posList>48.66667 -65 48.66667 -62.66667 48.05 -61.125 47.96833 -61.05833 47.16667
+                                    -62.5 47.16667 -65 48.66667 -65
+                                </gml:posList>
+                            </gml:LinearRing>
+                        </gml:exterior>
+                    </S100:Polygon>
+                </S100:surfaceProperty>
+            </geometry>
+            <warningInformation>
+                <language>eng</language>
+                <text>Within the Southern static zone, bounded by 48° 40’ N 065° 00’ W, 48° 40’ N 062° 40’ W, 48° 03’ N
+                    061° 07.5’ W, 47° 58.1’ N 061° 03.5’ W, 47° 10’ N 062° 30’ W, 47° 10’ N 065° 00’ W: Vessels are
+                    instructed to proceed at a speed not exceeding 10.0kts over the ground.
+                    Failure to comply with this speed restriction could lead to enforcement action.
+
+                    Details, including coordinates of the Dynamic Sectors, are available in Notice to Mariners 801/19
+                    and is available upon request from a Marine Communications and Traffic Services Centre.
+
+                    Mariners are requested to report all whale sightings and observations of entangled, dead, or injured
+                    whales to the nearest Marine Communications and Traffic Services Centre.
+
+                    Navigational Warnings (NAVWARNs) replace Notices to Shipping (NOTSHIPs) and shall be construed as
+                    Notices to Shipping.
+                </text>
+            </warningInformation>
+            <warningHazardType>marine mammals</warningHazardType>
+            <header xlink:href="#NW.CA.CCG.Q.1604.19.0"/>
+        </S124:NavigationalWarningFeaturePart>
+    </S124:member>
+
+</S124:DataSet>
