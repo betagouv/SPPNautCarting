@@ -1,13 +1,13 @@
-<div class="fr-table sppnaut-max-w-120w">
+<div class="fr-table sn-max-w-120w">
     <table>
         <caption class='fr-mb-3w'>{{caption}}</caption>
         <tbody>
             {% for ouvrage in ouvrages %}
                 <tr>
                     <th scope="row">
-                        <img height="297" width="210" class="sppnaut-width-auto sppnaut-max-h-8w" src="{{ouvrage.vignette.url}}" alt=""/>
+                        <img height="297" width="210" class="sn-w-auto sn-max-h-8w" src="{{ouvrage.vignette.url}}" alt=""/>
                     </th>
-                    <th class="fr-h3 sppnaut-width-full" scope="row">
+                    <th class="fr-h3 sn-w-full" scope="row">
                         {{ ouvrage.name }}
                     </th>
 
