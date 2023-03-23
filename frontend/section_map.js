@@ -75,22 +75,18 @@ export class SectionMap {
         })
 
         const layerPerZoom = [
-            { layer: "RASTER_MARINE_1M_3857_WMSR", maxZoom: 7 },
-            { layer: "RASTER_MARINE_400_WMSR_3857", minZoom: 7, maxZoom: 10 },
-            { layer: "RASTER_MARINE_150_WMSR_3857", minZoom: 10, maxZoom: 11 },
-            { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 11 },
-            { layer: "RASTER_MARINE_20_WMSR_3857", minZoom: 13 },
+            // We keep RASTER_MARINE_50_WMSR_3857 because RASTER_MARINE_3857_WMSR is missing tiles at high zoom levels
+            { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 13 },
+            { layer: "RASTER_MARINE_3857_WMSR" },
         ]
-        const rasterMarineLayers = layerPerZoom.map(({ layer, minZoom, maxZoom }) => {
+        const rasterMarineLayers = layerPerZoom.map(({ layer, minZoom }) => {
             return new TileLayer({
                 source: new TileWMS({
-                    // FIXME : ne pas hardcoder cette url dans le JS mais la définir côté router
-                    url: "/carting/proxy",
+                    url: "https://services.data.shom.fr/u2kejlcaaf2ar8v69kvvqef6/wms/r",
                     params: { LAYERS: layer },
                     serverType: "geoserver",
                 }),
                 preload: Infinity,
-                maxZoom,
                 minZoom,
             })
         })
