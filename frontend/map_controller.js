@@ -4,10 +4,11 @@ import { SectionMap } from "./section_map"
 export default class extends Controller {
     #map
 
-    static targets = ["map", "geojson"]
+    static targets = ["map", "geojson", "featurePopin"]
     static values = {
         initialCenter: { type: Array, default: [-2.0, 48.65] },
         maxZoom: { type: Number, default: 13 },
+        wmsUrl: String,
     }
 
     connect() {
@@ -16,6 +17,7 @@ export default class extends Controller {
             initialCenter: this.initialCenterValue,
             maxZoom: this.maxZoomValue,
             geojson: this.geojsonTarget.textContent,
+            wmsUrl: this.wmsUrlValue,
         })
 
         this.#map.fitViewToAllSections()
@@ -32,5 +34,20 @@ export default class extends Controller {
             return
         }
         this.#map.selectSection(bpnID)
+    }
+
+    showFeaturePopin(event) {
+        this.#popinController.show(event.detail.html)
+    }
+
+    closeFeaturePopin() {
+        this.#popinController.close()
+    }
+
+    get #popinController() {
+        return this.application.getControllerForElementAndIdentifier(
+            this.featurePopinTarget,
+            "popin",
+        )
     }
 }

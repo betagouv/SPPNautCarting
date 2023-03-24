@@ -11,13 +11,15 @@
     },
     "python.analysis.typeCheckingMode": "basic",
     "[django-html]": {
-        "editor.formatOnSave": false
+        "editor.formatOnSave": false,
+        "tailwindCSS.experimental.classRegex": ["class=['\"]([^'\"]*)"]
     },
     "[css]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[html]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "tailwindCSS.experimental.classRegex": ["class=['\"]([^'\"]*)"]
     },
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"

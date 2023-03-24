@@ -27,6 +27,7 @@ export class SectionMap {
     #map
     #geojsonLayer
     #selectInteraction
+    #source
 
     #maxZoom
     #padding = [20, 20, 20, 20]
@@ -44,14 +45,15 @@ export class SectionMap {
     #selectedFillColor = "#00009108"
     #selectedWidth = 2
 
-    constructor({ target, initialCenter, maxZoom, geojson }) {
+    constructor({ target, initialCenter, maxZoom, geojson, wmsUrl }) {
         this.#maxZoom = maxZoom
-        this.#map = this.#initMap(maxZoom, initialCenter, target, geojson)
+        this.#map = this.#initMap(maxZoom, initialCenter, target, geojson, wmsUrl)
         this.#initHoverInteraction()
         this.#selectInteraction = this.#initSelectInteraction()
+        this.#map.on("click", this.#dispatchWMSFeature)
     }
 
-    #initMap(maxZoom, initialCenter, target, geojson) {
+    #initMap(maxZoom, initialCenter, target, geojson, wmsUrl) {
         this.#geojsonLayer = new VectorLayer({
             source: new VectorSource({
                 features: new GeoJSON().readFeatures(geojson),
@@ -91,10 +93,21 @@ export class SectionMap {
             })
         })
 
+        const LAYERS = "BALISAGE_BDD_WMSV"
+        this.#source = new TileWMS({
+            url: wmsUrl,
+            params: { TILED: true, LAYERS },
+            serverType: "geoserver",
+        })
+        const WMSLayer = new TileLayer({
+            source: this.#source,
+            minZoom: 11,
+        })
+
         return new OLMap({
             target,
             view,
-            layers: [...rasterMarineLayers, this.#geojsonLayer],
+            layers: [...rasterMarineLayers, this.#geojsonLayer, WMSLayer],
         })
     }
 
@@ -116,7 +129,8 @@ export class SectionMap {
 
     #initHoverInteraction() {
         const hoverInteraction = new Select({
-            condition: pointerMove,
+            condition: (mapBrowserEvent) =>
+                pointerMove(mapBrowserEvent) && noModifierKeys(mapBrowserEvent),
             style: buildStyle({
                 strokeColor: this.#hoveredStrokeColor,
                 fillColor: this.#hoveredFillColor,
@@ -166,6 +180,37 @@ export class SectionMap {
         this.#map.getTargetElement().dispatchEvent(
             new CustomEvent("ol:select", {
                 detail: { bpnID },
+                bubbles: true,
+            }),
+        )
+    }
+
+    #dispatchWMSFeature = async (mapBrowserEvent) => {
+        if (!mapBrowserEvent.originalEvent.shiftKey) {
+            console.log("Pas de shift == pas de popin")
+            return
+        }
+
+        const resolutionIn4326Unit = 0.0002
+        const htmlUrl = this.#source.getFeatureInfoUrl(
+            mapBrowserEvent.coordinate,
+            resolutionIn4326Unit,
+            "EPSG:4326",
+            {
+                INFO_FORMAT: "text/html",
+            },
+        )
+
+        const response = await fetch(htmlUrl)
+        const html = await response.text()
+        const fetchedEmptyFeature = !html.includes("FR00")
+        if (fetchedEmptyFeature) {
+            return
+        }
+
+        this.#map.getTargetElement().dispatchEvent(
+            new CustomEvent("wms:featureInfoFetched", {
+                detail: { html },
                 bubbles: true,
             }),
         )
