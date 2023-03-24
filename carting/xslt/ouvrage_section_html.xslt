@@ -13,7 +13,7 @@
     </xsl:template>
 
     <xsl:template match="titre/numero">
-        <span class="sppnaut-bold fr-pr-1w">
+        <span class="sn-font-bold fr-pr-1w">
             <xsl:apply-templates />
         </span>
     </xsl:template>
@@ -36,7 +36,7 @@
         <a
             id="{@bpn_id}"
             href="#{@bpn_id}"
-            class="sppnaut-scroll-mt-20vh"
+            class="sn-scroll-mt-[20vh]"
         >
             <xsl:apply-templates />
         </a>

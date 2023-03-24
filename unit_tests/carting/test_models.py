@@ -339,7 +339,7 @@ class TestContentHtml:
         ) == normalize_multiline_string(
             """
             <h2 class="fr-mt-2w">
-                <span class="sppnaut-bold fr-pr-1w">0.2.1.</span>
+                <span class="sn-font-bold fr-pr-1w">0.2.1.</span>
                 Objet des Instructions Nautiques
             </h2>
         """

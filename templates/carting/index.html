@@ -41,7 +41,7 @@
             <div
                 id="map"
                 data-map-target="map"
-                class="fr-p-1w sppnaut-min-h-half-screen sppnaut-max-h-screen sppnaut-h-full sppnaut-width-full sppnaut-sticky sppnaut-top-0"
+                class="fr-p-1w sn-max-h-screen sn-h-full sn-w-full sn-sticky sn-top-0"
             >
             </div>
         </div>
@@ -66,10 +66,9 @@
                     {% if section.should_display %}
                         <div
                             id="{{section.pk}}"
-                            style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; max-width: 80ch;"
-                            class="sppnaut-section sppnaut-scroll-mt-20vh"
+                            class="sn-flex sn-gap-1w sn-mb-1w sn-max-w-readable target:sn-bg-info-975-active sn-scroll-mt-[20vh]"
                         >
-                            <span style="min-width: 2.5rem">
+                            <span class="sn-min-w-5w">
                                 {% if section.geometry and section.tree_depth >= search_tree_depth %}
                                     <a href="#{{ section.pk }}"
                                         class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line"
