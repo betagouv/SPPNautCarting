@@ -7,6 +7,7 @@ module.exports = {
     },
     theme: {
         colors: {
+            // https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-identite-de-l-etat/couleurs-palette/
             info: {
                 "975-active": "#c2cfff",
             },
@@ -16,6 +17,7 @@ module.exports = {
             "120w": "60rem",
         },
         spacing: {
+            // https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-techniques/espacements
             0: 0,
             "1v": "0.25rem",
             "1w": "0.5rem",
