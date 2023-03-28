@@ -11,6 +11,14 @@ class UploadFileForm(forms.Form):
         },
     )
 
+    def clean_file(self):
+        file = self.cleaned_data["file"]
+        if file.content_type != "text/xml":
+            raise forms.ValidationError(
+                "Le fichier doit être un fichier tableau type format XML"
+            )
+        return file
+
 
 def _get_preparation_ouvrages():
     ouvrages = generator.get(
