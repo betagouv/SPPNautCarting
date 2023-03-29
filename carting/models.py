@@ -95,6 +95,11 @@ class SectionTypology(Enum):
     def choices(cls) -> list[tuple[str, str]]:
         return [(member.name, member.label) for member in cls]
 
+    @classmethod
+    @property
+    def paragraph_likes(cls):
+        return {member for member in cls if member.ingester == ParagraphIngester}
+
 
 def find_ingestable_child_elements(
     element: ElementTree.Element,

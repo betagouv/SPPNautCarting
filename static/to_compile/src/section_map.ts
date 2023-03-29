@@ -1,6 +1,6 @@
 import "ol/ol.css"
 
-import { Map as OLMap, View } from "ol"
+import { MapBrowserEvent, Map as OLMap, View } from "ol"
 import {
     FullScreen,
     MousePosition,
@@ -9,9 +9,10 @@ import {
 } from "ol/control"
 import { Coordinate, toStringHDMS } from "ol/coordinate"
 import { click, noModifierKeys, pointerMove } from "ol/events/condition.js"
+import type { Extent } from "ol/extent"
 import { getArea, isEmpty } from "ol/extent"
 import GeoJSON from "ol/format/GeoJSON.js"
-import Select from "ol/interaction/Select.js"
+import Select, { SelectEvent } from "ol/interaction/Select.js"
 import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
 import { useGeographic } from "ol/proj.js"
@@ -81,6 +82,7 @@ export class SectionMap {
         this.#hoverSectionInteraction = this.#initHoverSectionInteraction()
         this.#selectInteraction = this.#initSelectInteraction()
         this.#map.on("click", this.#dispatchWMSFeature)
+        this.#map.on("moveend", this.#dispatchBboxChanged)
     }
 
     #initMap(
@@ -203,14 +205,14 @@ export class SectionMap {
         return hoverSectionInteraction
     }
 
-    selectSection(bpnID) {
+    selectSection(bpnID: string) {
         const feature = this.#selectFeature(bpnID, { in: this.#selectInteraction })
         if (feature) {
-            this.#fitMapToExtent(feature.getGeometry()!.getExtent())
+            this.fitMapToExtent(feature.getGeometry()!.getExtent())
         }
     }
 
-    highlightSection(bpnID) {
+    highlightSection(bpnID: string) {
         this.#selectFeature(bpnID, { in: this.#hoverSectionInteraction })
     }
 
@@ -218,7 +220,7 @@ export class SectionMap {
         this.#hoverSectionInteraction.getFeatures().clear()
     }
 
-    #selectFeature(bpnID, { in: selectInteraction }: { in: Select }) {
+    #selectFeature(bpnID: string, { in: selectInteraction }: { in: Select }) {
         const sectionFeature = this.#geojsonLayer.getSource()!.getFeatureById(bpnID)
         if (!sectionFeature) {
             console.debug(`No geometry associated to hash: "${bpnID}"`)
@@ -231,33 +233,34 @@ export class SectionMap {
     }
 
     fitViewToAllSections() {
-        this.#fitMapToExtent(this.#geojsonLayer.getSource()!.getExtent())
+        this.fitMapToExtent(this.#geojsonLayer.getSource()!.getExtent())
     }
 
-    #fitMapToExtent(extent) {
+    fitMapToExtent(extent: Extent, { withAnimation = true } = {}) {
         if (isEmpty(extent)) {
             console.debug("Cannot fit empty extent provided as 'geometry'")
             return
         }
         const view = this.#map.getView()
         view.cancelAnimations()
+
         view.fit(extent, {
             maxZoom: this.#maxZoom,
             padding: this.#padding,
-            duration: this.#duration,
+            duration: withAnimation ? this.#duration : undefined,
         })
     }
 
-    #dispatch(type, details) {
+    #dispatch(type: string, detail: unknown) {
         this.#map.getTargetElement().dispatchEvent(
             new CustomEvent(type, {
-                detail: details,
+                detail,
                 bubbles: true,
             }),
         )
     }
 
-    #dispatchBpnID = (olEvent) => {
+    #dispatchBpnID = (olEvent: SelectEvent & { target: Select }) => {
         const selectedFeature = olEvent.target.getFeatures().item(0)
         let bpnID = ""
         if (selectedFeature) {
@@ -266,7 +269,15 @@ export class SectionMap {
         this.#dispatch("ol:select", { bpnID })
     }
 
-    #dispatchWMSFeature = async (mapBrowserEvent) => {
+    #dispatchBboxChanged = (mapBrowserEvent) => {
+        const view = this.#map.getView()
+        this.#dispatch("ol:changed", {
+            bbox: view.calculateExtent().map((a) => a.toFixed(2)),
+            zoom: view.getZoom()?.toFixed(2),
+        })
+    }
+
+    #dispatchWMSFeature = async (mapBrowserEvent: MapBrowserEvent<MouseEvent>) => {
         if (!mapBrowserEvent.originalEvent.shiftKey) {
             console.log("Pas de shift == pas de popin")
             return
@@ -290,5 +301,13 @@ export class SectionMap {
         }
 
         this.#dispatch("wms:featureInfoFetched", { html })
+    }
+
+    updateGeoJson(geojson: string) {
+        this.#geojsonLayer.setSource(
+            new VectorSource({
+                features: new GeoJSON().readFeatures(geojson),
+            }),
+        )
     }
 }

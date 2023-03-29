@@ -5,7 +5,8 @@ def menu(request):
     return {
         "menu": {
             "Carting": {
-                "Démo": reverse("carting:index"),
+                "Recherche texte": reverse("carting:search_by_text"),
+                "Recherche position": reverse("carting:search_by_position"),
             },
         }
     }

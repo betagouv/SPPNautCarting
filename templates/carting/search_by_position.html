@@ -1,0 +1,114 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block page_title %}Carting - Recherche position{% endblock%}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static "carting.css" %}">
+{% endblock %}
+
+{% block js %}
+<script type="module" src="{% static "carting.js" %}"></script>
+{% endblock %}
+
+{% block main %}
+<div
+    class="
+        fr-container--fluid
+        sn-snap-always sn-snap-start
+    "
+>
+    <div
+        data-controller="map"
+        data-map-wms-url-value="{% url 'carting:wms-proxy' %}"
+        data-map-bbox-value="{{ bbox }}"
+        data-action="
+            ol:select->map#selectSectionInText
+            ol:changed->map#updateBboxInUrl
+            wms:featureInfoFetched->map#showFeaturePopin
+            hashchange@window->map#selectSectionInMapFromHash
+            hashchange@window->map#closeFeaturePopin
+        "
+        class="
+            fr-grid-row fr-m-1w
+            sn-bg-white
+        "
+    >
+        <div class="fr-col-12 fr-col-md-7">
+            <div
+                id="map"
+                data-map-target="map"
+                class="
+                    sn-h-screen sn-w-full
+                    fr-p-1w
+                "
+            >
+            </div>
+        </div>
+        <div class="
+                sn-relative
+                fr-col-12 fr-col-md-5 fr-p-1w
+            "
+        >
+            {% include 'carting/partial/layer_popin.html' %}
+
+            <turbo-frame
+                id="sections"
+                data-map-target="turboframe"
+                data-turbo-action="advance"
+                class="
+                    sn-block sn-h-screen sn-overflow-auto sn-overscroll-contain sn-px-1v sn-pb-1v
+                    aria-busy:sn-opacity-50 sn-transition-opacity sn-ease-in aria-busy:sn-delay-150
+                "
+            >
+                <script type="application/geojson" data-map-target="geojson">
+                    {{ geojson|safe }}
+                </script>
+                {% if expanded %}
+                    <div class="sn-sticky sn-top-0 sn-bg-white sn-z-10">
+                        <a
+                            {% if expanded_section.pk == root_expanded %}
+                                href="{% url 'carting:search_by_position' %}?{{request.GET.urlencode}}"
+                            {% else %}
+                                href="{% url 'carting:search_by_position_details' root_expanded=root_expanded expanded=expanded_section.parent.pk %}?{{request.GET.urlencode}}"
+                            {% endif %}
+                            class="fr-mb-1w fr-btn fr-btn--icon-left fr-btn--secondary fr-icon-arrow-left-line"
+                        >
+                            Retour
+                        </a>
+                    </div>
+                    {% if expanded_section %}
+                        {% include 'carting/cards/title.html' with section=expanded_section %}
+                    {% endif %}
+                    {% for section in expanded_section.children.all %}
+                        {% if section.typology == "ALINEA" %}
+                            {% ifchanged section.typology %}
+                                <div class="sn-m-2w">
+                            {% endifchanged %}
+
+                            {% include 'carting/cards/alinea.html' %}
+
+                            {% if forloop.last %}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            {% ifchanged section.typology %}
+                                {% if not forloop.first %}
+                                    </div>
+                                {% endif %}
+                            {% endifchanged %}
+
+                            {% include 'carting/cards/title.html' %}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% for section in sections %}
+                        {% include 'carting/cards/title.html' %}
+                    {% endfor %}
+                {% endif %}
+            </turbo-frame>
+        </div>
+    </div>
+</div>
+{% endblock %}

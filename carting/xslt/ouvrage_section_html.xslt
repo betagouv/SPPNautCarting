@@ -37,6 +37,7 @@
             id="{@bpn_id}"
             href="#{@bpn_id}"
             class="sn-scroll-mt-[20vh]"
+            data-turbo="false"
         >
             <xsl:apply-templates />
         </a>
