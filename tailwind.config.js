@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ["templates/**/*html", "carting/**/*xslt"],
+    content: ["./**/templates/**/*html", "carting/**/*xslt"],
     prefix: "sn-",
     corePlugins: {
         preflight: false,
@@ -34,6 +34,12 @@ module.exports = {
             "15w": "7.5rem",
         },
         extend: {
+            height: {
+                "half-screen": "50vh",
+            },
+            minHeight: {
+                "half-screen": "50vh",
+            },
             minWidth: ({ theme }) => ({ ...theme("spacing") }),
         },
     },
