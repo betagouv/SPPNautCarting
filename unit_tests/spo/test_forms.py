@@ -7,7 +7,7 @@ from spo.forms import UploadFileForm
 
 
 class TestUploadFileForm:
-    def test_upload_file_form_xml_file_ok(self):
+    def test_xml_file_ok(self):
         xml_file = SimpleUploadedFile("file.xml", b"fake", content_type="text/xml")
         form = UploadFileForm({}, {"file": xml_file})
         assert form.errors == {}
