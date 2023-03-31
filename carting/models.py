@@ -207,23 +207,3 @@ class OuvrageSection(TreeNode):
             SectionTypology.REFERENCE,
             SectionTypology.TOPONYME,
         ]
-
-
-"""
-
-Solution #1
-Stockage en base des infos
-
-Object
-    id
-    type
-    enum (pilotagedistrict)
-    xml
-    geometry
-    lien entre objects (m2m)
-
-Solution #2
-Stockage du couple type / id / geometry
-Pas de stockage du xml en base
-Stockage des objets dans un fichier xml
-"""
