@@ -208,5 +208,6 @@ LOGIN_REDIRECT_URL = "spo:ouvrages_by_name"
 LANGUAGE_CODE = "fr"
 
 SHELL_PLUS_PRINT_SQL = True
+SHELL_PLUS_IMPORTS = ["from carting.models import SectionTypology"]
 GDAL_LIBRARY_PATH = config("GDAL_LIBRARY_PATH", default=None)
 GEOS_LIBRARY_PATH = config("GEOS_LIBRARY_PATH", default=None)

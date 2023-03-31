@@ -39,7 +39,10 @@ class OuvrageSectionAdmin(GISModelAdmin):
     gis_widget = CustomOSMWidget
     ordering = ("numero",)
     list_display = ("__str__", "bpn_id", "ouvrage_name")
-    list_filter = (("geometry", admin.EmptyFieldListFilter),)
+    list_filter = (
+        ("geometry", admin.EmptyFieldListFilter),
+        "typology",
+    )
     search_fields = ("bpn_id", "numero", "content")
 
     readonly_fields = (
