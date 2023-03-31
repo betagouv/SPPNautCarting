@@ -1,13 +1,16 @@
 from django import forms
 from django.conf import settings
+from django.core.validators import FileExtensionValidator
 
 from . import generator
 
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=["xml"])],
         error_messages={
-            "required": "Vous devez séléctionner un fichier tableau type format XML"
+            "required": "Vous devez séléctionner un fichier tableau type format XML",
+            "invalid_extension": "Le fichier doit être un fichier tableau type format XML",
         },
     )
 
