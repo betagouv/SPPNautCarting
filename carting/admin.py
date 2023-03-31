@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.html import format_html_join
 from tree_queries.models import TreeNode
 
-from .models import OuvrageSection
+from .models import OuvrageSection, S1xyObject
 from .widgets import CustomOSMWidget
 
 logger = logging.getLogger(__name__)
@@ -63,3 +63,23 @@ class OuvrageSectionAdmin(GISModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(S1xyObject)
+class S1xyObject(GISModelAdmin):
+    gis_widget = CustomOSMWidget
+    list_display = ("id", "typology")
+    search_fields = ("id",)
+    autocomplete_fields = ("link_to",)
+    fields = (
+        "id",
+        "typology",
+        "content",
+        "geometry",
+        "link_to",
+    )
+    readonly_fields = (
+        "id",
+        "typology",
+        "content",
+    )

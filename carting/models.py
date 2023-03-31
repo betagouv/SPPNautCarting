@@ -207,3 +207,11 @@ class OuvrageSection(TreeNode):
             SectionTypology.REFERENCE,
             SectionTypology.TOPONYME,
         ]
+
+
+class S1xyObject(models.Model):
+    id = models.CharField(max_length=255, primary_key=True)
+    typology = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
+    geometry = models.GeometryField(blank=True, null=True, default=None, srid=4326)
+    link_to = models.ManyToManyField("self", blank=True)
