@@ -13,7 +13,7 @@ class TestUploadFileForm:
         assert form.errors == {}
         assert form.is_valid()
 
-    def test_upload_conte_form_extension_xml_file_ko(self):
+    def test_ods_file_refused(self):
         wrong_xml_file = SimpleUploadedFile(
             "file.ods", b"fake", content_type="text/xml"
         )
