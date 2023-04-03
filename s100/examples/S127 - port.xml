@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../schemas/S127/1.0.0/20181129/S127Basic.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<S127:Dataset xmlns:S127="http://www.iho.int/S127/gml/cs0/1.0"
+    xsi:schemaLocation="http://www.iho.int/S127/gml/cs0/1.0 ../../../schemas/S127/1.0.0/20181129/S127.xsd
+                        "
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:S100="http://www.iho.int/s100gml/1.0"
+    xmlns:s100_profile="http://www.iho.int/S-100/profile/s100_gmlProfile"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <imember>
+        <S127:Authority gml:id="FR.AUTORI.02">
+            <!-- Roderic : est-ce qu'on doit spécifer plus que ça l'authorité -->
+            <!-- Roderic : comment associer un site web -->
+            <featureName>
+                <name>Port de Saint-Malo</name>
+            </featureName>
+            <categoryOfAuthority>maritime</categoryOfAuthority>
+            <theContactDetails xlink:href="#FR.CONDET.02" />
+            <theContactDetails xlink:href="#FR.CONDET.03" />
+            <theContactDetails xlink:href="#FR.CONDET.04" />
+        </S127:Authority>
+    </imember>
+
+    <imember>
+        <S127:ContactDetails gml:id="FR.CONDET.02">
+            <featureName>
+                <name>Capitainerie</name>
+            </featureName>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 2 99 20 36 90</telecommunicationIdentifier>
+                <telecommunicationService>Voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 2 99 20 36 91</telecommunicationIdentifier>
+                <telecommunicationService>Voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>saint-malo.capitainerie@finistere.gouv.fr</telecommunicationIdentifier>
+                <telecommunicationService>Email</telecommunicationService>
+            </telecommunications>
+            <theAuthority xlink:href="#FR.AUTORI.02" />
+        </S127:ContactDetails>
+    </imember>
+
+    <imember>
+        <S127:ContactDetails gml:id="FR.CONDET.03">
+            <featureName>
+                <name>Exploitation portuaire</name>
+            </featureName>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 2 99 20 51 00</telecommunicationIdentifier>
+                <telecommunicationService>Voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 2 99 82 11 25</telecommunicationIdentifier>
+                <telecommunicationService>Voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>commerce@saintmalo-cancale.port.bzh</telecommunicationIdentifier>
+                <telecommunicationService>Email</telecommunicationService>
+            </telecommunications>
+            <theAuthority xlink:href="#FR.AUTORI.02" />
+        </S127:ContactDetails>
+    </imember>
+    <imember>
+        <S127:ContactDetails gml:id="FR.CONDET.04">
+            <featureName>
+                <name>Port de pêche</name>
+            </featureName>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 2 99 81 79 86</telecommunicationIdentifier>
+                <telecommunicationService>Voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>Gael.Michel@saintmalo-cancale.port.bzh</telecommunicationIdentifier>
+                <telecommunicationService>Email</telecommunicationService>
+            </telecommunications>
+            <theAuthority xlink:href="#FR.AUTORI.02" />
+        </S127:ContactDetails>
+    </imember>
+
+</S127:Dataset>

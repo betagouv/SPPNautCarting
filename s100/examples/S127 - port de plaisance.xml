@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../schemas/S127/1.0.0/20181129/S127Basic.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<S127:Dataset xmlns:S127="http://www.iho.int/S127/gml/cs0/1.0"
+    xsi:schemaLocation="http://www.iho.int/S127/gml/cs0/1.0 ../../../schemas/S127/1.0.0/20181129/S127.xsd
+                        "
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:S100="http://www.iho.int/s100gml/1.0"
+    xmlns:s100_profile="http://www.iho.int/S-100/profile/s100_gmlProfile"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+
+    <imember>
+        <S127:Authority gml:id="FR.AUTORI.03">
+            <!-- Roderic : 2 ports de plaisance, est-ce 2 authorités distincts ou 2 services de
+            l'authorité du « ports de plaisance » -->
+            <featureName>
+                <name>Port Vauban</name>
+            </featureName>
+            <categoryOfAuthority>Port</categoryOfAuthority>
+            <theServiceHours>
+                <!-- Comment faire des horaires différent selon les mois de l'année ? -->
+            </theServiceHours>
+            <theContactDetails xlink:href="#FR.CONDET.05" />
+        </S127:Authority>
+    </imember>
+
+
+    <imember>
+        <S127:Authority gml:id="FR.AUTORI.04">
+            <!-- Roderic : 2 ports de plaisance, est-ce 2 authorités distincts ou 2 services de
+            l'authorité du « ports de plaisance » -->
+            <!-- 2 site web à d-référencer sur l'authority ou le contactDetails :
+                    https://www.saintmalo-cancale.port.bzh/page/ports-de-plaisance-a-saint-malo
+                    https://www.ville-saint-malo.fr/les-equipements-du-port-de-plaisance-des-sablons/
+                Comment faire ? -->
+            <featureName>
+                <name>Port des Sablons</name>
+            </featureName>
+            <categoryOfAuthority>Port</categoryOfAuthority>
+            <theServiceHours>
+
+            </theServiceHours>
+            <theShipReport xlink:href="#FR.SHPREP.02" />
+            <theContactDetails xlink:href="#FR.CONDET.06" />
+        </S127:Authority>
+    </imember>
+
+
+    <!-- ShipReportingServiceArea DataCorverage -->
+    <imember>
+        <S127:ShipReport gml:id="FR.SHPREP.02">
+            <categoryOfShipReport>sailing plan</categoryOfShipReport>
+            <imoFormatForReporting>0</imoFormatForReporting>
+            <reportTo xlink:href="#FR.AUTORI.03" />
+            <noticeTime>
+                <noticeTimeHours>48</noticeTimeHours>
+                <noticeTimeText>avant l’arrivée par VHF ou téléphone</noticeTimeText>
+            </noticeTime>
+        </S127:ShipReport>
+    </imember>
+
+
+    <ShipReportingServiceArea>
+        <consistsOf xlink:href="FR.SHPREP.02" />
+        <geometry>
+            <!-- Polygone du port -->
+        </geometry>
+    </ShipReportingServiceArea>
+
+    <HarbourAreaAdministrative>
+        <categoryOfHarbourFacility><!-- Roderic : quelle valeur pour un port de paisance ? -->
+        </categoryOfHarbourFacility>
+        <geometry>
+            <!-- Polygone du port -->
+        </geometry>
+    </HarbourAreaAdministrative>
+
+
+    <imember>
+        <S127:ContactDetails gml:id="FR.CONDET.05">
+            <featureName>
+                <name>Port Vauban</name>
+            </featureName>
+            <communicationChannel>9</communicationChannel>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 02 99 56 51 91</telecommunicationIdentifier>
+                <!-- telecommunicationService : faut-il mettre le telecommunicationServiceLabel ou
+                telecommunicationServiceCode -->
+                <telecommunicationService>Voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>portplaisancevauban@ille-et-vilaine.cci.fr</telecommunicationIdentifier>
+                <telecommunicationService>Email</telecommunicationService>
+            </telecommunications>
+            <theAuthority xlink:href="#FR.AUTORI.03" />
+        </S127:ContactDetails>
+    </imember>
+
+    <imember>
+        <S127:ContactDetails gml:id="FR.CONDET.06">
+            <featureName>
+                <name>Port des Sablons</name>
+            </featureName>
+            <communicationChannel>9</communicationChannel>
+            <telecommunications>
+                <telecommunicationIdentifier>+33 02 99 81 71 34</telecommunicationIdentifier>
+                <telecommunicationService>Voice</telecommunicationService>
+            </telecommunications>
+            <telecommunications>
+                <telecommunicationIdentifier>port.plaisance@saint-malo.fr</telecommunicationIdentifier>
+                <telecommunicationService>Email</telecommunicationService>
+            </telecommunications>
+            <theAuthority xlink:href="#FR.AUTORI.03" />
+        </S127:ContactDetails>
+    </imember>
+</S127:Dataset>

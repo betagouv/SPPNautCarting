@@ -47,6 +47,11 @@
             <textContent>
                 <categoryOfText>extract</categoryOfText>
                 <information>
+                    <headline>TBT(en): Arrêté n°2014-7986 (DIRM n°1/2014) du Préfet de la Région
+                        Bretagne, Préfet d’Ille-et-Vilaine du 06 janvier 2014.</headline>
+                </information>
+                <information>
+                    <language>fr</language>
                     <headline>Arrêté n°2014-7986 (DIRM n°1/2014) du Préfet de la Région
                         Bretagne, Préfet d’Ille-et-Vilaine du 06 janvier 2014.</headline>
                 </information>
@@ -77,6 +82,12 @@
             <textContent>
                 <information>
                     <text>
+                        TBT(en): A proximité de la bouée d’atterrage
+                    </text>
+                </information>
+                <information>
+                    <language>fr</language>
+                    <text>
                         A proximité de la bouée d’atterrage
                     </text>
                 </information>
@@ -100,26 +111,11 @@
         <S127:PilotService gml:id="FR.PLTSRV.01">
             <remotePilot>0</remotePilot>
             <pilotRequest>
-                Obligation de pilotage : Obligatoire pour les navires de LHT > 45 m et les navires
-                transportant des hydrocarbures ou des marchandises dangereuses.
-
-                Embarquement du pilote : A proximité de la bouée d’atterrage (48° 42,4' N - 2°
-                07,3' W).
-
-                Communication HPA : 6 h avant l’HPA.
-
-                Communication HPD : Demande 2 h avant l’HPD, avant 1800 (h. locale) pour un départ
-                entre 2000 et 0800 (h. locale).
-
-                Communication mouvements : 1 h avant le changement de poste.
-
-                Notes : Sous certaines conditions, les capitaines de navires peuvent obtenir une
-                licence de « Capitaine-Pilote » les dispensant de l’assistance d’un pilote.
-                Lors de l’approche et dans la zone de pilotage, les navires doivent assurer une
-                veille permanente VHF Can. 16 et 12.
-                Cette station fournit également des pilotes pour St Cast, Le Guildo, Dinard, la
-                Rance, Cancale et Port Barrier.
-            </pilotRequest>
+                <!-- Roderic : rendre object ces notes ? comment stocker en anglais et en français --> Notes : Sous certaines conditions, les capitaines de navires peuvent
+                obtenir une licence de « Capitaine-Pilote » les dispensant de l’assistance d’un
+                pilote. Lors de l’approche et dans la zone de pilotage, les navires doivent assurer
+                une veille permanente VHF Can. 16 et 12. Cette station fournit également des
+                pilotes pour St Cast, Le Guildo, Dinard, la Rance, Cancale et Port Barrier. </pilotRequest>
             <geometry>
                 <S100:surfaceProperty nilReason="unknown" />
             </geometry>
@@ -133,6 +129,7 @@
             <reportTo xlink:href="#FR.AUTORI.01" />
             <noticeTime>
                 <noticeTimeHours>6</noticeTimeHours>
+                <!-- Roderic : 6h avant HPA comment objéîfier l'info -->
                 <noticeTimeText>Avant HPA</noticeTimeText>
             </noticeTime>
             <noticeTime>
@@ -206,6 +203,17 @@
             <telecommunications>
                 <telecommunicationIdentifier>+33 2 99 81 61 66</telecommunicationIdentifier>
                 <telecommunicationService>voice</telecommunicationService>
+                <scheduleByDayOfWeekType>
+                    <categoryOfSchedule>normal operation</categoryOfSchedule>
+                    <timeIntervalsByDayOfWeek>
+                        dayOfWeekType
+                        dayOfWeekIsRange
+                        timeOfDayStart
+                        timeOfDayEnds
+
+
+                    </timeIntervalsByDayOfWeek>
+                </scheduleByDayOfWeekType>
             </telecommunications>
             <telecommunications>
                 <telecommunicationIdentifier>+33 2 99 81 61 26</telecommunicationIdentifier>
