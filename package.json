@@ -1,17 +1,21 @@
 {
     "scripts": {
-        "build": "rm -rf compiled_static && parcel build",
-        "watch": "rm -rf compiled_static && parcel watch",
+        "build": "parcel build",
+        "watch": "parcel watch",
         "lint": "prettier --check ."
     },
     "source": [
-        "frontend/carting.js",
-        "frontend/sppnaut.css"
+        "frontend/sppnaut.css",
+        "frontend/sppnaut.js",
+        "frontend/carting.js"
     ],
     "targets": {
         "default": {
             "distDir": "./compiled_static"
         }
+    },
+    "@parcel/transformer-css": {
+        "errorRecovery": true
     },
     "prettier": {
         "trailingComma": "all",
@@ -28,6 +32,7 @@
         ]
     },
     "dependencies": {
+        "@gouvfr/dsfr": "^1.7.2",
         "@hotwired/stimulus": "^3.2.1",
         "ol": "^7.3.0",
         "parcel": "^2.8.3",
