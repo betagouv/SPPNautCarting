@@ -19,7 +19,7 @@ class CustomOSMWidget(forms.widgets.BaseGeometryWidget):
         }
         js = (
             "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js",
-            "js/admin-map-widget.js",
+            "admin-map-widget.js",
         )
 
     def __init__(self, attrs=None):

@@ -5,6 +5,6 @@
 __pycache__
 .venv
 .parcel-cache
-staticfiles
-compiled_static
+static/collected
+static/compiled
 node_modules

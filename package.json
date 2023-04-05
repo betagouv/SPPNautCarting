@@ -5,13 +5,15 @@
         "lint": "prettier --check ."
     },
     "source": [
-        "frontend/sppnaut.css",
-        "frontend/sppnaut.js",
-        "frontend/carting.js"
+        "static/to_compile/entrypoints/sppnaut.css",
+        "static/to_compile/entrypoints/sppnaut.js",
+        "static/to_compile/entrypoints/carting.js",
+        "static/to_compile/entrypoints/admin-map-widget.js",
+        "static/to_compile/entrypoints/publication.js"
     ],
     "targets": {
         "default": {
-            "distDir": "./compiled_static"
+            "distDir": "./static/compiled"
         }
     },
     "@parcel/transformer-css": {
