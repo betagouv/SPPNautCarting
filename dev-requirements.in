@@ -2,6 +2,7 @@
 
 black
 django-browser-reload
+django-debug-toolbar
 honcho
 pytest
 pytest-django
