@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
-from carting.models import OuvrageSection, SectionTypology
+from carting.models import OuvrageSection, S1xyObject, SectionTypology
 
 
 # FIXME : Les sections commençant par '0.' ne devraient pas être affichées (pas de géométrie attachée); les illustrations en '0.' sont mal ordonnées
@@ -61,11 +61,64 @@ def index(request: HttpRequest) -> HttpResponse:
 
     geojson = Serializer().serialize(s for s in sections if s.geometry)
 
+    # S1xyObject information display
+    from io import BytesIO, StringIO
+
+    from lxml import etree
+
+    # s1xyobjects = S1xyObject.objects.filter(geometry__isnull=False)
+    s1xyobjects = S1xyObject.objects.all()
+    for s1xyobject in s1xyobjects:
+        linked_objects = {x.id: x for x in s1xyobject.link_to.all()}
+        content = "Typology : " + s1xyobject.typology + "<br/>"
+        content += "Id : " + s1xyobject.id + "<br/>"
+
+        root = etree.XML(s1xyobject.content)
+        root_element = root.xpath(
+            './/*[local-name()="' + s1xyobject.typology.split(":")[1] + '"]'
+        )
+
+        for element in root_element[0]:
+            href = element.get("{http://www.w3.org/1999/xlink}href")
+            if href is not None:
+                linked_id = href.replace("#", "")
+                try:
+                    linked_object = linked_objects[linked_id]
+                except KeyError:
+                    linked_object = None
+                if linked_object is not None:
+                    content += (
+                        linked_object.typology
+                        + " : <a href='#"
+                        + linked_object.id
+                        + "'>"
+                        + linked_object.id
+                        + "</a><br/>"
+                    )
+            elif element.tag != "geometry":
+                # Il doit forcement y avoir moins degolasse à faire
+                for event, elmt in etree.iterparse(
+                    BytesIO(etree.tostring(element)),
+                    events=("start", "end"),
+                ):
+                    if event == "start":
+                        content += "<ul>"
+                        content += "<li>" + etree.QName(elmt).localname
+                        if elmt.text.isspace():
+                            content += "</li>"
+                        else:
+                            content += " : " + elmt.text + "</li>"
+                    else:
+                        content += "</ul>"
+
+        s1xyobject.content = content
+
     return render(
         request,
         "carting/index.html",
         {
             "sections": sections,
+            "s1xyobjects": s1xyobjects,
             "geojson": geojson,
             "search_tree_depth": section.tree_depth,
             "search": search,
