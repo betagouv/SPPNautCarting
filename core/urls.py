@@ -16,9 +16,10 @@ urlpatterns: URLList = [
     path("carting/", include(("carting.urls", "carting"), namespace="carting")),
 ]
 
-if "django_browser_reload" in settings.INSTALLED_APPS:
+if settings.DEBUG:
     urlpatterns.extend(
         [
+            path("__debug__/", include("debug_toolbar.urls")),
             path("__reload__/", include("django_browser_reload.urls")),
         ]
     )

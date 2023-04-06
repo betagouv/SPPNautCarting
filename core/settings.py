@@ -40,6 +40,7 @@ if DEBUG:
     INSTALLED_APPS.extend(
         [
             "django_browser_reload",
+            "debug_toolbar",
         ]
     )
 
@@ -53,12 +54,18 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-if "django_browser_reload" in INSTALLED_APPS:
+if DEBUG:
     MIDDLEWARE.extend(
         [
+            "debug_toolbar.middleware.DebugToolbarMiddleware",
             "django_browser_reload.middleware.BrowserReloadMiddleware",
         ]
     )
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": "operator.truth",
+}
+
 
 ROOT_URLCONF = "core.urls"
 
