@@ -103,11 +103,11 @@ DATABASES = {
 }
 
 # Static files
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "static" / "collected"
 STATIC_URL = "static/"
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    BASE_DIR / "compiled_static",
+    BASE_DIR / "static" / "to_collect",
+    BASE_DIR / "static" / "compiled",
 ]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True

@@ -1,7 +1,7 @@
 import { Application } from "@hotwired/stimulus"
 
-import MapController from "./map_controller"
-import PopinController from "./popin_controller"
+import MapController from "../src/map_controller"
+import PopinController from "../src/popin_controller"
 
 window.stimulus = Application.start()
 stimulus.register("map", MapController)
