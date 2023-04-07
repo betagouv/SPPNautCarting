@@ -1,9 +1,13 @@
+import re
+
 import requests
 from django.core import serializers
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.template import loader
 from django.urls import reverse
 from django.views.decorators.http import require_GET
+from xsdata.formats.dataclass.parsers import XmlParser
 
 from carting.models import OuvrageSection, S1xyObject, SectionTypology
 from carting.s127_models import Dataset
@@ -62,63 +66,15 @@ def index(request: HttpRequest) -> HttpResponse:
 
     geojson = Serializer().serialize(s for s in sections if s.geometry)
 
-    # S1xyObject information display
-    from io import BytesIO, StringIO
-
-    from lxml import etree
+    pilotage_district = None
 
     # s1xyobjects = S1xyObject.objects.filter(geometry__isnull=False)
     s1xyobjects = S1xyObject.objects.filter(typology="S127:PilotageDistrict")
     for s1xyobject in s1xyobjects:
-        from xsdata.formats.dataclass.parsers import XmlParser
-
         parser = XmlParser()
         dataset = parser.from_string(s1xyobject.content, Dataset)
-        print(dataset.member[0].pilotage_district.feature_name[1].name)
 
-        # linked_objects = {x.id: x for x in s1xyobject.link_to.all()}
-        # content = "Typology : " + s1xyobject.typology + "<br/>"
-        # content += "Id : " + s1xyobject.id + "<br/>"
-
-        # root = etree.XML(s1xyobject.content)
-        # root_element = root.xpath(
-        #     './/*[local-name()="' + s1xyobject.typology.split(":")[1] + '"]'
-        # )
-
-        # for element in root_element[0]:
-        #     href = element.get("{http://www.w3.org/1999/xlink}href")
-        #     if href is not None:
-        #         linked_id = href.replace("#", "")
-        #         try:
-        #             linked_object = linked_objects[linked_id]
-        #         except KeyError:
-        #             linked_object = None
-        #         if linked_object is not None:
-        #             content += (
-        #                 linked_object.typology
-        #                 + " : <a href='#"
-        #                 + linked_object.id
-        #                 + "'>"
-        #                 + linked_object.id
-        #                 + "</a><br/>"
-        #             )
-        #     elif element.tag != "geometry":
-        #         # Il doit forcement y avoir moins degolasse à faire
-        #         for event, elmt in etree.iterparse(
-        #             BytesIO(etree.tostring(element)),
-        #             events=("start", "end"),
-        #         ):
-        #             if event == "start":
-        #                 content += "<ul>"
-        #                 content += "<li>" + etree.QName(elmt).localname
-        #                 if elmt.text.isspace():
-        #                     content += "</li>"
-        #                 else:
-        #                     content += " : " + elmt.text + "</li>"
-        #             else:
-        #                 content += "</ul>"
-
-        # s1xyobject.content = content
+        pilotage_district = dataset.member[0].pilotage_district
 
     return render(
         request,
@@ -126,10 +82,22 @@ def index(request: HttpRequest) -> HttpResponse:
         {
             "sections": sections,
             "s1xyobjects": s1xyobjects,
+            "pilotage_district": render_to_string(pilotage_district),
             "geojson": geojson,
             "search_tree_depth": section.tree_depth,
             "search": search,
         },
+    )
+
+
+def camel_to_snake(name):
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
+
+
+def render_to_string(s1xyobject):
+    return loader.render_to_string(
+        camel_to_snake(s1xyobject.__class__.__name__) + ".html", {"self": s1xyobject}
     )
 
 
