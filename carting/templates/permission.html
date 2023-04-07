@@ -1,0 +1,9 @@
+{% load s100 %}
+
+{{ self.category_of_relationship }}
+
+{% if self.permission %}
+    {% for permission in self.permission %}
+        {% applicability permission.href %}
+    {% endfor %}
+{% endif %}

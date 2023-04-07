@@ -66,23 +66,24 @@ def index(request: HttpRequest) -> HttpResponse:
 
     geojson = Serializer().serialize(s for s in sections if s.geometry)
 
-    pilotage_district = None
-
+    parser = XmlParser()
     # s1xyobjects = S1xyObject.objects.filter(geometry__isnull=False)
     s1xyobjects = S1xyObject.objects.filter(typology="S127:PilotageDistrict")
-    for s1xyobject in s1xyobjects:
-        parser = XmlParser()
-        dataset = parser.from_string(s1xyobject.content, Dataset)
 
+    s1xyobjects_renderized = []
+    for s1xyobject in s1xyobjects:
+        dataset = parser.from_string(s1xyobject.content, Dataset)
         pilotage_district = dataset.member[0].pilotage_district
+        s1xyobjects_renderized.append(
+            {"s1xyobject": s1xyobject, "render": render_to_string(pilotage_district)}
+        )
 
     return render(
         request,
         "carting/index.html",
         {
             "sections": sections,
-            "s1xyobjects": s1xyobjects,
-            "pilotage_district": render_to_string(pilotage_district),
+            "s1xyobjects": s1xyobjects_renderized,
             "geojson": geojson,
             "search_tree_depth": section.tree_depth,
             "search": search,

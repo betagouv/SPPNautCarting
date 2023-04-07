@@ -1,1 +1,31 @@
-<h6>{{self.feature_name.0.name}}</h6>
+{% load s100 %}
+
+{% for feature_name in self.feature_name %}
+    {% if feature_name.language == "fr" %}
+        <div>{{self.feature_name.1.language}} : {{self.feature_name.1.name}}</div>
+    {% else %}
+        <h6>{{self.feature_name.0.name}}</h6>
+    {% endif %}
+{% endfor %}
+
+<div>Procédure</div>
+{% for permission in self.permission %}
+    <div>{% permission permission.href %}</div>
+{% endfor %}
+
+<div>Embarquement du pilote</div>
+{% for consists_of in self.consists_of %}
+    <div>{% consist_of consists_of.href %}</div>
+{% endfor %}
+
+<div>Notes</div>
+{% for service_provider in self.service_provider %}
+    <div>{{service_provider.href}}</div>
+{% endfor %}
+
+<div>Arrêtés</div>
+{% for the_rx_n in self.the_rx_n %}
+    <div>{{the_rx_n.href}}</div>
+{% endfor %}
+
+
