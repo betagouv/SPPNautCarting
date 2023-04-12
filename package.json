@@ -6,10 +6,10 @@
     },
     "source": [
         "static/to_compile/entrypoints/sppnaut.css",
-        "static/to_compile/entrypoints/sppnaut.js",
-        "static/to_compile/entrypoints/carting.js",
-        "static/to_compile/entrypoints/admin-map-widget.js",
-        "static/to_compile/entrypoints/publication.js"
+        "static/to_compile/entrypoints/sppnaut.ts",
+        "static/to_compile/entrypoints/carting.ts",
+        "static/to_compile/entrypoints/admin-map-widget.ts",
+        "static/to_compile/entrypoints/publication.ts"
     ],
     "targets": {
         "default": {

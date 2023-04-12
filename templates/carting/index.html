@@ -35,7 +35,10 @@
             hashchange@window->map#selectSectionInMapFromHash
             hashchange@window->map#closeFeaturePopin
         "
-        class="fr-grid-row fr-m-1w"
+        class="
+            fr-grid-row fr-m-1w
+            sn-bg-white
+        "
     >
         <script type="application/geojson" data-map-target="geojson">
             {{ geojson|safe }}
@@ -100,8 +103,13 @@
                         >
                             <span class="sn-min-w-5w">
                                 {% if section.geometry and section.tree_depth >= search_tree_depth %}
-                                    <a href="#{{ section.pk }}"
+                                    <a
+                                        href="#{{ section.pk }}"
                                         class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line"
+                                        data-action="
+                                            mouseenter->map#highlightSectionInMap
+                                            mouseleave->map#unhighlightSectionInMap
+                                        "
                                     >
                                         Montrer sur la carte
                                     </a>
