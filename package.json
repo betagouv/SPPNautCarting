@@ -34,7 +34,7 @@
         ]
     },
     "dependencies": {
-        "@gouvfr/dsfr": "^1.7.2",
+        "@gouvfr/dsfr": "^1.9.1",
         "@hotwired/stimulus": "^3.2.1",
         "ol": "^7.3.0",
         "parcel": "^2.8.3",
