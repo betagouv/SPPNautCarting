@@ -26,6 +26,15 @@
 </div>
 
 <div class="fr-container--fluid">
+    <div>
+        {% for s1xyobject in s1xyobjects %}
+            <div class="fr-col-12 fr-m-3w sn-max-w-readable"
+                id="{{s1xyobject.id}}"
+            >
+                {{ s1xyobject.render }}
+            </div>
+        {% endfor %}
+    </div>
     <div
         data-controller="map"
         data-map-wms-url-value="{% url 'carting:wms-proxy' %}"
@@ -115,15 +124,6 @@
                 {% endfor %}
             </div>
         </div>
-    </div>
-    <div>
-        {% for s1xyobject in s1xyobjects %}
-            <div class="fr-col-12 fr-m-3w sn-max-w-readable"
-                id="{{s1xyobject.id}}"
-            >
-                {{ s1xyobject.render }}
-            </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}
