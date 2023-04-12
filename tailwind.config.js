@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ["templates/**/*html", "carting/**/*xslt"],
+    content: ["templates/**/*html", "carting/**/*xslt", "static/to_compile/**/*{j,t}s"],
     prefix: "sn-",
     corePlugins: {
         preflight: false,
@@ -8,6 +8,7 @@ module.exports = {
     theme: {
         colors: {
             // https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-identite-de-l-etat/couleurs-palette/
+            white: "white",
             info: {
                 "975-active": "#c2cfff",
             },
