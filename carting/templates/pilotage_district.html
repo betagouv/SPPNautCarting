@@ -11,12 +11,54 @@
 
 <h4>Arrêtés</h4>
 {% for the_rx_n in self.the_rx_n %}
-    <div>{% rx_n the_rx_n.href %}</div>
+    {% with rx_n=the_rx_n|follow_link_through:model_instance %}
+        {% for text_content in rx_n.as_dataclass.text_content %}
+            {% with text_content.information.0 as information %}
+                <p>
+                    {{ information.headline }}
+                </p>
+            {% endwith %}
+        {% endfor %}
+    {% endwith %}
 {% endfor %}
 
 <h4>Procédure</h4>
-{% for permission in self.permission %}
-    <div>{% permission permission.href %}</div>
+{% for permission_reference in self.permission %}
+    {% with permission=permission_reference|follow_link_through:model_instance %}
+        {% with ship_report=permission.as_dataclass.permission.0|follow_link_through:permission %}
+            {# fixme : ce if sent la donnée mal structurée #}
+            {% if ship_report.as_dataclass.the_ship_report %}
+                {% with report_to=ship_report.as_dataclass.the_ship_report.0|follow_link_through:ship_report %}
+                    {% with authority=report_to.as_dataclass.report_to.0|follow_link_through:report_to %}
+                        <h5>Coordonnées</h5>
+                        {% with contact_details=authority.as_dataclass.the_contact_details.0|follow_link_through:authority %}
+                            <ul>
+                            {% for telecommunication in contact_details.as_dataclass.telecommunications %}
+                                <li>
+                                    {% with telecommunication.telecommunication_service.0.value as type %}
+                                        {% if type == "voice" %}
+                                        tel
+                                        {% elif type == "facsimile" %}
+                                        fax
+                                        {% elif type == "email" %}
+                                        email
+                                        {% endif %}
+                                    {% endwith %}
+                                    : {{ telecommunication.telecommunication_identifier }}
+                                </li>
+                            {% endfor %}
+                            </ul>
+
+                            Radicommunications
+                            Indicatif {{ contact_details.as_dataclass.call_sign }}
+                            VHF {{ contact_details.as_dataclass.communication_channel }}
+                            {{ contact_details.as_dataclass.communication_channel }}
+                        {% endwith%}
+                    {% endwith%}
+                {% endwith %}
+            {% endif  %}
+        {% endwith %}
+    {% endwith %}
 {% endfor %}
 
 <h4>Embarquement du pilote</h4>

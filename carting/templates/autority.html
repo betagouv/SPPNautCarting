@@ -1,8 +1,0 @@
-{% load s100 %}
-
-{% comment %} {{ self.the_contact_details  }} {% endcomment %}
-
-{% if self.the_contact_details.0 %}
-    {% contact_details self.the_contact_details.0.href %}
-{% endif %}
-

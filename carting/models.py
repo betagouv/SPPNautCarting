@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from enum import Enum
 from functools import cached_property
 from typing import Iterator, NamedTuple
@@ -11,6 +12,15 @@ from django.contrib.gis.db import models
 from django.db import DatabaseError
 from django.utils.safestring import mark_safe
 from tree_queries.models import TreeNode, TreeQuerySet
+from xsdata.formats.dataclass.parsers import XmlParser
+
+from carting.s127_models import Dataset
+
+
+def camel_to_snake(name):
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
+
 
 xslt_transform = ET.XSLT(ET.parse("carting/xslt/ouvrage_section_html.xslt"))
 
@@ -215,3 +225,21 @@ class S1xyObject(models.Model):
     content = models.TextField(blank=True)
     geometry = models.GeometryField(blank=True, null=True, default=None, srid=4326)
     link_to = models.ManyToManyField("self", blank=True)
+
+    @cached_property
+    def typology_abc(self):
+        return camel_to_snake(self.typology.replace("S127:", ""))
+
+    @cached_property
+    def as_dataclass(self):
+        parser = XmlParser()
+        dataset = parser.from_string(self.content, Dataset)
+        try:
+            return getattr(dataset.member[0], self.typology_abc)
+        except IndexError:
+            return getattr(dataset.imember[0], self.typology_abc)
+
+    def follow_link(self, dataclass):
+        id = dataclass.href.replace("#", "")
+        s1xyobject = self.link_to.get(id=id)
+        return s1xyobject

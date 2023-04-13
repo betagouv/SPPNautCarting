@@ -1,7 +1,0 @@
-    {% for text_content in self.text_content %}
-        {% with text_content.information.0 as information %}
-            <p>
-                {{ information.headline }}
-            </p>
-        {% endwith %}
-    {% endfor %}
