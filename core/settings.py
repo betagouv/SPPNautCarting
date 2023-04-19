@@ -1,3 +1,4 @@
+from contextlib import suppress
 from pathlib import Path
 
 import sentry_sdk
@@ -61,12 +62,14 @@ if DEBUG:
             "django_browser_reload.middleware.BrowserReloadMiddleware",
         ]
     )
-from debug_toolbar.settings import CONFIG_DEFAULTS
 
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK": "operator.truth",
-    "HIDE_IN_STACKTRACES": CONFIG_DEFAULTS["HIDE_IN_STACKTRACES"] + ("sentry_sdk",),
-}
+with suppress(ModuleNotFoundError):
+    from debug_toolbar.settings import CONFIG_DEFAULTS
+
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK": "operator.truth",
+        "HIDE_IN_STACKTRACES": CONFIG_DEFAULTS["HIDE_IN_STACKTRACES"] + ("sentry_sdk",),
+    }
 
 
 ROOT_URLCONF = "core.urls"
