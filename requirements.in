@@ -8,3 +8,4 @@ python-decouple
 requests
 sentry-sdk
 whitenoise
+xsdata

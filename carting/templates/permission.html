@@ -1,0 +1,7 @@
+{% load s100 %}
+
+{% if self.permission %}
+    {% for permission in self.permission %}
+        {% applicability permission.href %}
+    {% endfor %}
+{% endif %}

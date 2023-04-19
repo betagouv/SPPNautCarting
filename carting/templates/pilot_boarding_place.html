@@ -1,0 +1,6 @@
+<div>Pilot Boarding Place : {{ self.feature_name.0.name }}</div>
+<div>Communication Channel :
+{% for com_channel in self.communication_channel %}
+    {{ com_channel }}
+{% endfor %}
+</div>

@@ -1,0 +1,12 @@
+{% load s100 %}
+
+{% comment %} {{ self.vessels_characteristics }}
+{{ self.vessels_measurements.0.comparison_operator }}
+{{ self.vessels_characteristics_value }}
+{{ self.vessels_characteristics_unit }}
+
+{{ self.category_of_cargo.0 }} {% endcomment %}
+
+{% if self.the_ship_report.0.href %}
+    {% ship_report self.the_ship_report.0.href %}
+{% endif %}

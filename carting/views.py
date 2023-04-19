@@ -1,11 +1,16 @@
+import re
+
 import requests
 from django.core import serializers
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.template import loader
 from django.urls import reverse
 from django.views.decorators.http import require_GET
+from xsdata.formats.dataclass.parsers import XmlParser
 
-from carting.models import OuvrageSection, SectionTypology
+from carting.models import OuvrageSection, S1xyObject, SectionTypology
+from carting.s127_models import Dataset
 
 
 # FIXME : Les sections commençant par '0.' ne devraient pas être affichées (pas de géométrie attachée); les illustrations en '0.' sont mal ordonnées
@@ -61,15 +66,39 @@ def index(request: HttpRequest) -> HttpResponse:
 
     geojson = Serializer().serialize(s for s in sections if s.geometry)
 
+    parser = XmlParser()
+    # s1xyobjects = S1xyObject.objects.filter(geometry__isnull=False)
+    s1xyobjects = S1xyObject.objects.filter(typology="S127:PilotageDistrict")
+
+    s1xyobjects_renderized = []
+    for s1xyobject in s1xyobjects:
+        dataset = parser.from_string(s1xyobject.content, Dataset)
+        pilotage_district = dataset.member[0].pilotage_district
+        s1xyobjects_renderized.append(
+            {"s1xyobject": s1xyobject, "render": render_to_string(pilotage_district)}
+        )
+
     return render(
         request,
         "carting/index.html",
         {
             "sections": sections,
+            "s1xyobjects": s1xyobjects_renderized,
             "geojson": geojson,
             "search_tree_depth": section.tree_depth,
             "search": search,
         },
+    )
+
+
+def camel_to_snake(name):
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
+
+
+def render_to_string(s1xyobject):
+    return loader.render_to_string(
+        camel_to_snake(s1xyobject.__class__.__name__) + ".html", {"self": s1xyobject}
     )
 
 
