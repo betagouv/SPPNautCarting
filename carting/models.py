@@ -1,18 +1,21 @@
 from __future__ import annotations
 
+import copy
 import logging
 from enum import Enum
 from functools import cached_property
+from pathlib import Path
 from typing import Iterator, NamedTuple
 from xml.etree import ElementTree
 
-import lxml.etree as ET
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import GEOSGeometry
 from django.db import DatabaseError
 from django.utils.safestring import mark_safe
+from lxml import etree
 from tree_queries.models import TreeNode, TreeQuerySet
 
-xslt_transform = ET.XSLT(ET.parse("carting/xslt/ouvrage_section_html.xslt"))
+xslt_transform = etree.XSLT(etree.parse("carting/xslt/ouvrage_section_html.xslt"))
 
 
 class SectionIngester(NamedTuple):
@@ -192,7 +195,7 @@ class OuvrageSection(TreeNode):
         if not self.content:
             return ""
 
-        inner_html = xslt_transform(ET.fromstring(self.content))
+        inner_html = xslt_transform(etree.fromstring(self.content))
 
         html_tag = self.typology_object.html_tag
 
@@ -207,3 +210,96 @@ class OuvrageSection(TreeNode):
             SectionTypology.REFERENCE,
             SectionTypology.TOPONYME,
         ]
+
+
+def _get_submember_from_root(root_tag: etree.Element):
+    member = (
+        root_tag.find("member")
+        if root_tag.find("member") is not None
+        else root_tag.find("imember")
+    )
+    return member[0]
+
+
+class S1xyObjectManager(models.Manager):
+    def inject_from_xml_file(self, filepath: str | Path):
+        tree = etree.parse(filepath)
+        root = tree.getroot()
+
+        object_root = copy.deepcopy(root)
+        etree.strip_elements(object_root, "member", "imember")
+
+        for member in ("member", "imember"):
+            for object in root.findall(member):
+                object_content = copy.deepcopy(object_root)
+                object_content.append(object)
+                S1xyObject.inject_from_xml(object_content)
+
+
+class S1xyObject(models.Model):
+    id = models.CharField(max_length=255, primary_key=True)
+    typology = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
+    geometry = models.GeometryField(blank=True, null=True, default=None, srid=4326)
+    link_to = models.ManyToManyField("self", blank=True)
+
+    objects = S1xyObjectManager()
+
+    def _create_links(self):
+        for link_id in self._collect_link_ids():
+            (link_obj, _) = S1xyObject.objects.get_or_create(id=link_id)
+            self.link_to.add(link_obj)
+
+    def _get_submember(self):
+        root = etree.fromstring(self.content)
+        return _get_submember_from_root(root)
+
+    @classmethod
+    def inject_from_xml_str(cls, xml_str: str):
+        root_tag = etree.fromstring(xml_str)
+        return cls.inject_from_xml(root_tag)
+
+    @classmethod
+    def inject_from_xml(cls, root_tag: etree.Element):
+        sub_member = _get_submember_from_root(root_tag)
+        gml_id = sub_member.get("{" + sub_member.nsmap["gml"] + "}id")
+        typology = (sub_member.prefix + ":" if sub_member.prefix else "") + etree.QName(
+            sub_member
+        ).localname
+
+        geometry = None
+        geom = sub_member.find("geometry")
+        if geom is not None:
+            try:
+                geometry = GEOSGeometry.from_gml(
+                    etree.tostring(geom[0][0], method="xml", encoding="unicode")
+                )
+            except IndexError:
+                pass
+
+        xml_str = etree.tostring(
+            root_tag, method="xml", encoding="unicode", pretty_print=True
+        )
+        (s1xy_object, _) = S1xyObject.objects.update_or_create(
+            id=gml_id,
+            defaults={
+                "typology": typology,
+                "content": xml_str,
+                "geometry": geometry,
+            },
+        )
+        s1xy_object._create_links()
+        return s1xy_object
+
+    def _collect_link_ids(self):
+        sub_member = self._get_submember()
+        if "xlink" not in sub_member.nsmap:
+            return []
+        to_link_list = []
+        for child in sub_member.findall(
+            ".//*[@{" + sub_member.nsmap["xlink"] + "}href]"
+        ):
+            child_href = child.get("{" + child.nsmap["xlink"] + "}href")
+            child_href = child_href.replace("#", "")
+            to_link_list.append(child_href)
+        return to_link_list
