@@ -53,6 +53,13 @@ class FeatureName(models.Model):
 
 
 class TextContent(models.Model):
+    feature_type = models.ForeignKey(
+        "carting.FeatureType",
+        on_delete=models.CASCADE,
+        null=True,
+        related_name="text_content",
+        help_text="",
+    )
     category_of_text = models.CharField(max_length=255, choices=CategoryOfText.choices)
 
 
@@ -69,3 +76,5 @@ class Information(models.Model):
         help_text="The language is encoded by a character code following ISO 639-3",
     )
     text = models.CharField(max_length=255, blank=True)
+    # file_locator = models.CharField(max_length=255, blank=True)
+    # file_reference = models.CharField(max_length=255, blank=True)

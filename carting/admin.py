@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.html import format_html_join
 from tree_queries.models import TreeNode
 
-from .models import OuvrageSection, PilotageDistrict
+from .models import OuvrageSection, PilotageDistrict, PilotBoardingPlace
 from .widgets import CustomOSMWidget
 
 logger = logging.getLogger(__name__)
@@ -69,5 +69,10 @@ class OuvrageSectionAdmin(GISModelAdmin):
 
 
 @admin.register(PilotageDistrict)
-class PilotageDistrictadmin(GISModelAdmin):
+class PilotageDistrictAdmin(GISModelAdmin):
+    list_display = ("id",)
+
+
+@admin.register(PilotBoardingPlace)
+class PilotBoardingPlaceAdmin(GISModelAdmin):
     list_display = ("id",)
