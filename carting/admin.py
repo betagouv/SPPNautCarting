@@ -1,12 +1,14 @@
 import logging
 
+import nested_admin
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.gis.admin import GISModelAdmin
 from django.urls import reverse
 from django.utils.html import format_html_join
 from tree_queries.models import TreeNode
 
-from .models import OuvrageSection, PilotageDistrict, PilotBoardingPlace
+from .models import carting, s100, s127
 from .widgets import CustomOSMWidget
 
 logger = logging.getLogger(__name__)
@@ -34,7 +36,7 @@ def children(instance: TreeNode):
     )
 
 
-@admin.register(OuvrageSection)
+@admin.register(carting.OuvrageSection)
 class OuvrageSectionAdmin(GISModelAdmin):
     gis_widget = CustomOSMWidget
     ordering = ("numero",)
@@ -68,11 +70,34 @@ class OuvrageSectionAdmin(GISModelAdmin):
         return False
 
 
-@admin.register(PilotageDistrict)
-class PilotageDistrictAdmin(GISModelAdmin):
-    list_display = ("id",)
+class FeatureNameInline(nested_admin.NestedGenericTabularInline):
+    model = s100.FeatureName
+    extra = 0
+    min_num = 2
 
 
-@admin.register(PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(GISModelAdmin):
-    list_display = ("id",)
+class InformationInline(nested_admin.NestedTabularInline):
+    model = s100.Information
+    extra = 1
+
+class TextContentInline(nested_admin.NestedGenericTabularInline):
+    model = s100.TextContent
+    inlines = [InformationInline]
+    extra = 0
+
+
+class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
+    inlines = [
+        FeatureNameInline,
+        TextContentInline,
+    ]
+
+
+@admin.register(s127.PilotageDistrict)
+class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
+    pass
+
+
+@admin.register(s127.PilotBoardingPlace)
+class PilotBoardingPlaceAdmin(GISModelAdmin, FeatureTypeAdmin):
+    pass

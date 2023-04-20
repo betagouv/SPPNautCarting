@@ -28,6 +28,10 @@ django-extensions==3.2.1 \
     --hash=sha256:2a4f4d757be2563cd1ff7cfdf2e57468f5f931cc88b23cf82ca75717aae504a4 \
     --hash=sha256:421464be390289513f86cb5e18eb43e5dc1de8b4c27ba9faa3b91261b0d67e09
     # via -r requirements.in
+django-nested-admin==4.0.2 \
+    --hash=sha256:74d8fc0d0f17862ffcece66d39b8814cb649878b3b6ba8438076145a688ea473 \
+    --hash=sha256:79a5ce80b81c41a0f48f778fb556a3721029df48580bfce60a5962ffa2ef2d47
+    # via -r requirements.in
 django-tree-queries==0.14.0 \
     --hash=sha256:424ef445b2129762b567304186338b912ec90fe371dd5c92915093c6db063598 \
     --hash=sha256:8f83d6ef2d3871dbff7a9d9c68167dbe561565d99f4d41fae97676ae160360c5
@@ -138,6 +142,10 @@ python-decouple==3.8 \
     --hash=sha256:ba6e2657d4f376ecc46f77a3a615e058d93ba5e465c01bbe57289bfb7cce680f \
     --hash=sha256:d0d45340815b25f4de59c974b855bb38d03151d81b037d9e3f463b0c9f8cbd66
     # via -r requirements.in
+python-monkey-business==1.0.0 \
+    --hash=sha256:6d4cf47f011945db838ccf04643acd49b82f7ad6ab7ecba4c8165385687a828a \
+    --hash=sha256:9976522989766f00b2aaa24ec96eacb91a6de7b7001d1452079323b071988e0e
+    # via django-nested-admin
 requests==2.28.1 \
     --hash=sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983 \
     --hash=sha256:8fefa2a1a1365bf5520aac41836fbee479da67864514bdb821f31ce07ce65349
@@ -146,6 +154,10 @@ sentry-sdk==1.19.0 \
     --hash=sha256:6732b59a55051646587acce21f6a00b53d05df9282d54886ad88b59b4e9b82ad \
     --hash=sha256:8dcffbbb963963567384d6eb49c76b8fb05753540715cbee5e5ca5bc8327ded4
     # via -r requirements.in
+six==1.16.0 \
+    --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
+    --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+    # via python-monkey-business
 sqlparse==0.4.2 \
     --hash=sha256:0c00730c74263a94e5a9919ade150dfc3b19c574389985446148402998287dae \
     --hash=sha256:48719e356bb8b42991bdbb1e8b83223757b93789c00910a616a071910ca4a64d

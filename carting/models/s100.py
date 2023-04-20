@@ -1,4 +1,12 @@
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
+
+
+class ISO639_3(models.TextChoices):
+    FRA = "FRA"
+    ENG = "ENG"
 
 
 class CategoryOfText(models.TextChoices):
@@ -17,33 +25,26 @@ class CategoryOfText(models.TextChoices):
     FULL_TEXT = "full text"
 
 
-class GMLObject(models.Model):
-    id = models.CharField(primary_key=True, max_length=255)
-
-
-class FeatureType(GMLObject):
-    pass
+# class GMLObject(models.Model):
+#     # FIXME : Discuter de l'algo de création automatique de l'id
+#     id = models.CharField(primary_key=True, max_length=255)
 
 
 class FeatureName(models.Model):
-    feature_type = models.ForeignKey(
-        "carting.FeatureType",
-        on_delete=models.CASCADE,
-        null=True,
-        related_name="feature_name",
-        help_text="",
-    )
-    display_name = models.BooleanField(default=False)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.BigIntegerField()
+    feature_type = GenericForeignKey()
     language = models.CharField(
-        # FIXME : add choices with available languages
         max_length=3,
         blank=True,
         null=True,
+        choices=ISO639_3.choices,
         help_text="The language is encoded by a character code following ISO 639-3",
     )
     name = models.CharField(
         max_length=255, help_text="The individual name of a feature."
     )
+    display_name = models.BooleanField(default=False)
 
     # Uncomment when upgrading to django 4.2
     # class Meta:
@@ -53,28 +54,31 @@ class FeatureName(models.Model):
 
 
 class TextContent(models.Model):
-    feature_type = models.ForeignKey(
-        "carting.FeatureType",
-        on_delete=models.CASCADE,
-        null=True,
-        related_name="text_content",
-        help_text="",
-    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.BigIntegerField()
+    feature_type = GenericForeignKey()
     category_of_text = models.CharField(max_length=255, choices=CategoryOfText.choices)
-
 
 class Information(models.Model):
     text_content = models.ForeignKey(
-        "carting.TextContent", on_delete=models.CASCADE, related_name="information"
+        TextContent, on_delete=models.CASCADE, related_name="information"
     )
-    headline = models.CharField(max_length=255, blank=True)
     language = models.CharField(
-        # FIXME : add choices with available languages
         max_length=3,
         blank=True,
         null=True,
+        choices=ISO639_3.choices,
         help_text="The language is encoded by a character code following ISO 639-3",
     )
+    headline = models.CharField(max_length=255, blank=True)
     text = models.CharField(max_length=255, blank=True)
     # file_locator = models.CharField(max_length=255, blank=True)
     # file_reference = models.CharField(max_length=255, blank=True)
+
+
+class FeatureType(models.Model):
+    feature_names = GenericRelation(FeatureName)
+    text_contents = GenericRelation(TextContent)
+
+    class Meta:
+        abstract = True

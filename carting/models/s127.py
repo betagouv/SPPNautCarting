@@ -1,6 +1,20 @@
+from django import forms
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
 
-from carting.models.s100 import FeatureType
+from carting.models import s100
+
+
+class ChoiceArrayField(ArrayField):
+
+    def formfield(self, **kwargs):
+        defaults = {
+            'form_class': forms.MultipleChoiceField,
+            'choices': self.base_field.choices,
+        }
+        defaults.update(kwargs)
+
+        return super(ArrayField, self).formfield(**defaults)
 
 
 class CategoryOfPilotBoardingPlace(models.TextChoices):
@@ -170,9 +184,12 @@ class Status(models.TextChoices):
     BUOYED = "buoyed"
 
 
-class PilotageDistrict(FeatureType):
-    # FIXME: Should be a list of communication channel : ArrayField ?
-    communication_channel = models.CharField(max_length=255, blank=True, null=True)
+class PilotageDistrict(s100.FeatureType):
+    communication_channel = ArrayField(
+        models.CharField(max_length=255, blank=True, null=True),
+        blank=True,
+        null=True
+    )
     geometry = models.MultiPolygonField()
 
     # Uncomment when upgrading to django 4.2
@@ -182,7 +199,7 @@ class PilotageDistrict(FeatureType):
     #     "dictates circumstances under which they apply."
 
 
-class OrganisationContactArea(FeatureType):
+class OrganisationContactArea(s100.FeatureType):
     pass
 
 
@@ -212,8 +229,11 @@ class PilotBoardingPlace(OrganisationContactArea):
         blank=True,
         null=True,
     )
-    # FIXME: Should be a list of communication channel : ArrayField ?
-    communication_channel = models.CharField(max_length=255, blank=True, null=True)
+    communication_channel = ArrayField(
+        models.CharField(max_length=255, blank=True, null=True),
+        blank=True,
+        null=True
+    )
     destination = models.CharField(max_length=255, blank=True, null=True)
     pilot_movement = models.CharField(
         max_length=255,
@@ -227,12 +247,16 @@ class PilotBoardingPlace(OrganisationContactArea):
         null=True,
         help_text="Description of the pilot vessel. The pilot vessel is a small vessel used by a pilot to go to or from a vessel employing the pilot's services.",
     )
-    # FIXME: Should be a list of status : ArrayField ?
-    status = models.CharField(
-        max_length=255,
-        choices=Status.choices,
+    status = ChoiceArrayField(
+        base_field=models.CharField(
+                max_length=255,
+                choices=Status.choices,
+                blank=True,
+                null=True,
+            ),
+        default=list,
         blank=True,
-        null=True,
+        null=True
     )
     geometry = models.GeometryField()
 
