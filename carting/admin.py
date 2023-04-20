@@ -76,11 +76,14 @@ class FeatureNameInline(nested_admin.NestedGenericTabularInline):
     min_num = 2
 
 
-class InformationInline(nested_admin.NestedTabularInline):
+class InformationInline(nested_admin.NestedStackedInline):
     model = s100.Information
-    extra = 1
+    fields = (("language", "headline"), "text")
+    extra = 0
+    min_num = 2
 
-class TextContentInline(nested_admin.NestedGenericTabularInline):
+
+class TextContentInline(nested_admin.NestedGenericStackedInline):
     model = s100.TextContent
     inlines = [InformationInline]
     extra = 0
@@ -91,6 +94,12 @@ class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
         FeatureNameInline,
         TextContentInline,
     ]
+
+
+class ApplicabilityInline(nested_admin.NestedGenericTabularInline):
+    model = s127.Applicability
+    extra = 0
+    min_num = 1
 
 
 @admin.register(s127.PilotageDistrict)

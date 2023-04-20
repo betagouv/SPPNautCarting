@@ -1,12 +1,11 @@
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-                                                GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 
 
 class ISO639_3(models.TextChoices):
-    FRA = "FRA"
-    ENG = "ENG"
+    FRA = "fra", "French"
+    ENG = "eng", "English"
 
 
 class CategoryOfText(models.TextChoices):
@@ -36,10 +35,7 @@ class FeatureName(models.Model):
     feature_type = GenericForeignKey()
     language = models.CharField(
         max_length=3,
-        blank=True,
-        null=True,
         choices=ISO639_3.choices,
-        help_text="The language is encoded by a character code following ISO 639-3",
     )
     name = models.CharField(
         max_length=255, help_text="The individual name of a feature."
@@ -59,26 +55,29 @@ class TextContent(models.Model):
     feature_type = GenericForeignKey()
     category_of_text = models.CharField(max_length=255, choices=CategoryOfText.choices)
 
+
 class Information(models.Model):
     text_content = models.ForeignKey(
         TextContent, on_delete=models.CASCADE, related_name="information"
     )
     language = models.CharField(
         max_length=3,
-        blank=True,
-        null=True,
         choices=ISO639_3.choices,
-        help_text="The language is encoded by a character code following ISO 639-3",
     )
     headline = models.CharField(max_length=255, blank=True)
-    text = models.CharField(max_length=255, blank=True)
-    # file_locator = models.CharField(max_length=255, blank=True)
-    # file_reference = models.CharField(max_length=255, blank=True)
+    text = models.TextField(blank=True)
 
 
 class FeatureType(models.Model):
     feature_names = GenericRelation(FeatureName)
     text_contents = GenericRelation(TextContent)
+
+    class Meta:
+        abstract = True
+
+
+class InformationType(models.Model):
+    feature_names = GenericRelation(FeatureName)
 
     class Meta:
         abstract = True
