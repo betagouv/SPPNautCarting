@@ -42,6 +42,9 @@ class FeatureName(models.Model):
     )
     display_name = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"{self.language} - {self.name}"
+
     # Uncomment when upgrading to django 4.2
     # class Meta:
     #     db_table_comment = "The complex attribute provides the name of an entity, "
