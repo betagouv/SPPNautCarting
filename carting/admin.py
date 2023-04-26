@@ -89,21 +89,26 @@ class TextContentInline(nested_admin.NestedGenericStackedInline):
     extra = 0
 
 
+class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
+    model = s127.Applicability
+    extra = 0
+
+
 class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
     inlines = [
         FeatureNameInline,
         TextContentInline,
+        ApplicabilityInline,
     ]
-
-
-class ApplicabilityInline(nested_admin.NestedGenericTabularInline):
-    model = s127.Applicability
-    extra = 0
-    min_num = 1
 
 
 @admin.register(s127.PilotageDistrict)
 class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
+    pass
+
+
+@admin.register(s127.PilotService)
+class PilotServiceAdmin(GISModelAdmin, FeatureTypeAdmin):
     pass
 
 
