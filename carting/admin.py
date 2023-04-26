@@ -76,7 +76,7 @@ class FeatureNameInline(nested_admin.NestedGenericTabularInline):
     min_num = 2
 
 
-class InformationInline(nested_admin.NestedStackedInline):
+class InformationInline(nested_admin.NestedGenericStackedInline):
     model = s100.Information
     fields = (("language", "headline"), "text")
     extra = 0
@@ -91,20 +91,33 @@ class TextContentInline(nested_admin.NestedGenericStackedInline):
 
 class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     model = s127.Applicability
+    inlines = [InformationInline]
     extra = 0
 
 
 class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
     inlines = [
         FeatureNameInline,
-        TextContentInline,
         ApplicabilityInline,
+        TextContentInline,
     ]
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        print(kwargs)
+        print(self.get_fieldsets(request, obj))
+        return super().get_form(request, obj=obj, change=change, **kwargs)
 
 
 @admin.register(s127.PilotageDistrict)
 class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
-    pass
+    fieldsets = [
+        (
+            "SPECIFIC FIELDS",
+            {
+                "fields": ["geometry", "communication_channel"],
+            },
+        ),
+    ]
 
 
 @admin.register(s127.PilotService)

@@ -24,15 +24,26 @@ class CategoryOfText(models.TextChoices):
     FULL_TEXT = "full text"
 
 
+class ComplexAttributeType(models.Model):
+    class Meta:
+        abstract = True
+
+
+class GenericComplexAttributeType(ComplexAttributeType):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.BigIntegerField()
+    content_object = GenericForeignKey()
+
+    class Meta:
+        abstract = True
+
+
 # class GMLObject(models.Model):
 #     # FIXME : Discuter de l'algo de création automatique de l'id
 #     id = models.CharField(primary_key=True, max_length=255)
 
 
-class FeatureName(models.Model):
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.BigIntegerField()
-    feature_type = GenericForeignKey()
+class FeatureName(GenericComplexAttributeType):
     language = models.CharField(
         max_length=3,
         choices=ISO639_3.choices,
@@ -52,23 +63,18 @@ class FeatureName(models.Model):
     #     "display the name at various system display settings."
 
 
-class TextContent(models.Model):
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.BigIntegerField()
-    feature_type = GenericForeignKey()
-    category_of_text = models.CharField(max_length=255, choices=CategoryOfText.choices)
-
-
-class Information(models.Model):
-    text_content = models.ForeignKey(
-        TextContent, on_delete=models.CASCADE, related_name="information"
-    )
+class Information(GenericComplexAttributeType):
     language = models.CharField(
         max_length=3,
         choices=ISO639_3.choices,
     )
     headline = models.CharField(max_length=255, blank=True)
     text = models.TextField(blank=True)
+
+
+class TextContent(GenericComplexAttributeType):
+    category_of_text = models.CharField(max_length=255, choices=CategoryOfText.choices)
+    information = GenericRelation(Information)
 
 
 class FeatureType(models.Model):
