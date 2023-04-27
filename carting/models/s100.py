@@ -65,8 +65,7 @@ class FeatureName(GenericComplexAttributeType):
 
 class Information(GenericComplexAttributeType):
     language = models.CharField(
-        max_length=3,
-        choices=ISO639_3.choices,
+        max_length=3, choices=ISO639_3.choices, default=ISO639_3.FRA
     )
     headline = models.CharField(max_length=255, blank=True)
     text = models.TextField(blank=True)
@@ -80,6 +79,7 @@ class TextContent(GenericComplexAttributeType):
 class FeatureType(models.Model):
     feature_names = GenericRelation(FeatureName)
     text_contents = GenericRelation(TextContent)
+    applicabilities = GenericRelation("carting.applicability")
 
     class Meta:
         abstract = True

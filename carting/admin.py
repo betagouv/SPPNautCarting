@@ -73,26 +73,43 @@ class OuvrageSectionAdmin(GISModelAdmin):
 class FeatureNameInline(nested_admin.NestedGenericTabularInline):
     model = s100.FeatureName
     extra = 0
-    min_num = 2
+    min_num = 1
+    max_num = 1
 
 
 class InformationInline(nested_admin.NestedGenericStackedInline):
     model = s100.Information
-    fields = (("language", "headline"), "text")
+    fields = ("headline", "text")
     extra = 0
-    min_num = 2
+    min_num = 1
+    max_num = 1
 
 
 class TextContentInline(nested_admin.NestedGenericStackedInline):
     model = s100.TextContent
     inlines = [InformationInline]
     extra = 0
+    max_num = 1
 
 
 class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     model = s127.Applicability
     inlines = [InformationInline]
     extra = 0
+    fieldsets = [
+        (
+            "GENERALITES",
+            {
+                "fields": ["in_ballast"],
+            },
+        ),
+        (
+            "DANGERS",
+            {
+                "fields": ["category_of_dangerous_or_hazardous_cargo"],
+            },
+        ),
+    ]
 
 
 class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
@@ -102,14 +119,16 @@ class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
         TextContentInline,
     ]
 
-    def get_form(self, request, obj=None, change=False, **kwargs):
-        print(kwargs)
-        print(self.get_fieldsets(request, obj))
-        return super().get_form(request, obj=obj, change=change, **kwargs)
+
+class PilotServiceInline(admin.StackedInline):
+    fields = tuple()
+    model = s127.PilotService
 
 
 @admin.register(s127.PilotageDistrict)
-class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
+class PilotageDistrictAdmin(
+    GISModelAdmin,
+):
     fieldsets = [
         (
             "SPECIFIC FIELDS",
@@ -118,6 +137,7 @@ class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
             },
         ),
     ]
+    inlines = [PilotServiceInline]
 
 
 @admin.register(s127.PilotService)
