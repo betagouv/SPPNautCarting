@@ -6,6 +6,8 @@ from django.contrib.postgres.fields import ArrayField
 
 from carting.models import s100
 
+BOOLEAN_CHOICES = ((None, "---------"), (True, "Yes"), (False, "No"))
+
 
 class ChoiceArrayField(ArrayField):
     def formfield(self, **kwargs):
@@ -369,7 +371,7 @@ class PilotageDistrict(s100.FeatureType):
         models.CharField(max_length=255, blank=True, null=True),
         blank=True,
         null=True,
-        help_text="ℹ️ Saisissez des valeurs séparées par une virgule pour en définir plusieurs.",
+        help_text="ℹ️ Write comma separated values to define multiple.",
     )
 
     # FIXME: GM_Surface ? 0..* ?
@@ -430,6 +432,7 @@ class PilotService(ReportableServiceArea):
     remote_pilot = models.BooleanField(
         null=True,
         blank=True,
+        choices=BOOLEAN_CHOICES,
         help_text="Whether remote pilot services are available. "
         "True: remote pilot is available: Pilotage is available remotely from shore or other location remote from the vessel requiring pilotage."
         "False: remote pilot is not available: Remote pilotage is not available.",
@@ -603,8 +606,6 @@ class Applicability(models.Model):
         IMDG_CODE_CLASS_8 = "IMDG Code Class 8"
         IMDG_CODE_CLASS_9 = "IMDG Code Class 9"
         HARMFUL_SUBSTANCES_IN_PACKAGED_FORM = "Harmful Substances in packaged form"
-
-    BOOLEAN_CHOICES = ((None, "---------"), (True, "Yes"), (False, "No"))
 
     in_ballast = models.BooleanField(
         null=True,
@@ -923,15 +924,15 @@ class VesselsMeasurements(models.Model):
     applicability = models.ForeignKey(
         Applicability, on_delete=models.CASCADE, related_name="vessels_measurements"
     )
-    comparison_operator = models.CharField(
-        max_length=255,
-        choices=ComparisonOperator.choices,
-        blank=True,
-        null=True,
-    )
     vessels_characteristics = models.CharField(
         max_length=255,
         choices=VesselsCharacteristics.choices,
+        blank=True,
+        null=True,
+    )
+    comparison_operator = models.CharField(
+        max_length=255,
+        choices=ComparisonOperator.choices,
         blank=True,
         null=True,
     )
