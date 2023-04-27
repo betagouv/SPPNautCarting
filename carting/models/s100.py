@@ -79,7 +79,7 @@ class TextContent(GenericComplexAttributeType):
 class FeatureType(models.Model):
     feature_names = GenericRelation(FeatureName)
     text_contents = GenericRelation(TextContent)
-    applicabilities = GenericRelation("carting.applicability")
+    permission_types = GenericRelation("carting.PermissionType")
 
     class Meta:
         abstract = True

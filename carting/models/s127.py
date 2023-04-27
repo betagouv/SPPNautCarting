@@ -12,6 +12,7 @@ class ChoiceArrayField(ArrayField):
         defaults = {
             "form_class": forms.MultipleChoiceField,
             "choices": self.base_field.choices,
+            "widget": forms.CheckboxSelectMultiple,
         }
         defaults.update(kwargs)
 
@@ -605,15 +606,15 @@ class Applicability(models.Model):
 
     BOOLEAN_CHOICES = ((None, "---------"), (True, "Yes"), (False, "No"))
 
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.BigIntegerField()
-    information_type = GenericForeignKey()
     in_ballast = models.BooleanField(
         null=True,
         blank=True,
         help_text="Whether the vessel is in ballast.",
         choices=BOOLEAN_CHOICES,
     )
+    # FIXME: check remarks in https://github.com/betagouv/SPPNautS1xyModelisation/blob/main/S127/XSD/S127/1.0.0/20181129/S127.xsd
+    # and write corresponding validators
+    # Example : If item 7 is used, the nature of dangerous or hazardous cargoes can be amplified with category of dangerous or hazardous cargo.
     category_of_cargo = ChoiceArrayField(
         base_field=models.CharField(
             max_length=255,
@@ -626,8 +627,6 @@ class Applicability(models.Model):
         "a ship may be carrying <br/>"
         "If item 7 is used, the nature of dangerous or hazardous cargoes can"
         " be amplified with category of dangerous or hazardous cargo.",
-        # TODO : à la validation vérifier la condition :
-        # If item 7 is used, the nature of dangerous or hazardous cargoes can be amplified with category of dangerous or hazardous cargo.
     )
     category_of_dangerous_or_hazardous_cargo = ChoiceArrayField(
         base_field=models.CharField(
@@ -669,8 +668,60 @@ class Applicability(models.Model):
     )
     information = GenericRelation(s100.Information)
 
+    def __str__(self):
+        # FIXME : check reprensentation
+        foo = f"{self.id}"
+
+        if self.category_of_vessel:
+            foo = f"{foo} - {self.category_of_vessel}"
+
+        if self.category_of_cargo:
+            foo = f"{foo} - {self.category_of_cargo}"
+
+        if self.category_of_dangerous_or_hazardous_cargo:
+            foo = f"{foo} - {self.category_of_dangerous_or_hazardous_cargo}"
+
+        return foo
+
     class Meta:
         verbose_name_plural = "Applicabilities"
+
+
+class PermissionType(models.Model):
+    class CategoryOfRelationship(models.TextChoices):
+        """
+        This attribute expresses the level of insistence for or against an action
+        or activity.
+
+        :cvar PROHIBITED: use of facility, waterway or service is forbidden
+        :cvar NOT_RECOMMENDED: use of facility, waterway or service is not
+            recommended
+        :cvar PERMITTED: use of facility, waterway, or service is permitted
+            but not required
+        :cvar RECOMMENDED: use of facility, waterway, or service is
+            recommended
+        :cvar REQUIRED: use of facility, waterway, or service is required
+        :cvar NOT_REQUIRED: use of facility, waterway, or service is not
+            required
+        """
+
+        PROHIBITED = "prohibited"
+        NOT_RECOMMENDED = "not recommended"
+        PERMITTED = "permitted"
+        RECOMMENDED = "recommended"
+        REQUIRED = "required"
+        NOT_REQUIRED = "not required"
+
+    category_of_relationship = models.CharField(
+        choices=CategoryOfRelationship.choices, max_length=255
+    )
+    feature_content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="+"
+    )
+    feature_object_id = models.BigIntegerField()
+    feature_object = GenericForeignKey("feature_content_type", "feature_object_id")
+
+    applicability = models.ForeignKey(Applicability, on_delete=models.CASCADE)
 
 
 class VesselsMeasurements(models.Model):

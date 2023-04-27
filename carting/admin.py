@@ -96,39 +96,47 @@ class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     model = s127.Applicability
     inlines = [InformationInline]
     extra = 0
-    fieldsets = [
-        (
-            "GENERALITES",
-            {
-                "fields": ["in_ballast"],
-            },
-        ),
-        (
-            "DANGERS",
-            {
-                "fields": ["category_of_dangerous_or_hazardous_cargo"],
-            },
-        ),
-    ]
+    # fieldsets = [
+    #     (
+    #         "GENERALITES",
+    #         {
+    #             "fields": ["in_ballast"],
+    #         },
+    #     ),
+    #     (
+    #         "DANGERS",
+    #         {
+    #             "fields": ["category_of_dangerous_or_hazardous_cargo"],
+    #         },
+    #     ),
+    # ]
+
+
+@admin.register(s127.Applicability)
+class ApplicabilityAdmin(admin.ModelAdmin):
+    search_fields = ["id"]
+
+
+class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
+    ct_field = "feature_content_type"
+    ct_fk_field = "feature_object_id"
+    model = s127.PermissionType
+
+    min_num = 0
+    extra = 0
+    autocomplete_fields = ["applicability"]
 
 
 class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
     inlines = [
         FeatureNameInline,
-        ApplicabilityInline,
+        FeatureTypePermissionTypeInline,
         TextContentInline,
     ]
 
 
-class PilotServiceInline(admin.StackedInline):
-    fields = tuple()
-    model = s127.PilotService
-
-
 @admin.register(s127.PilotageDistrict)
-class PilotageDistrictAdmin(
-    GISModelAdmin,
-):
+class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
     fieldsets = [
         (
             "SPECIFIC FIELDS",
