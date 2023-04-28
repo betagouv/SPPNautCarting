@@ -76,8 +76,8 @@ class Applicability(s100.models.InformationType):
         null=True,
         help_text="Classification of the different types of cargo that "
         "a ship may be carrying <br/>"
-        "If item 7 is used, the nature of dangerous or hazardous cargoes can"
-        " be amplified with category of dangerous or hazardous cargo.",
+        "If item 7 is used, the nature of dangerous or hazardous cargoes can "
+        "be amplified with category of dangerous or hazardous cargo.",
     )
     category_of_dangerous_or_hazardous_cargo = ChoiceArrayField(
         base_field=models.CharField(
@@ -98,8 +98,9 @@ class Applicability(s100.models.InformationType):
         choices=CategoryOfVessel.choices,
         blank=True,
         null=True,
-        help_text="Classification of vessels by function or use",
+        help_text=CategoryOfVessel.help_text,
     )
+
     category_of_vessel_registry = models.CharField(
         max_length=255,
         choices=CategoryOfVesselRegistry.choices,

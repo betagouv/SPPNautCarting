@@ -78,8 +78,9 @@ class PilotBoardingPlace(OrganisationContactArea):
         choices=CategoryOfVessel.choices,
         blank=True,
         null=True,
-        help_text="Classification of vessels by function or use",
+        help_text=CategoryOfVessel.help_text,
     )
+
     # FIXME : Mettre un joli widget
     communication_channel = ArrayField(
         models.CharField(max_length=255),
