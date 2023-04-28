@@ -16,7 +16,6 @@ module.exports = {
         maxWidth: {
             readable: "80ch",
             "120w": "60rem",
-            full: "100%",
         },
         spacing: {
             // https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-techniques/espacements
