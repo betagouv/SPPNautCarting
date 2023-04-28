@@ -8,6 +8,7 @@
         "static/to_compile/entrypoints/sppnaut.css",
         "static/to_compile/entrypoints/sppnaut.ts",
         "static/to_compile/entrypoints/carting.ts",
+        "static/to_compile/entrypoints/admin.css",
         "static/to_compile/entrypoints/admin-map-widget.ts",
         "static/to_compile/entrypoints/publication.ts"
     ],

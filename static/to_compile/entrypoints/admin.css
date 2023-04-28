@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.choice-array-field {
+    @apply sn-grid;
+    grid-template-columns: repeat(auto-fill, 15rem);
+}
+
+/* Break lines after each checkbox in multiple inputs */
+.aligned .choice-array-field label {
+    @apply sn-flex sn-w-auto sn-space-x-3v sn-text-base sn-items-center;
+}
+
+.choice-array-field input {
+    @apply sn-mr-1w;
+}
+
+/* Add a simple border around fieldsets */
+.inline-group,
+.inline-group.djn-group-nested,
+form .module {
+    @apply sn-border sn-border-solid sn-border-[var(--primary)];
+}

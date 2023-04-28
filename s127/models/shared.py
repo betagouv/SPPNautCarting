@@ -26,7 +26,9 @@ class ChoiceArrayField(ArrayField):
         defaults = {
             "form_class": forms.MultipleChoiceField,
             "choices": self.base_field.choices,
-            "widget": forms.CheckboxSelectMultiple,
+            "widget": forms.CheckboxSelectMultiple(
+                attrs={"class": "choice-array-field"},
+            ),
         }
         defaults.update(kwargs)
 

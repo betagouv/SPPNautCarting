@@ -5,8 +5,14 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.gis.admin import GISModelAdmin
 
 import s100.models
+from carting.widgets import CustomOSMWidget
 
 from . import models
+
+
+# FIXME : move in a shared module, core or carting maybe ?
+class GISModelAdminWithRasterMarine(GISModelAdmin):
+    gis_widget = CustomOSMWidget
 
 
 class S100Config(AppConfig):
@@ -95,11 +101,27 @@ class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
             },
         ),
     ]
+    search_fields = ["id"]
 
 
 @admin.register(models.PilotService)
 class PilotServiceAdmin(GISModelAdmin, FeatureTypeAdmin):
-    pass
+    fieldsets = [
+        (
+            "SPECIFIC FIELDS",
+            {
+                "fields": [
+                    "geometry",
+                    "pilotage_district",
+                    "category_of_pilot",
+                    "pilot_qualification",
+                    "pilot_request",
+                    "remote_pilot",
+                ],
+            },
+        )
+    ]
+    autocomplete_fields = ["pilotage_district"]
 
 
 @admin.register(models.PilotBoardingPlace)
