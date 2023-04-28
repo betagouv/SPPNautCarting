@@ -10,7 +10,8 @@ class PilotageDistrict(s100.models.FeatureType):
         models.CharField(max_length=255, blank=True, null=True),
         blank=True,
         null=True,
-        help_text="ℹ️ Write comma separated values to define multiple.",
+        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
+        "ℹ️ Write comma separated values to define multiple.",
     )
 
     # FIXME: GM_Surface ? 0..* ?

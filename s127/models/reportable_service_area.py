@@ -9,76 +9,27 @@ from .shared import BooleanChoices, ChoiceArrayField, S127ReportableServiceArea
 
 class S127PilotService(S127ReportableServiceArea):
     class CategoryOfPilot(models.TextChoices):
-        """
-        Classification of pilots and pilot services by type of waterway where
-        piloting services are provided.
-
-        :cvar PILOT: Pilot licenced to conduct vessels during approach from
-            sea to a specified place which may be a handover place, an
-            anchorage or alongside.
-        :cvar DEEP_SEA: Pilot licenced to conduct vessels over extensive sea
-            areas.
-        :cvar HARBOUR: Pilot who is licenced to conduct vessels from a
-            specified place, such as a handover area or anchorage into a
-            harbour.
-        :cvar BAR: Pilot licensed to conduct vessels over a bar to or from a
-            handover with a river pilot (for example as used in USA).
-        :cvar RIVER: Pilot licensed to conduct vessels from and to specified
-            places, along the course of a river (for example as used in Rio
-            Amazonas and Rio de La Plata).
-        :cvar CHANNEL: Pilot licensed to conduct vessels from and to
-            specified places, along the course of a channel. (for example as
-            used in Rio Amazonas and Rio de La Plata).
-        :cvar LAKE: Pilot licensed to conduct vessels from and to specified
-            places on a great lake. (for example as used in the Lago de
-            Maracaibo in Venezuela.
-        """
-
-        PILOT = "pilot"
-        DEEP_SEA = "deep sea"
-        HARBOUR = "harbour"
-        BAR = "bar"
-        RIVER = "river"
-        CHANNEL = "channel"
-        LAKE = "lake"
+        # fmt: off
+        PILOT = "pilot" # Pilot licenced to conduct vessels during approach from sea to a specified place which may be a handover place, an anchorage or alongside.
+        DEEP_SEA = "deep sea" # Pilot licenced to conduct vessels over extensive sea areas.
+        HARBOUR = "harbour" # Pilot who is licenced to conduct vessels from a specified place, such as a handover area or anchorage into a harbour.
+        BAR = "bar" # Pilot licensed to conduct vessels over a bar to or from a handover with a river pilot (for example as used in USA).
+        RIVER = "river" # Pilot licensed to conduct vessels from and to specified places, along the course of a river (for example as used in Rio Amazonas and Rio de La Plata).
+        CHANNEL = "channel" # Pilot licensed to conduct vessels from and to specified places, along the course of a channel. (for example as used in Rio Amazonas and Rio de La Plata).
+        LAKE = "lake" # Pilot licensed to conduct vessels from and to specified places on a great lake. (for example as used in the Lago de  Maracaibo in Venezuela).
+        # fmt: on
 
     class PilotQualification(models.TextChoices):
-        """
-        Classification of pilots and pilot services by type of license
-        qualification or type of organization providing services.
-
-        :cvar GOVERNMENT_PILOT: A pilot service carried out by government
-            pilots.
-        :cvar PILOT_APPROVED_BY_GOVERNMENT: A pilot service carried out by
-            pilots who are approved by government.
-        :cvar STATE_PILOT: A pilot that is licensed by the State (USA)
-            and/or their respective pilot association, required for all
-            foreign vessels and all American vessels under registry, bound
-            for a port with compulsory State pilotage. A federal licence is
-            not sufficient to pilot such vessels into the port.
-        :cvar FEDERAL_PILOT: A pilot who carries a Federal endorsement,
-            offering services to vessels that are not required to obtain
-            compulsory State pilotage. Services are usually contracted for
-            in advance.
-        :cvar COMPANY_PILOT: A pilot provided by a commercial company.
-        :cvar LOCAL_PILOT: A pilot with local knowledge but who does not
-            hold a qualification as a pilot.
-        :cvar CITIZEN_WITH_SUFFICIENT_LOCAL_KNOWLEDGE: A pilot service
-            carried out by a citizen with sufficient local knowledge.
-        :cvar CITIZEN_WITH_DOUBTFUL_LOCAL_KNOWLEDGE: A pilot service carried
-            out by a citizen whose local knowledge is uncertain.
-        """
-
-        GOVERNMENT_PILOT = "government pilot"
-        PILOT_APPROVED_BY_GOVERNMENT = "pilot approved by government"
-        STATE_PILOT = "state pilot"
-        FEDERAL_PILOT = "federal pilot"
-        COMPANY_PILOT = "company pilot"
-        LOCAL_PILOT = "local pilot"
-        CITIZEN_WITH_SUFFICIENT_LOCAL_KNOWLEDGE = (
-            "citizen with sufficient local knowledge"
-        )
-        CITIZEN_WITH_DOUBTFUL_LOCAL_KNOWLEDGE = "citizen with doubtful local knowledge"
+        # fmt: off
+        GOVERNMENT_PILOT = "government pilot" # A pilot service carried out by government pilots.
+        PILOT_APPROVED_BY_GOVERNMENT = "pilot approved by government" # A pilot service carried out by pilots who are approved by government.
+        STATE_PILOT = "state pilot" # A pilot that is licensed by the State (USA) and/or their respective pilot association, required for all foreign vessels and all American vessels under registry, bound for a port with compulsory State pilotage. A federal licence is not sufficient to pilot such vessels into the port.
+        FEDERAL_PILOT = "federal pilot" # A pilot who carries a Federal endorsement, offering services to vessels that are not required to obtain compulsory State pilotage. Services are usually contracted for in advance.
+        COMPANY_PILOT = "company pilot" # A pilot provided by a commercial company.
+        LOCAL_PILOT = "local pilot" # A pilot with local knowledge but who does not hold a qualification as a pilot.
+        CITIZEN_WITH_SUFFICIENT_LOCAL_KNOWLEDGE = "citizen with sufficient local knowledge" # A pilot service carried out by a citizen with sufficient local knowledge.
+        CITIZEN_WITH_DOUBTFUL_LOCAL_KNOWLEDGE = "citizen with doubtful local knowledge" # A pilot service carried out by a citizen whose local knowledge is uncertain.
+        # fmt: on
 
     pilotage_district = models.ForeignKey(
         PilotageDistrict,
@@ -86,6 +37,7 @@ class S127PilotService(S127ReportableServiceArea):
         related_name="pilot_service",
         blank=True,
         null=True,
+        help_text="An area within which a pilotage direction exists.",
     )
     category_of_pilot = ChoiceArrayField(
         base_field=models.CharField(
@@ -95,13 +47,14 @@ class S127PilotService(S127ReportableServiceArea):
         default=list,
         blank=True,
         null=True,
+        help_text="Classification of pilots and pilot services by type of waterway where piloting services are provided.",
     )
     pilot_qualification = models.CharField(
         max_length=255,
         choices=PilotQualification.choices,
         blank=True,
         null=True,
-        help_text="",
+        help_text="Classification of pilots and pilot services by type of license qualification or type of organization providing services.",
     )
     pilot_request = models.CharField(
         max_length=255,
@@ -129,21 +82,21 @@ class S127PilotService(S127ReportableServiceArea):
 
 class S127NoticeTime(s100.models.ComplexAttributeType):
     class Operation(models.TextChoices):
-        """Indicates whether the minimum or maximum value should be used to describe a condition or in application processing
+        """
         Remarks: OPERAT is intended to be used in conjunction with other attributes (or sub-attributes of a complex attribute) to indicate how their values must be combined in order to describe a condition. Null attributes are ignored.
         Example: Complex attribute underkeelAllowance with UKCFIX=2.5, UKCVAR=10.00, OPERAT=1 inicates that the under-keel allowance required is the greater of 2.5 metres or 10% of the ship's draught.
-
-        :cvar LARGEST_VALUE: The numerically largest value computed from the
-            applicable attributes or sub-attributes
-        :cvar SMALLEST_VALUE: The numerically smallest value computed from
-            the applicable attributes or sub-attributes
         """
 
-        LARGEST_VALUE = "largest value"
-        SMALLEST_VALUE = "smallest value"
+        # fmt: off
+        LARGEST_VALUE = "largest value" # The numerically largest value computed from the applicable attributes or sub-attributes
+        SMALLEST_VALUE = "smallest value" # The numerically smallest value computed from the applicable attributes or sub-attributes
+        # fmt: on
 
     pilot_service = models.ForeignKey(
-        S127PilotService, on_delete=models.CASCADE, related_name="notice_time"
+        S127PilotService,
+        on_delete=models.CASCADE,
+        related_name="notice_time",
+        help_text="The service provided by a person who directs the movements of a vessel through pilot waters",
     )
     notice_time_hours = ArrayField(
         models.FloatField(),
