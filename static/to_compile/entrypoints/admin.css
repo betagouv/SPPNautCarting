@@ -22,3 +22,61 @@
 form .module {
     @apply sn-border sn-border-solid sn-border-[var(--primary)];
 }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+        Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol", "Noto Color Emoji";
+}
+/* Add max width to the form */
+#content-main {
+    @apply sn-max-w-120w;
+}
+
+/*
+- aligned : ajoutée par défaut sur les fieldset https://github.com/django/django/blob/7bbbadc69383f0a2b99253e153b974f8783e876d/django/contrib/admin/templates/admin/includes/fieldset.html#LL1C1-L1C1
+*/
+/* Help text */
+form .aligned input + p.help,
+form .aligned textarea + p.help,
+form .aligned select + p.help,
+form .aligned input + div.help,
+form .aligned textarea + div.help,
+form .aligned p.help,
+form .aligned div.help,
+form .aligned select + div.help {
+    @apply sn-ml-0 sn-pl-0 !important;
+}
+
+/* Corresponding template
+https://github.com/django/django/blob/7bbbadc69383f0a2b99253e153b974f8783e876d/django/contrib/admin/templates/admin/includes/fieldset.html#L2
+*/
+.module > h2 {
+    @apply sn-text-lg sn-sticky sn-top-0 sn-font-semibold sn-z-10;
+}
+
+/* Prevent label and input to be on the same line */
+.form-row > div {
+    @apply sn-inline-flex sn-flex-col sn-w-full;
+}
+.form-row > div > label {
+    @apply sn-text-lg sn-text-[var(--body-loud-color)];
+}
+
+.form-row .help {
+    @apply sn-text-sm sn-text-[var(--body-quiet-color)] sn-max-w-readable;
+}
+
+/* Suggestions
+- Set a custom classname at the template level, for the geometry field
+- Add an attribute on the field in the django model
+*/
+#id_geometry_map,
+#id_geometry_div_map {
+    @apply sn-w-full !important;
+}
+
+.tabular .vLargeTextField,
+.tabular .vXMLLargeTextField {
+    @apply sn-w-auto;
+}
