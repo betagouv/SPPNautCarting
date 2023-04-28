@@ -1,24 +1,33 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 .choice-array-field {
-    @apply sn-grid;
     grid-template-columns: repeat(auto-fill, 15rem);
+    display: grid;
 }
 
-/* Break lines after each checkbox in multiple inputs */
 .aligned .choice-array-field label {
-    @apply sn-flex sn-w-auto sn-space-x-3v sn-text-base sn-items-center;
+    width: auto;
+    align-items: center;
+    display: flex;
+}
+
+.aligned .choice-array-field label > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.aligned .choice-array-field label {
+    font-size: 1rem;
+    line-height: 1.5rem;
 }
 
 .choice-array-field input {
-    @apply sn-mr-1w;
+    margin-right: 0.5rem;
 }
 
-/* Add a simple border around fieldsets */
 .inline-group,
 .inline-group.djn-group-nested,
 form .module {
-    @apply sn-border sn-border-solid sn-border-[var(--primary)];
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--primary);
 }
