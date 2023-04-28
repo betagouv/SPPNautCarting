@@ -6,7 +6,7 @@ import s100.models
 from s127.models.shared import BooleanChoices, CategoryOfVessel, ChoiceArrayField
 
 
-class S127Applicability(s100.models.InformationType):
+class Applicability(s100.models.InformationType):
     class CategoryOfDangerousOrHazardousCargo(models.TextChoices):
         # fmt: off
         IMDG_CODE_CLASS_1_DIV_1_1 = "IMDG Code Class 1 Div. 1.1" # Explosives, Division 1: substances and articles which have a mass explosion hazard
@@ -146,20 +146,16 @@ class S127Applicability(s100.models.InformationType):
         verbose_name_plural = "Applicabilities"
 
 
-class S127PermissionType(models.Model):
+class PermissionType(s100.models.GenericManyToMany):
     class CategoryOfRelationship(models.TextChoices):
+        # fmt: off
         PROHIBITED = "prohibited"  # use of facility, waterway or service is forbidden
-        NOT_RECOMMENDED = (
-            "not recommended"  # use of facility, waterway or service is not recommended
-        )
+        NOT_RECOMMENDED = "not recommended"  # use of facility, waterway or service is not recommended
         PERMITTED = "permitted"  # use of facility, waterway, or service is permitted but not required
-        RECOMMENDED = (
-            "recommended"  # use of facility, waterway, or service is recommended
-        )
+        RECOMMENDED = "recommended"  # use of facility, waterway, or service is recommended
         REQUIRED = "required"  # use of facility, waterway, or service is required
-        NOT_REQUIRED = (
-            "not required"  # use of facility, waterway, or service is not required
-        )
+        NOT_REQUIRED = "not required"  # use of facility, waterway, or service is not required
+        # fmt: on
 
     category_of_relationship = models.CharField(
         choices=CategoryOfRelationship.choices,
@@ -173,10 +169,10 @@ class S127PermissionType(models.Model):
     )
     feature_object_id = models.BigIntegerField()
     feature_object = GenericForeignKey("feature_content_type", "feature_object_id")
-    applicability = models.ForeignKey(S127Applicability, on_delete=models.CASCADE)
+    applicability = models.ForeignKey(Applicability, on_delete=models.CASCADE)
 
 
-class S127VesselsMeasurements(s100.models.ComplexAttributeType):
+class VesselsMeasurements(s100.models.ComplexAttributeType):
     class ComparisonOperator(models.TextChoices):
         """
         Remarks: The definition of COMPOP provides the relation between the value given in the model and the real ship's value.
@@ -226,7 +222,7 @@ class S127VesselsMeasurements(s100.models.ComplexAttributeType):
         # fmt: on
 
     applicability = models.ForeignKey(
-        S127Applicability, on_delete=models.CASCADE, related_name="vessels_measurements"
+        Applicability, on_delete=models.CASCADE, related_name="vessels_measurements"
     )
     vessels_characteristics = models.CharField(
         max_length=255,

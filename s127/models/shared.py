@@ -5,17 +5,17 @@ from django.contrib.postgres.fields import ArrayField
 import s100.models
 
 
-class S127OrganisationContactArea(s100.models.FeatureType):
+class OrganisationContactArea(s100.models.FeatureType):
     class Meta:
         abstract = True
 
 
-class S127SupervisedArea(S127OrganisationContactArea):
+class SupervisedArea(OrganisationContactArea):
     class Meta:
         abstract = True
 
 
-class S127ReportableServiceArea(S127SupervisedArea):
+class ReportableServiceArea(SupervisedArea):
     class Meta:
         abstract = True
 

@@ -78,7 +78,8 @@ class TextContent(GenericComplexAttributeType):
 class FeatureType(models.Model):
     feature_names = GenericRelation(FeatureName)
     text_contents = GenericRelation(TextContent)
-    permission_types = GenericRelation("s127.S127PermissionType")
+    # FIXME : S100 n'a pas le droit de connaitre S127
+    permission_types = GenericRelation("s127.PermissionType")
 
     class Meta:
         abstract = True
@@ -87,5 +88,10 @@ class FeatureType(models.Model):
 class InformationType(models.Model):
     feature_names = GenericRelation(FeatureName)
 
+    class Meta:
+        abstract = True
+
+
+class GenericManyToMany(models.Model):
     class Meta:
         abstract = True

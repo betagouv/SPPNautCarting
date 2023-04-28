@@ -1,10 +1,10 @@
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from .shared import CategoryOfVessel, ChoiceArrayField, S127OrganisationContactArea
+from .shared import CategoryOfVessel, ChoiceArrayField, OrganisationContactArea
 
 
-class S127PilotBoardingPlace(S127OrganisationContactArea):
+class PilotBoardingPlace(OrganisationContactArea):
     class CategoryOfPilotBoardingPlace(models.TextChoices):
         # fmt: off
         BOARDING_BY_PILOT_CRUISING_VESSEL = "boarding by pilot-cruising vessel" # Pilot boards from a cruising vessel.

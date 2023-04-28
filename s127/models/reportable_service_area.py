@@ -4,10 +4,10 @@ from django.contrib.postgres.fields import ArrayField
 import s100.models
 from s127.models.feature_type import PilotageDistrict
 
-from .shared import BooleanChoices, ChoiceArrayField, S127ReportableServiceArea
+from .shared import BooleanChoices, ChoiceArrayField, ReportableServiceArea
 
 
-class S127PilotService(S127ReportableServiceArea):
+class PilotService(ReportableServiceArea):
     class CategoryOfPilot(models.TextChoices):
         # fmt: off
         PILOT = "pilot" # Pilot licenced to conduct vessels during approach from sea to a specified place which may be a handover place, an anchorage or alongside.
@@ -80,7 +80,7 @@ class S127PilotService(S127ReportableServiceArea):
     #     "in a particular area and is licensed for that area."
 
 
-class S127NoticeTime(s100.models.ComplexAttributeType):
+class NoticeTime(s100.models.ComplexAttributeType):
     class Operation(models.TextChoices):
         """
         Remarks: OPERAT is intended to be used in conjunction with other attributes (or sub-attributes of a complex attribute) to indicate how their values must be combined in order to describe a condition. Null attributes are ignored.
@@ -93,7 +93,7 @@ class S127NoticeTime(s100.models.ComplexAttributeType):
         # fmt: on
 
     pilot_service = models.ForeignKey(
-        S127PilotService,
+        PilotService,
         on_delete=models.CASCADE,
         related_name="notice_time",
         help_text="The service provided by a person who directs the movements of a vessel through pilot waters",

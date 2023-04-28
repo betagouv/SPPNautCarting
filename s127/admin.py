@@ -37,12 +37,12 @@ class TextContentInline(nested_admin.NestedGenericStackedInline):
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
-    model = models.S127VesselsMeasurements
+    model = models.VesselsMeasurements
     extra = 0
 
 
 class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
-    model = models.S127Applicability
+    model = models.Applicability
     inlines = [InformationInline, VesselsMeasurementsInline]
     extra = 0
     # fieldsets = [
@@ -61,7 +61,7 @@ class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     # ]
 
 
-@admin.register(models.S127Applicability)
+@admin.register(models.Applicability)
 class ApplicabilityAdmin(nested_admin.NestedModelAdmin):
     search_fields = ["id"]
     inlines = [InformationInline, VesselsMeasurementsInline]
@@ -70,7 +70,7 @@ class ApplicabilityAdmin(nested_admin.NestedModelAdmin):
 class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     ct_field = "feature_content_type"
     ct_fk_field = "feature_object_id"
-    model = models.S127PermissionType
+    model = models.PermissionType
 
     min_num = 0
     extra = 0
@@ -97,11 +97,11 @@ class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
     ]
 
 
-@admin.register(models.S127PilotService)
+@admin.register(models.PilotService)
 class PilotServiceAdmin(GISModelAdmin, FeatureTypeAdmin):
     pass
 
 
-@admin.register(models.S127PilotBoardingPlace)
+@admin.register(models.PilotBoardingPlace)
 class PilotBoardingPlaceAdmin(GISModelAdmin, FeatureTypeAdmin):
     pass
