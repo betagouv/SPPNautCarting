@@ -1,10 +1,9 @@
 import nested_admin
 from django.apps import AppConfig
 from django.contrib import admin
-from django.contrib.contenttypes.admin import GenericTabularInline
-from django.contrib.gis.admin import GISModelAdmin
 
 import s100.models
+from carting.admin import GISModelAdminWithRasterMarine
 
 from . import models
 
@@ -45,20 +44,6 @@ class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     model = models.Applicability
     inlines = [InformationInline, VesselsMeasurementsInline]
     extra = 0
-    # fieldsets = [
-    #     (
-    #         "GENERALITES",
-    #         {
-    #             "fields": ["in_ballast"],
-    #         },
-    #     ),
-    #     (
-    #         "DANGERS",
-    #         {
-    #             "fields": ["category_of_dangerous_or_hazardous_cargo"],
-    #         },
-    #     ),
-    # ]
 
 
 @admin.register(models.Applicability)
@@ -86,22 +71,15 @@ class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
 
 
 @admin.register(models.PilotageDistrict)
-class PilotageDistrictAdmin(GISModelAdmin, FeatureTypeAdmin):
-    fieldsets = [
-        (
-            "SPECIFIC FIELDS",
-            {
-                "fields": ["geometry", "communication_channel"],
-            },
-        ),
-    ]
+class PilotageDistrictAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
+    search_fields = ["id"]
 
 
 @admin.register(models.PilotService)
-class PilotServiceAdmin(GISModelAdmin, FeatureTypeAdmin):
-    pass
+class PilotServiceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
+    autocomplete_fields = ["pilotage_district"]
 
 
 @admin.register(models.PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(GISModelAdmin, FeatureTypeAdmin):
+class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
     pass
