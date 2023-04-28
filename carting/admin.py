@@ -1,13 +1,13 @@
 import logging
 
 from django.contrib import admin
+from django.contrib.gis.admin import GISModelAdmin
 from django.urls import reverse
 from django.utils.html import format_html_join
 from tree_queries.models import TreeNode
 
-from s127.admin import GISModelAdminWithRasterMarine
-
 from .models import OuvrageSection
+from .widgets import CustomOSMWidget
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,10 @@ def children(instance: TreeNode):
             for child in children
         ),
     )
+
+
+class GISModelAdminWithRasterMarine(GISModelAdmin):
+    gis_widget = CustomOSMWidget
 
 
 @admin.register(OuvrageSection)
