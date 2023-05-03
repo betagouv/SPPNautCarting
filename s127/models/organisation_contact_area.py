@@ -78,7 +78,7 @@ class PilotBoardingPlace(OrganisationContactArea):
         choices=CategoryOfVessel.choices,
         blank=True,
         null=True,
-        help_text=CategoryOfVessel.help_text,
+        help_text="Classification of vessels by function or use",
     )
 
     # FIXME : Mettre un joli widget

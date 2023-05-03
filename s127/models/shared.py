@@ -61,8 +61,3 @@ class CategoryOfVessel(s100.models.CodeList):
     LIVESTOCK_CARRIER = "livestock carrier" # livestock carrier (A vessel designed to carry large quantities of live animals.)
     SPORT_FISHING = "sport fishing" # sport fishing (A vessel used in fishing for pleasure or competition.)
     # fmt: on
-
-    @property
-    @classmethod
-    def help_text(cls):
-        return "Classification of vessels by function or use"

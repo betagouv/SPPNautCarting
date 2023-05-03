@@ -4,8 +4,8 @@ from django.contrib.gis.db import models
 
 
 class ISO639_3(models.TextChoices):
-    FRA = "fra", "French"
-    ENG = "eng", "English"
+    FRENCH = "fra"
+    ENGLISH = "eng"
 
 
 class CodeList(models.TextChoices):
@@ -33,35 +33,47 @@ class GenericComplexAttributeType(ComplexAttributeType):
         abstract = True
 
 
-# class GMLObject(models.Model):
-#     # FIXME : Discuter de l'algo de création automatique de l'id
-#     id = models.CharField(primary_key=True, max_length=255)
-
-
 class FeatureName(GenericComplexAttributeType):
-    language = models.CharField(
-        max_length=3,
-        choices=ISO639_3.choices,
-    )
+    # Language is not mandatory in the spec. We think it's because the language can be defined once at the XML root level and then is implied.
+    # We make it mandatory because we need to know explicitly.
+    language = models.CharField(max_length=3, choices=ISO639_3.choices)
+
     name = models.CharField(
         max_length=255, help_text="The individual name of a feature."
     )
-    display_name = models.BooleanField(default=False)
+
+    # Indication: Boolean. A True value is an indication that the name is intended to be displayed.
+    # Remarks:
+    # Where it is allowable to encode multiple instances of feature name for a single feature instance,
+    # only one feature name instance can indicate that the name is to be displayed (display name set to True).
+    display_name = models.BooleanField(
+        default=False,
+        help_text="A statement expressing if a feature name is to be displayed in certain display settings or not.",
+    )
 
     def __str__(self):
-        return f"{self.language} - {self.name}"
+        return f"{self.language} - {self.name}" + (
+            " - display" if self.display_name else ""
+        )
 
-    # Uncomment when upgrading to django 4.2
-    # class Meta:
-    #     db_table_comment = "The complex attribute provides the name of an entity, "
-    #     "defines the national language of the name, and provides the option to "
-    #     "display the name at various system display settings."
+    class Meta:
+        constraints = [
+            # https://github.com/betagouv/SPPNautInterface/issues/227
+            models.UniqueConstraint(
+                fields=["content_type", "object_id", "display_name"],
+                condition=models.Q(display_name=True),
+                name="unique_display_name",
+            )
+        ]
+
+        # Uncomment when upgrading to django 4.2
+        # db_table_comment = "The complex attribute provides the name of an entity, "
+        # "defines the national language of the name, and provides the option to "
+        # "display the name at various system display settings."
 
 
 class Information(GenericComplexAttributeType):
-    language = models.CharField(
-        max_length=3, choices=ISO639_3.choices, default=ISO639_3.FRA
-    )
+    language = models.CharField(max_length=3, choices=ISO639_3.choices)
     headline = models.CharField(max_length=255, blank=True)
     text = models.TextField(blank=True)
 
@@ -71,16 +83,11 @@ class TextContent(GenericComplexAttributeType):
         """
         Classification of completeness of textual information in relation to the
         source.
-
-        :cvar ABSTRACT_OR_SUMMARY: A statement summarizing the important
-            points of a text.
-        :cvar EXTRACT: An excerpt or excerpts from a text.
-        :cvar FULL_TEXT: The whole text
         """
 
-        ABSTRACT_OR_SUMMARY = "abstract or summary"
-        EXTRACT = "extract"
-        FULL_TEXT = "full text"
+        ABSTRACT_OR_SUMMARY = "abstract or summary"  # A statement summarizing the important points of a text.
+        EXTRACT = "extract"  # An excerpt or excerpts from a text.
+        FULL_TEXT = "full text"  # The whole text
 
     category_of_text = models.CharField(max_length=255, choices=CategoryOfText.choices)
     information = GenericRelation(Information)
@@ -89,8 +96,6 @@ class TextContent(GenericComplexAttributeType):
 class FeatureType(models.Model):
     feature_names = GenericRelation(FeatureName)
     text_contents = GenericRelation(TextContent)
-    # FIXME : S100 n'a pas le droit de connaitre S127
-    permission_types = GenericRelation("s127.PermissionType")
 
     class Meta:
         abstract = True

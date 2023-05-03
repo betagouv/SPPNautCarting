@@ -98,7 +98,7 @@ class Applicability(s100.models.InformationType):
         choices=CategoryOfVessel.choices,
         blank=True,
         null=True,
-        help_text=CategoryOfVessel.help_text,
+        help_text="Classification of vessels by function or use",
     )
 
     category_of_vessel_registry = models.CharField(

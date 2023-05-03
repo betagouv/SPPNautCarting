@@ -80,6 +80,7 @@ class PilotService(ReportableServiceArea):
     #     "in a particular area and is licensed for that area."
 
 
+# FIXME: À connecter ? À supprimer ?
 class NoticeTime(s100.models.ComplexAttributeType):
     class Operation(models.TextChoices):
         """
