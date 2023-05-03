@@ -2,37 +2,10 @@ import nested_admin
 from django.apps import AppConfig
 from django.contrib import admin
 
-import s100.models
 from carting.admin import GISModelAdminWithRasterMarine
+from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 from . import models
-
-
-class S100Config(AppConfig):
-    default_auto_field = "django.db.models.BigAutoField"
-    name = "s100"
-
-
-class FeatureNameInline(nested_admin.NestedGenericTabularInline):
-    model = s100.models.FeatureName
-    extra = 0
-    min_num = 1
-    max_num = 1
-
-
-class InformationInline(nested_admin.NestedGenericStackedInline):
-    model = s100.models.Information
-    fields = ("headline", "text")
-    extra = 0
-    min_num = 1
-    max_num = 1
-
-
-class TextContentInline(nested_admin.NestedGenericStackedInline):
-    model = s100.models.TextContent
-    inlines = [InformationInline]
-    extra = 0
-    max_num = 1
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
