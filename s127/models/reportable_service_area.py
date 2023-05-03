@@ -70,7 +70,8 @@ class PilotService(ReportableServiceArea):
         "True: remote pilot is available: Pilotage is available remotely from shore or other location remote from the vessel requiring pilotage."
         "False: remote pilot is not available: Remote pilotage is not available.",
     )
-    # FIXME: GM_OrientableSurface ? 0..* ?
+    # FIXME: 0..* ?
+    # https://github.com/betagouv/SPPNautInterface/issues/228
     geometry = models.MultiPolygonField()
 
     # Uncomment when upgrading to django 4.2

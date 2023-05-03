@@ -5,17 +5,16 @@ import s100.models
 
 
 class PilotageDistrict(s100.models.FeatureType):
-    # FIXME : Mettre un joli widget
     communication_channel = ArrayField(
-        models.CharField(max_length=255, blank=True, null=True),
+        models.CharField(max_length=255),
         blank=True,
         null=True,
         help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
         "ℹ️ Write comma separated values to define multiple.",
     )
 
-    # FIXME: GM_Surface ? 0..* ?
-    geometry = models.MultiPolygonField()
+    # Spec says it is optional. We've decided to make it mandatory.
+    geometry = s100.models.GMMultiSurface()
 
     # Uncomment when upgrading to django 4.2
     # class Meta:

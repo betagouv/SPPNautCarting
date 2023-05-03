@@ -19,6 +19,19 @@ class CodeList(models.TextChoices):
     # A code list type is a list of literals which may be extended only in conformance with specified rules.
 
 
+class GMSurface(models.PolygonField):
+    """
+    It should also include CurvePolygonField but Django does not support it.
+    """
+
+
+class GMMultiSurface(models.MultiPolygonField):
+    # https://github.com/betagouv/SPPNautInterface/issues/229
+    """
+    It should also include MutliCurvePolygonField but Django does not support it.
+    """
+
+
 class ComplexAttributeType(models.Model):
     class Meta:
         abstract = True
