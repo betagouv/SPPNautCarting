@@ -8,6 +8,17 @@ class ISO639_3(models.TextChoices):
     ENG = "eng", "English"
 
 
+class CodeList(models.TextChoices):
+    """
+    We may add "other" choices to this enum based on SHOM feedback.
+    This is allowed by the spec by prefixing them with "other: ".
+    r"other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"
+    """
+
+    # In spec: A type of flexible enumeration.
+    # A code list type is a list of literals which may be extended only in conformance with specified rules.
+
+
 class ComplexAttributeType(models.Model):
     class Meta:
         abstract = True
