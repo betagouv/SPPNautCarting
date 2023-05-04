@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 import s100.models
 from s127.models.feature_type import PilotageDistrict
 
-from .shared import BooleanChoices, ChoiceArrayField, ReportableServiceArea
+from .shared import BOOLEAN_CHOICES, ChoiceArrayField, ReportableServiceArea
 
 
 class PilotService(ReportableServiceArea):
@@ -46,7 +46,6 @@ class PilotService(ReportableServiceArea):
         ),
         default=list,
         blank=True,
-        null=True,
         help_text="Classification of pilots and pilot services by type of waterway where piloting services are provided.",
     )
     pilot_qualification = models.CharField(
@@ -65,7 +64,7 @@ class PilotService(ReportableServiceArea):
     remote_pilot = models.BooleanField(
         null=True,
         blank=True,
-        choices=BooleanChoices.choices,
+        choices=BOOLEAN_CHOICES,
         help_text="Whether remote pilot services are available. "
         "True: remote pilot is available: Pilotage is available remotely from shore or other location remote from the vessel requiring pilotage."
         "False: remote pilot is not available: Remote pilotage is not available.",

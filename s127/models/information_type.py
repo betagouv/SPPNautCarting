@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 
 import s100.models
-from s127.models.shared import BooleanChoices, CategoryOfVessel, ChoiceArrayField
+from s127.models.shared import BOOLEAN_CHOICES, CategoryOfVessel, ChoiceArrayField
 
 
 class Applicability(s100.models.InformationType):
@@ -58,14 +58,11 @@ class Applicability(s100.models.InformationType):
         # fmt: on
 
     in_ballast = models.BooleanField(
-        choices=BooleanChoices.choices,
+        choices=BOOLEAN_CHOICES,
         null=True,
         blank=True,
         help_text="Whether the vessel is in ballast.",
     )
-    # FIXME: check remarks in https://github.com/betagouv/SPPNautS1xyModelisation/blob/main/S127/XSD/S127/1.0.0/20181129/S127.xsd
-    # and write corresponding validators
-    # Example : If item 7 is used, the nature of dangerous or hazardous cargoes can be amplified with category of dangerous or hazardous cargo.
     category_of_cargo = ChoiceArrayField(
         base_field=models.CharField(
             max_length=255,
@@ -73,11 +70,7 @@ class Applicability(s100.models.InformationType):
         ),
         default=list,
         blank=True,
-        null=True,
-        help_text="Classification of the different types of cargo that "
-        "a ship may be carrying <br/>"
-        "If item 7 is used, the nature of dangerous or hazardous cargoes can "
-        "be amplified with category of dangerous or hazardous cargo.",
+        help_text="Classification of the different types of cargo that a ship may be carrying",
     )
     category_of_dangerous_or_hazardous_cargo = ChoiceArrayField(
         base_field=models.CharField(
@@ -86,13 +79,9 @@ class Applicability(s100.models.InformationType):
         ),
         default=list,
         blank=True,
-        null=True,
-        help_text="Classification of dangerous goods or hazardous materials based on "
-        "the International Maritime Dangerous Goods Code"
-        # FIXME : vérifier avec Anthony si on a bien besoin des deux valeur du rel
-        " (<a href='https://www.imo.org/fr/OurWork/Safety/Pages/DangerousGoods-default.aspx' target='_blank' rel='noreferrer noopener'>IMDG Code</a>)",
+        help_text="Classification of dangerous goods or hazardous materials based on the International Maritime Dangerous Goods Code"
+        " (<a href='https://www.imo.org/fr/OurWork/Safety/Pages/DangerousGoods-default.aspx' target='_blank'>IMDG Code</a>)",
     )
-    # FIXME: In XSD : simpleType with Union = choice or other string
     category_of_vessel = models.CharField(
         max_length=255,
         choices=CategoryOfVessel.choices,
@@ -100,7 +89,6 @@ class Applicability(s100.models.InformationType):
         null=True,
         help_text="Classification of vessels by function or use",
     )
-
     category_of_vessel_registry = models.CharField(
         max_length=255,
         choices=CategoryOfVesselRegistry.choices,
@@ -108,20 +96,23 @@ class Applicability(s100.models.InformationType):
         null=True,
         help_text="The locality of vessel registration or enrolment relative to the nationality of a port, territorial sea, administrative area, exclusive zone or other location.",
     )
+
+    # https://github.com/betagouv/SPPNautInterface/issues/230
     logical_connectives = models.CharField(
         max_length=255,
         choices=LogicalConnectives.choices,
         blank=True,
         null=True,
-        # FIXME: No description in XSD
+        # No description in XSD
     )
+
+    # https://github.com/betagouv/SPPNautInterface/issues/231
     thickness_of_ice_capability = models.IntegerField(
         null=True,
         blank=True,
         help_text="The thickness of ice that the ship can safely transit",
     )
-    vessel_performance = models.CharField(
-        max_length=255,
+    vessel_performance = models.TextField(
         blank=True,
         null=True,
         help_text="A description of the required handling characteristics of a vessel including hull design, main and auxilliary machinery, cargo handling equipment, navigation equipment and manoeuvring behaviour.",
@@ -129,19 +120,21 @@ class Applicability(s100.models.InformationType):
     information = GenericRelation(s100.models.Information)
 
     def __str__(self):
-        # FIXME : check reprensentation
-        foo = f"{self.id}"
+        parts = []
+
+        if self.id:
+            parts.append(str(self.id))
 
         if self.category_of_vessel:
-            foo = f"{foo} - {self.category_of_vessel}"
+            parts.append(self.category_of_vessel)
 
         if self.category_of_cargo:
-            foo = f"{foo} - {self.category_of_cargo}"
+            parts.append(" - ".join(self.category_of_cargo))
 
         if self.category_of_dangerous_or_hazardous_cargo:
-            foo = f"{foo} - {self.category_of_dangerous_or_hazardous_cargo}"
+            parts.append(" - ".join(self.category_of_dangerous_or_hazardous_cargo))
 
-        return foo
+        return " - ".join(parts)
 
     class Meta:
         verbose_name_plural = "Applicabilities"
@@ -226,24 +219,16 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
         Applicability, on_delete=models.CASCADE, related_name="vessels_measurements"
     )
     vessels_characteristics = models.CharField(
-        max_length=255,
-        choices=VesselsCharacteristics.choices,
-        blank=True,
-        null=True,
-        # FIXME: No description in XSD
+        max_length=255, choices=VesselsCharacteristics.choices
     )
     comparison_operator = models.CharField(
-        max_length=255,
-        choices=ComparisonOperator.choices,
-        blank=True,
-        null=True,
-        # FIXME: No description in XSD
+        max_length=255, choices=ComparisonOperator.choices
     )
-    vessels_characteristics_value = models.FloatField()  # FIXME: No description in XSD
+
+    # https://github.com/betagouv/SPPNautInterface/issues/232
+    # https://github.com/betagouv/SPPNautInterface/issues/233
+    # FIXME: Positive + max_digits + decimal_places
+    vessels_characteristics_value = models.DecimalField(max_digits=10, decimal_places=3)
     vessels_characteristics_unit = models.CharField(
-        max_length=255,
-        choices=VesselsCharacteristicsUnit.choices,
-        blank=True,
-        null=True,
-        # FIXME: No description in XSD
+        max_length=255, choices=VesselsCharacteristicsUnit.choices
     )

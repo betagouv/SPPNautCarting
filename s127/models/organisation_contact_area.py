@@ -112,12 +112,9 @@ class PilotBoardingPlace(OrganisationContactArea):
         base_field=models.CharField(
             max_length=255,
             choices=Status.choices,
-            blank=True,
-            null=True,
         ),
         default=list,
         blank=True,
-        null=True,
         # FIXME : "Definition required" in XSD. So no help_text.
     )
     geometry = models.GeometryField()

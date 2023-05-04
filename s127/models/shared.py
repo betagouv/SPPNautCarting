@@ -36,9 +36,11 @@ class ChoiceArrayField(ArrayField):
         return super(ArrayField, self).formfield(**defaults)
 
 
-class BooleanChoices(models.TextChoices):
-    YES = True
-    NO = False
+# To force english labels
+BOOLEAN_CHOICES = (
+    (True, "Yes"),
+    (False, "No"),
+)
 
 
 class CategoryOfVessel(s100.models.CodeList):
