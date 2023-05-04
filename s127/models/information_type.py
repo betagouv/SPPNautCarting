@@ -1,6 +1,8 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 
 import s100.models
 from s127.models.shared import BOOLEAN_CHOICES, CategoryOfVessel, ChoiceArrayField
@@ -166,6 +168,14 @@ class PermissionType(s100.models.GenericManyToMany):
     applicability = models.ForeignKey(Applicability, on_delete=models.CASCADE)
 
 
+def validate_positive(value):
+    if value < 0:
+        raise ValidationError(
+            "%(value)s is not a positive number",
+            params={"value": value},
+        )
+
+
 class VesselsMeasurements(s100.models.ComplexAttributeType):
     class ComparisonOperator(models.TextChoices):
         """
@@ -227,8 +237,9 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
 
     # https://github.com/betagouv/SPPNautInterface/issues/232
     # https://github.com/betagouv/SPPNautInterface/issues/233
-    # FIXME: Positive + max_digits + decimal_places
-    vessels_characteristics_value = models.DecimalField(max_digits=10, decimal_places=3)
+    vessels_characteristics_value = models.DecimalField(
+        max_digits=10, decimal_places=3, validators=[MinValueValidator(0)]
+    )
     vessels_characteristics_unit = models.CharField(
         max_length=255, choices=VesselsCharacteristicsUnit.choices
     )
