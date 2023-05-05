@@ -168,14 +168,6 @@ class PermissionType(s100.models.GenericManyToMany):
     applicability = models.ForeignKey(Applicability, on_delete=models.CASCADE)
 
 
-def validate_positive(value):
-    if value < 0:
-        raise ValidationError(
-            "%(value)s is not a positive number",
-            params={"value": value},
-        )
-
-
 class VesselsMeasurements(s100.models.ComplexAttributeType):
     class ComparisonOperator(models.TextChoices):
         """
