@@ -34,7 +34,7 @@ class PilotService(ReportableServiceArea):
     pilotage_district = models.ForeignKey(
         PilotageDistrict,
         on_delete=models.CASCADE,
-        related_name="pilot_service",
+        related_name="pilot_services",
         blank=True,
         null=True,
         help_text="An area within which a pilotage direction exists.",
@@ -55,23 +55,20 @@ class PilotService(ReportableServiceArea):
         null=True,
         help_text="Classification of pilots and pilot services by type of license qualification or type of organization providing services.",
     )
-    pilot_request = models.CharField(
-        max_length=255,
+    pilot_request = models.TextField(
         blank=True,
         null=True,
         help_text="Description of the pilot request procedure",
     )
     remote_pilot = models.BooleanField(
-        null=True,
-        blank=True,
         choices=BOOLEAN_CHOICES,
+        default=False,
         help_text="Whether remote pilot services are available. "
         "True: remote pilot is available: Pilotage is available remotely from shore or other location remote from the vessel requiring pilotage."
         "False: remote pilot is not available: Remote pilotage is not available.",
     )
-    # FIXME: 0..* ?
     # https://github.com/betagouv/SPPNautInterface/issues/228
-    geometry = models.MultiPolygonField()
+    geometry = s100.models.GMMultiSurface()
 
     # Uncomment when upgrading to django 4.2
     # class Meta:
@@ -80,7 +77,6 @@ class PilotService(ReportableServiceArea):
     #     "in a particular area and is licensed for that area."
 
 
-# FIXME: À connecter ? À supprimer ?
 class NoticeTime(s100.models.ComplexAttributeType):
     class Operation(models.TextChoices):
         """
@@ -93,20 +89,19 @@ class NoticeTime(s100.models.ComplexAttributeType):
         SMALLEST_VALUE = "smallest value" # The numerically smallest value computed from the applicable attributes or sub-attributes
         # fmt: on
 
-    pilot_service = models.ForeignKey(
+    pilot_service = models.OneToOneField(
         PilotService,
         on_delete=models.CASCADE,
         related_name="notice_time",
         help_text="The service provided by a person who directs the movements of a vessel through pilot waters",
     )
     notice_time_hours = ArrayField(
-        models.FloatField(),
+        models.DurationField(),
         default=list,
         blank=True,
         help_text="The time duration prior to the time the service is needed, when notice must be provided to the service provider.",
     )
-    notice_time_text = models.CharField(
-        max_length=255,
+    notice_time_text = models.TextField(
         blank=True,
         null=True,
         help_text="Text string qualifying the notice time specified in NTCHRS."
