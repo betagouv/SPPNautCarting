@@ -101,6 +101,8 @@ class NoticeTime(s100.models.ComplexAttributeType):
     )
     notice_time_hours = ArrayField(
         models.FloatField(),
+        default=list,
+        blank=True,
         help_text="The time duration prior to the time the service is needed, when notice must be provided to the service provider.",
     )
     notice_time_text = models.CharField(

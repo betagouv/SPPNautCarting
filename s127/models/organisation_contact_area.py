@@ -1,7 +1,14 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import GeometryCollection, Point, Polygon
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 
 from .shared import CategoryOfVessel, ChoiceArrayField, OrganisationContactArea
+
+
+def validate_point_or_surface(collection: GeometryCollection):
+    if not all(isinstance(geometry, Point | Polygon) for geometry in collection):
+        raise ValidationError(message="OH MY GOD !", code="point_or_surface")
 
 
 class PilotBoardingPlace(OrganisationContactArea):
@@ -47,10 +54,8 @@ class PilotBoardingPlace(OrganisationContactArea):
         BUOYED = "buoyed" # Marked by buoys
         # fmt: on
 
-    # FIXME: We choose to skip this relation as we believe it's implicit through PilotService
-    # pilotage_district = models.ForeignKey(
-    #     PilotageDistrict, on_delete=models.CASCADE, related_name="pilot_boarding_places"
-    # )
+    # We choose to skip this relation as we believe it's implicit through PilotService
+    # pilotage_district = models.ForeignKey(PilotageDistrict, on_delete=models.CASCADE)
 
     call_sign = models.CharField(
         max_length=255,
@@ -72,7 +77,6 @@ class PilotBoardingPlace(OrganisationContactArea):
         null=True,
         help_text="The selection of one location compared to others.",
     )
-    # FIXME: Open Enumeration. On devrait pouvoir rédiger librement un texte en plus de l'enum
     category_of_vessel = models.CharField(
         max_length=255,
         choices=CategoryOfVessel.choices,
@@ -81,11 +85,10 @@ class PilotBoardingPlace(OrganisationContactArea):
         help_text="Classification of vessels by function or use",
     )
 
-    # FIXME : Mettre un joli widget
     communication_channel = ArrayField(
         models.CharField(max_length=255),
+        default=list,
         blank=True,
-        null=True,
         help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
         "ℹ️ Write comma separated values to define multiple.",
     )
@@ -115,9 +118,10 @@ class PilotBoardingPlace(OrganisationContactArea):
         ),
         default=list,
         blank=True,
-        # FIXME : "Definition required" in XSD. So no help_text.
+        # No description in XSD
     )
-    geometry = models.GeometryField()
+
+    geometry = models.GeometryCollectionField(validators=[validate_point_or_surface])
 
     # Uncomment when upgrading to django 4.2
     # class Meta:
