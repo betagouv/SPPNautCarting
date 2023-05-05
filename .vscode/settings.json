@@ -1,6 +1,6 @@
 {
     "editor.formatOnSave": true,
-    "python.formatting.provider": "none",
+    "python.formatting.provider": "black",
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
     },
@@ -35,8 +35,5 @@
     },
     "tailwindCSS.includeLanguages": {
         "xsl": "html"
-    },
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
     }
 }
