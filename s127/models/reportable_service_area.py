@@ -95,6 +95,9 @@ class NoticeTime(s100.models.ComplexAttributeType):
         related_name="notice_time",
         help_text="The service provided by a person who directs the movements of a vessel through pilot waters",
     )
+
+    # https://github.com/betagouv/SPPNautInterface/issues/234
+    # https://github.com/betagouv/SPPNautInterface/issues/235
     notice_time_hours = ArrayField(
         models.DurationField(),
         default=list,
