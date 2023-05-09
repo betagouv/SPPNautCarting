@@ -34,9 +34,12 @@ def children(instance: TreeNode):
     )
 
 
-@admin.register(OuvrageSection)
-class OuvrageSectionAdmin(GISModelAdmin):
+class GISModelAdminWithRasterMarine(GISModelAdmin):
     gis_widget = CustomOSMWidget
+
+
+@admin.register(OuvrageSection)
+class OuvrageSectionAdmin(GISModelAdminWithRasterMarine):
     ordering = ("numero",)
     list_display = ("__str__", "bpn_id", "ouvrage_name")
     list_filter = (

@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     "django_extensions",
     "spo",
     "carting",
+    "s100",
+    "s127",
 ]
 
 if DEBUG:

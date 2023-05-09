@@ -7,7 +7,7 @@ module.exports = {
     },
     theme: {
         colors: {
-            // https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-identite-de-l-etat/couleurs-palette/
+            // https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-de-l-identite-de-l-etat/couleurs-palette
             white: "white",
             info: {
                 "975-active": "#c2cfff",
