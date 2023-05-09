@@ -1,17 +1,16 @@
-import nested_admin
-from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericStackedInline, GenericTabularInline
 
 import s100.models
 
 
-class FeatureNameInline(nested_admin.NestedGenericTabularInline):
+class FeatureNameInline(GenericTabularInline):
     model = s100.models.FeatureName
     extra = 0
     min_num = 1
     max_num = 1
 
 
-class InformationInline(nested_admin.NestedGenericStackedInline):
+class InformationInline(GenericStackedInline):
     model = s100.models.Information
     fields = ("headline", "text")
     extra = 0
@@ -19,7 +18,7 @@ class InformationInline(nested_admin.NestedGenericStackedInline):
     max_num = 1
 
 
-class TextContentInline(nested_admin.NestedGenericStackedInline):
+class TextContentInline(GenericStackedInline):
     model = s100.models.TextContent
     inlines = [InformationInline]
     extra = 0

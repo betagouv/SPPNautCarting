@@ -1,6 +1,5 @@
-import nested_admin
-from django.apps import AppConfig
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 
 from carting.admin import GISModelAdminWithRasterMarine
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
@@ -8,24 +7,18 @@ from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 from . import models
 
 
-class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
+class VesselsMeasurementsInline(admin.StackedInline):
     model = models.VesselsMeasurements
     extra = 0
 
 
-class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
-    model = models.Applicability
-    inlines = [InformationInline, VesselsMeasurementsInline]
-    extra = 0
-
-
 @admin.register(models.Applicability)
-class ApplicabilityAdmin(nested_admin.NestedModelAdmin):
+class ApplicabilityAdmin(admin.ModelAdmin):
     search_fields = ["id"]
     inlines = [InformationInline, VesselsMeasurementsInline]
 
 
-class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
+class FeatureTypePermissionTypeInline(GenericTabularInline):
     ct_field = "feature_content_type"
     ct_fk_field = "feature_object_id"
     model = models.PermissionType
@@ -35,7 +28,7 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     autocomplete_fields = ["applicability"]
 
 
-class FeatureTypeAdmin(nested_admin.NestedModelAdmin):
+class FeatureTypeAdmin(admin.ModelAdmin):
     inlines = [
         FeatureNameInline,
         FeatureTypePermissionTypeInline,

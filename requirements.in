@@ -1,6 +1,5 @@
 Django
 django-extensions
-django-nested-admin
 django-tree-queries
 lxml
 natsort
