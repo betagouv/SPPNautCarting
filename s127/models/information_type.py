@@ -1,6 +1,13 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
+<<<<<<< HEAD
+||||||| parent of a7ac090 (Contact Details Modelization)
+from django.core.exceptions import ValidationError
+=======
+from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
+>>>>>>> a7ac090 (Contact Details Modelization)
 from django.core.validators import MinValueValidator
 from django.utils.text import Truncator
 
@@ -284,3 +291,198 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
                 f"{self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).label}"
             )
         return super().__str__()
+
+
+class CategoryOfCommPref(models.TextChoices):
+    # fmt: off
+    PREFERRED_CALLING = "preferred calling" # the first choice channel or frequency to be used when calling a radio station
+    ALTERNATE_CALLING = "alternate calling" # a channel or frequency to be used for calling a radio station when the preferred channel or frequency is busy or is suffering from interference
+    PREFERRED_WORKING = "preferred working" # the first choice channel or frequency to be used when working with a radio station
+    ALTERNATE_WORKING = "alternate working" # a channel or frequency to be used for working with a radio station when the preferred working channel or frequency is busy or is suffering from interference
+    # fmt: on
+
+
+# PDF page 26
+class ContactDetails(s100.models.InformationType):
+    """
+    Information on how to reach a person or organisation by postal, internet,
+    telephone, telex and radio systems.
+    """
+
+    call_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The designated call name of a station, e.g. radio station, radar station, pilot. Remarks: This is the name used when calling a radio station by radio i.e. 'Singapore Pilots'.",
+    )
+
+    call_sign = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The designated call-sign of a radio station.",
+    )
+
+    category_of_comm_pref = models.CharField(
+        max_length=255,
+        choices=CategoryOfCommPref.choices,
+        blank=True,
+        null=True,
+        # No description in XSD
+    )
+
+    communication_channel = ArrayField(
+        models.CharField(max_length=255),
+        default=list,
+        blank=True,
+        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
+        "ℹ️ Write comma separated values to define multiple.",
+    )
+
+    contact_instructions = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
+    )
+
+    information = GenericRelation(s100.models.Information)
+
+    language = models.CharField(
+        max_length=3,
+        blank=True,
+        null=True,
+        choices=s100.models.ISO639_3.choices,
+        # No description in XSD
+    )
+
+    mmsi_code = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The Maritime Mobile Service Identity (MMSI) Code is formed of a series of nine digits which are transmitted over the radio path in order to uniquely identify ship stations, ship earth stations, coast stations, coast earth stations, and group calls. These identities are formed in such a way that the identity or part thereof can be used by telephone and telex subscribers connected to the general telecommunications network principally to call ships automatically.",
+    )
+
+    class Meta:
+        verbose_name_plural = "Contact Details"
+
+
+class SrvContact(s100.models.GenericManyToMany):
+    # ManyToMany
+    feature_content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="+"
+    )
+    feature_object_id = models.BigIntegerField()
+    feature_object = GenericForeignKey("feature_content_type", "feature_object_id")
+    contact_details = models.ForeignKey(ContactDetails, on_delete=models.CASCADE)
+
+
+class ContactAddress(s100.models.ComplexAttributeType):
+    """
+    Direction or superscription of a letter, package, etc., specifying the name
+    of the place to which it is directed, and optionally a contact person or
+    organisation who should receive it.
+    """
+
+    contact_details = models.ForeignKey(
+        ContactDetails, on_delete=models.CASCADE, related_name="contact_addresses"
+    )
+
+    delivery_point = ArrayField(
+        models.CharField(max_length=255),
+        default=list,
+        blank=True,
+        help_text="Details of where post can be delivered such as the apartment, name and/or number of a street, building or PO Box.",
+    )
+
+    city_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The name of a town or city.",
+    )
+
+    postal_code = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Known in various countries as a postcode, or ZIP code, the postal code is a series of letters and/or digits that identifies each postal delivery area.",
+    )
+
+    administrative_division = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Administrative division is a generic term for an administrative region within a country at a level below that of the sovereign state.",
+    )
+
+    country_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The name of a nation. (Adapted from The American Heritage Dictionaries)",
+    )
+
+    class Meta:
+        verbose_name_plural = "Contact Addresses"
+
+
+class Telecommunications(s100.models.ComplexAttributeType):
+    """
+    A means or channel of communicating at a distance by electrical or
+    electromagnetic means such as telegraphy, telephony, or broadcasting.
+    """
+
+    class TelecommunicationService(s100.models.CodeList):
+        # fmt: off
+        VOICE = "voice" # The transfer or exchange of information by using sounds that are being made by mouth and throat when speaking
+        FACSIMILE = "facsimile" # a system of transmitting and reproducing graphic matter (as printing or still pictures) by means of signals sent over telephone lines
+        SMS = "sms" # Short Message Service, a form of text messaging communication on phones and mobile phones
+        DATA = "data" # facts or information used usually to calculate, analyze, or plan something
+        STREAMED_DATA = "streamedData" # Streamed data is data that that is constantly received by and presented to an end-user while being delivered by a provider.
+        TELEX = "telex" # a system of communication in which messages are sent over long distances by using a telephone system and are printed by using a special machine (called a teletypewriter)
+        TELEGRAPH = "telegraph" # an apparatus, system, or process for communication at a distance by electric transmission over wire
+        EMAIL = "email" # Messages and other data exchanged between individuals using computers in a network.
+        # fmt: on
+
+    contact_details = models.ForeignKey(
+        ContactDetails, on_delete=models.CASCADE, related_name="telecommunications"
+    )
+
+    category_of_comm_pref = models.CharField(
+        max_length=255,
+        choices=CategoryOfCommPref.choices,
+        blank=True,
+        null=True,
+        # No description in XSD
+    )
+
+    contact_instructions = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Instructions on how and when to contact an individual or organisation",
+    )
+
+    telcom_carrier = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The name of provider or type of carrier for a telecommunications service",
+    )
+
+    telecommunication_identifier = models.CharField(
+        max_length=255,
+        help_text="Identifier used for contact by means of a telecommunications service, such as a telephone number",
+    )
+
+    telecommunication_service = ChoiceArrayField(
+        base_field=models.CharField(
+            max_length=255,
+            choices=TelecommunicationService.choices,
+        ),
+        default=list,
+        blank=True,
+        help_text="Type of telecommunications service",
+    )
+
+    class Meta:
+        verbose_name_plural = "Telecommunications"
