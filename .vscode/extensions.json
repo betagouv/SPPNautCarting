@@ -4,9 +4,10 @@
 
     // List of extensions which should be recommended for users of this workspace.
     "recommendations": [
-        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
         "EditorConfig.EditorConfig",
-        "bradlc.vscode-tailwindcss"
+        "esbenp.prettier-vscode",
+        "ms-python.black-formatter"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []
