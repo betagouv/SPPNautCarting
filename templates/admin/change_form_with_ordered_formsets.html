@@ -1,0 +1,16 @@
+{% extends "admin/change_form.html" %}
+
+{# Here we render mixed normal and inline fieldsets #}
+{% block field_sets %}
+  {% for fieldset_or_inline in fieldsets_and_inlines %}
+    {% if fieldset_or_inline.opts.template %}
+      {% include fieldset_or_inline.opts.template with inline_admin_formset=fieldset_or_inline %}
+    {% else %}
+      {% include "admin/includes/fieldset.html" with fieldset=fieldset_or_inline %}
+    {% endif %}
+  {% endfor %}
+{% endblock %}
+
+{# And there we remove standard inline rendering #}
+{% block inline_field_sets %}
+{% endblock %}

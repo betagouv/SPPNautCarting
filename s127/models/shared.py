@@ -1,7 +1,3 @@
-from django import forms
-from django.contrib.gis.db import models
-from django.contrib.postgres.fields import ArrayField
-
 import s100.models
 
 
@@ -18,22 +14,6 @@ class SupervisedArea(OrganisationContactArea):
 class ReportableServiceArea(SupervisedArea):
     class Meta:
         abstract = True
-
-
-# FIXME: Est-ce qu'on a besoin de tout ? Est-ce qu'on peut faire ça dans l'admin ? Est-ce qu'on bouge ça dans un fields.py ?
-class ChoiceArrayField(ArrayField):
-    def formfield(self, **kwargs):
-        defaults = {
-            "form_class": forms.MultipleChoiceField,
-            "choices": self.base_field.choices,
-            "widget": forms.CheckboxSelectMultiple(
-                # FIXME : Les classes s'appliquent sur les labels des checkbox en plus du parent
-                attrs={"class": "choice-array-field"},
-            ),
-        }
-        defaults.update(kwargs)
-
-        return super(ArrayField, self).formfield(**defaults)
 
 
 # To force english labels

@@ -21,3 +21,17 @@ class PilotageDistrict(s100.models.FeatureType):
     #     db_table_comment = "An area within which a pilotage direction exists. "
     #     "Such directions are regulated by a competent harbour authority which "
     #     "dictates circumstances under which they apply."
+
+
+class SimplePilotageDistrictProxy(PilotageDistrict):
+    class Meta:
+        proxy = True
+        verbose_name = "Pilotage district (simple form)"
+        verbose_name_plural = "Pilotages district (simple form)"
+
+
+class FullPilotageDistrictProxy(PilotageDistrict):
+    class Meta:
+        proxy = True
+        verbose_name = "Pilotage district (full form)"
+        verbose_name_plural = "Pilotages district (full form)"

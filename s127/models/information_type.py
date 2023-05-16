@@ -1,11 +1,12 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.utils.text import Truncator
 
 import s100.models
-from s127.models.shared import BOOLEAN_CHOICES, CategoryOfVessel, ChoiceArrayField
+from carting.fields import ChoiceArrayField
+from s127.models.shared import BOOLEAN_CHOICES, CategoryOfVessel
 
 
 class Applicability(s100.models.InformationType):
@@ -99,15 +100,6 @@ class Applicability(s100.models.InformationType):
         help_text="The locality of vessel registration or enrolment relative to the nationality of a port, territorial sea, administrative area, exclusive zone or other location.",
     )
 
-    # https://github.com/betagouv/SPPNautInterface/issues/230
-    logical_connectives = models.CharField(
-        max_length=255,
-        choices=LogicalConnectives.choices,
-        blank=True,
-        null=True,
-        # No description in XSD
-    )
-
     # https://github.com/betagouv/SPPNautInterface/issues/231
     thickness_of_ice_capability = models.IntegerField(
         null=True,
@@ -119,24 +111,66 @@ class Applicability(s100.models.InformationType):
         null=True,
         help_text="A description of the required handling characteristics of a vessel including hull design, main and auxilliary machinery, cargo handling equipment, navigation equipment and manoeuvring behaviour.",
     )
+    # https://github.com/betagouv/SPPNautInterface/issues/230
+    logical_connectives = models.CharField(
+        max_length=255,
+        choices=LogicalConnectives.choices,
+        blank=True,
+        null=True,
+        # No description in XSD
+    )
     information = GenericRelation(s100.models.Information)
 
     def __str__(self):
         parts = []
 
-        if self.id:
-            parts.append(str(self.id))
-
-        if self.category_of_vessel:
-            parts.append(self.category_of_vessel)
+        if self.in_ballast is not None:
+            parts.append("In ballast" if self.in_ballast else "Not in ballast")
 
         if self.category_of_cargo:
-            parts.append(" - ".join(self.category_of_cargo))
+            parts.append(
+                " or ".join(
+                    self.CategoryOfCargo(x).label for x in self.category_of_cargo
+                )
+            )
 
         if self.category_of_dangerous_or_hazardous_cargo:
-            parts.append(" - ".join(self.category_of_dangerous_or_hazardous_cargo))
+            parts.append(
+                " or ".join(
+                    self.CategoryOfDangerousOrHazardousCargo(x).label
+                    for x in self.category_of_dangerous_or_hazardous_cargo
+                )
+            )
 
-        return " - ".join(parts)
+        if self.category_of_vessel:
+            parts.append(CategoryOfVessel(self.category_of_vessel).label)
+
+        if self.category_of_vessel_registry:
+            parts.append(
+                self.CategoryOfVesselRegistry(self.category_of_vessel_registry).label
+            )
+
+        if self.thickness_of_ice_capability:
+            parts.append(
+                f"Thickness of ice capability: {self.thickness_of_ice_capability}"
+            )
+
+        if self.vessel_performance:
+            parts.append(Truncator(self.vessel_performance).chars(25, truncate="…"))
+
+        if self.pk and self.vessels_measurements.all():
+            return str(self.vessels_measurements.all().first())
+            parts.append(" or ".join(str(x) for x in self.vessels_measurements.all()))
+
+        logical_connective = " - "
+        if self.logical_connectives == self.LogicalConnectives.LOGICAL_CONJUNCTION:
+            logical_connective = " AND "
+        if self.logical_connectives == self.LogicalConnectives.LOGICAL_DISJUNCTION:
+            logical_connective = " OR "
+
+        if not parts:
+            return super().__str__()
+        return logical_connective.join(parts)
 
     class Meta:
         verbose_name_plural = "Applicabilities"
@@ -175,12 +209,12 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
         """
 
         # fmt: off
-        GREATER_THAN = "greater than"  # The value of the left value is greater than that of the right.(http://en.wikipedia.org/wiki/Logical_connective)
-        GREATER_THAN_OR_EQUAL_TO = "greater than or equal to"  # The value of the left expression is greater than or equal to that of the right. (http://en.wikipedia.org/wiki/Logical_connective)
-        LESS_THAN = "less than"  # The value of the left expression is less than that of the right. (http://en.wikipedia.org/wiki/Logical_connective)
-        LESS_THAN_OR_EQUAL_TO = "less than or equal to"  # The value of the left expression is less than or equal to that of the right. (http://en.wikipedia.org/wiki/Logical_connective)
-        EQUAL_TO = "equal to"  # The two values are equivalent. (adapted http://en.wikipedia.org/wiki/Logical_connective)
-        NOT_EQUAL_TO = "not equal to"  # The two values are not equivalent. (adapted http://en.wikipedia.org/wiki/Logical_connective)
+        GREATER_THAN = "greater than", ">"  # The value of the left value is greater than that of the right.(http://en.wikipedia.org/wiki/Logical_connective)
+        GREATER_THAN_OR_EQUAL_TO = "greater than or equal to", "≥"  # The value of the left expression is greater than or equal to that of the right. (http://en.wikipedia.org/wiki/Logical_connective)
+        LESS_THAN = "less than", "<"  # The value of the left expression is less than that of the right. (http://en.wikipedia.org/wiki/Logical_connective)
+        LESS_THAN_OR_EQUAL_TO = "less than or equal to", "≤"  # The value of the left expression is less than or equal to that of the right. (http://en.wikipedia.org/wiki/Logical_connective)
+        EQUAL_TO = "equal to", "="  # The two values are equivalent. (adapted http://en.wikipedia.org/wiki/Logical_connective)
+        NOT_EQUAL_TO = "not equal to", "≠"  # The two values are not equivalent. (adapted http://en.wikipedia.org/wiki/Logical_connective)
         # fmt: on
 
     class VesselsCharacteristicsUnit(models.TextChoices):
@@ -235,3 +269,14 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
     vessels_characteristics_unit = models.CharField(
         max_length=255, choices=VesselsCharacteristicsUnit.choices
     )
+
+    def __str__(self):
+        if self.pk:
+            # FIXME : pluralize and lower case the unit
+            return (
+                f"{self.VesselsCharacteristics(self.vessels_characteristics).label} "
+                f"{self.ComparisonOperator(self.comparison_operator).label} "
+                f"{self.vessels_characteristics_value} "
+                f"{self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).label}"
+            )
+        return super().__str__()

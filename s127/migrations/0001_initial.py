@@ -3,8 +3,10 @@
 import django.contrib.gis.db.models.fields
 import django.contrib.postgres.fields
 import django.core.validators
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
+
+import carting.fields
 import s100.models
 import s127.models.organisation_contact_area
 import s127.models.shared
@@ -41,7 +43,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "category_of_cargo",
-                    s127.models.shared.ChoiceArrayField(
+                    carting.fields.ChoiceArrayField(
                         base_field=models.CharField(
                             choices=[
                                 ("bulk", "Bulk"),
@@ -64,7 +66,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "category_of_dangerous_or_hazardous_cargo",
-                    s127.models.shared.ChoiceArrayField(
+                    carting.fields.ChoiceArrayField(
                         base_field=models.CharField(
                             choices=[
                                 (
@@ -388,7 +390,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "status",
-                    s127.models.shared.ChoiceArrayField(
+                    carting.fields.ChoiceArrayField(
                         base_field=models.CharField(
                             choices=[
                                 ("permanent", "Permanent"),
@@ -546,7 +548,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "category_of_pilot",
-                    s127.models.shared.ChoiceArrayField(
+                    carting.fields.ChoiceArrayField(
                         base_field=models.CharField(
                             choices=[
                                 ("pilot", "Pilot"),

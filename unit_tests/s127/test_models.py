@@ -10,8 +10,172 @@ from django.contrib.gis.geos import (
 )
 from django.core.exceptions import ValidationError
 
-from s127.models.information_type import VesselsMeasurements
-from s127.models.organisation_contact_area import PilotBoardingPlace
+from s127.models import Applicability, PilotBoardingPlace, VesselsMeasurements
+from s127.models.shared import CategoryOfVessel
+
+
+class TestVesselsMeasurementsStr:
+    def test_empty(self):
+        assert str(VesselsMeasurements()) == "VesselsMeasurements object (None)"
+
+    @pytest.mark.django_db
+    def test_basic(self):
+        applicability = Applicability()
+        applicability.save()
+        vessels_measurements = VesselsMeasurements(
+            applicability=applicability,
+            vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
+            comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
+            vessels_characteristics_value=Decimal("1.1"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
+        )
+        vessels_measurements.save()
+        assert str(vessels_measurements) == f"Length Overall > 1.1 Metre"
+
+
+class TestApplicabilityStr:
+    def test_empty(self):
+        assert str(Applicability()) == "Applicability object (None)"
+
+    @pytest.mark.django_db
+    def test_empty_saved(self):
+        applicability = Applicability()
+        applicability.save()
+        assert str(applicability) == f"Applicability object ({applicability.pk})"
+
+    @pytest.mark.django_db
+    def test_with_in_ballast_true(self):
+        applicability = Applicability(in_ballast=True)
+        applicability.save()
+        assert str(applicability) == "In ballast"
+
+    @pytest.mark.django_db
+    def test_with_in_ballast_false(self):
+        applicability = Applicability(in_ballast=False)
+        applicability.save()
+        assert str(applicability) == "Not in ballast"
+
+    @pytest.mark.django_db
+    def test_with_category_of_cargo(self):
+        applicability = Applicability(
+            category_of_cargo=[Applicability.CategoryOfCargo.LIQUID]
+        )
+        applicability.save()
+        assert str(applicability) == "Liquid"
+
+    @pytest.mark.django_db
+    def test_with_multiple_category_of_cargo(self):
+        applicability = Applicability(
+            category_of_cargo=[
+                Applicability.CategoryOfCargo.LIQUID,
+                Applicability.CategoryOfCargo.LIVESTOCK,
+                Applicability.CategoryOfCargo.HEAVY_LIFT,
+            ]
+        )
+        applicability.save()
+        assert str(applicability) == "Liquid or Livestock or Heavy Lift"
+
+    @pytest.mark.django_db
+    def test_with_dangerous_or_hazardous_cargo(self):
+        "FIXME est-ce qu'on veut tester le non multiple ?"
+
+    @pytest.mark.django_db
+    def test_with_multiple_dangerous_or_hazardous_cargo(self):
+        applicability = Applicability(
+            category_of_dangerous_or_hazardous_cargo=[
+                Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_1_DIV_1_1,
+                Applicability.CategoryOfDangerousOrHazardousCargo.HARMFUL_SUBSTANCES_IN_PACKAGED_FORM,
+                Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_3,
+            ]
+        )
+        applicability.save()
+        assert (
+            str(applicability)
+            == "Imdg Code Class 1 Div 1 1 or Harmful Substances In Packaged Form or Imdg Code Class 3"
+        )
+
+    @pytest.mark.django_db
+    def test_with_category_of_vessel(self):
+        applicability = Applicability(category_of_vessel=CategoryOfVessel.TUG_AND_TOW)
+        applicability.save()
+        assert str(applicability) == "Tug And Tow"
+
+    @pytest.mark.django_db
+    def test_with_category_of_vessel_registry(self):
+        applicability = Applicability(
+            category_of_vessel_registry=Applicability.CategoryOfVesselRegistry.DOMESTIC
+        )
+        applicability.save()
+        assert str(applicability) == "Domestic"
+
+    @pytest.mark.django_db
+    def test_with_thickness_of_ice_capability(self):
+        applicability = Applicability(thickness_of_ice_capability=1)
+        applicability.save()
+        assert str(applicability) == "Thickness of ice capability: 1"
+
+    @pytest.mark.django_db
+    def test_with_vessel_performance(self):
+        applicability = Applicability(vessel_performance="Cool boat")
+        applicability.save()
+        assert str(applicability) == "Cool boat"
+
+    @pytest.mark.django_db
+    def test_with_vessel_performance_greather_than_25_char(self):
+        applicability = Applicability(
+            vessel_performance="Your boat should be the best of the best"
+        )
+        applicability.save()
+        assert str(applicability) == "Your boat should be the …"
+
+    @pytest.mark.django_db
+    def test_with_vessels_measurements(self):
+        applicability = Applicability()
+        applicability.save()
+        vessels_measurements = VesselsMeasurements(
+            applicability=applicability,
+            vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
+            comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
+            vessels_characteristics_value=Decimal("1.1"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
+        )
+        vessels_measurements.save()
+        assert str(vessels_measurements) == f"Length Overall > 1.1 Metre"
+        assert str(applicability) == f"Length Overall > 1.1 Metre"
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        "logical_connectives,logical_operator",
+        [
+            (Applicability.LogicalConnectives.LOGICAL_DISJUNCTION, "OR"),
+            (Applicability.LogicalConnectives.LOGICAL_CONJUNCTION, "AND"),
+            (None, "-"),
+        ],
+    )
+    def test_full_with_logical_connectives(self, logical_connectives, logical_operator):
+        applicability = Applicability(
+            in_ballast=True,
+            category_of_cargo=[
+                Applicability.CategoryOfCargo.LIQUID,
+                Applicability.CategoryOfCargo.LIVESTOCK,
+                Applicability.CategoryOfCargo.HEAVY_LIFT,
+            ],
+            category_of_dangerous_or_hazardous_cargo=[
+                Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_1_DIV_1_1,
+                Applicability.CategoryOfDangerousOrHazardousCargo.HARMFUL_SUBSTANCES_IN_PACKAGED_FORM,
+                Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_3,
+            ],
+            category_of_vessel=CategoryOfVessel.TUG_AND_TOW,
+            category_of_vessel_registry=Applicability.CategoryOfVesselRegistry.DOMESTIC,
+            thickness_of_ice_capability=1,
+            vessel_performance="Your boat should be the best of the best",
+            logical_connectives=logical_connectives,
+        )
+        applicability.save()
+        assert (
+            str(applicability)
+            == f"In ballast {logical_operator} Liquid or Livestock or Heavy Lift {logical_operator} Imdg Code Class 1 Div 1 1 or Harmful Substances In Packaged Form or Imdg Code Class 3 {logical_operator} Tug And Tow {logical_operator} Domestic {logical_operator} Thickness of ice capability: 1 {logical_operator} Your boat should be the …"
+        )
 
 
 class TestVesselsCharacteristicsValue:
