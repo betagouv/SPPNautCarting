@@ -158,19 +158,20 @@ class Applicability(s100.models.InformationType):
         if self.vessel_performance:
             parts.append(Truncator(self.vessel_performance).chars(25, truncate="…"))
 
-        if self.pk and self.vessels_measurements.all():
-            return str(self.vessels_measurements.all().first())
-            parts.append(" or ".join(str(x) for x in self.vessels_measurements.all()))
-
         logical_connective = " - "
         if self.logical_connectives == self.LogicalConnectives.LOGICAL_CONJUNCTION:
             logical_connective = " AND "
         if self.logical_connectives == self.LogicalConnectives.LOGICAL_DISJUNCTION:
             logical_connective = " OR "
 
+        if self.pk and self.vessels_measurements.all():
+            parts.append(
+                logical_connective.join(str(x) for x in self.vessels_measurements.all())
+            )
+
         if not parts:
             return super().__str__()
-        return logical_connective.join(parts)
+        return ", ".join(parts)
 
     class Meta:
         verbose_name_plural = "Applicabilities"

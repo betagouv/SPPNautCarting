@@ -140,7 +140,6 @@ class TestApplicabilityStr:
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
         vessels_measurements.save()
-        assert str(vessels_measurements) == f"Length Overall > 1.1 Metre"
         assert str(applicability) == f"Length Overall > 1.1 Metre"
 
     @pytest.mark.django_db
@@ -152,7 +151,42 @@ class TestApplicabilityStr:
             (None, "-"),
         ],
     )
-    def test_full_with_logical_connectives(self, logical_connectives, logical_operator):
+    def test_with_multiple_vessels_measurements(
+        self, logical_connectives, logical_operator
+    ):
+        applicability = Applicability.objects.create(
+            logical_connectives=logical_connectives
+        )
+        VesselsMeasurements.objects.create(
+            applicability=applicability,
+            vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
+            comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
+            vessels_characteristics_value=Decimal("1.1"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
+        )
+        VesselsMeasurements.objects.create(
+            applicability=applicability,
+            vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
+            comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
+            vessels_characteristics_value=Decimal("1.2"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
+        )
+
+        assert (
+            str(applicability)
+            == f"Length Overall > 1.1 Metre {logical_operator} Length Overall > 1.2 Metre"
+        )
+
+    @pytest.mark.django_db
+    @pytest.mark.parametrize(
+        "logical_connectives,logical_operator",
+        [
+            (Applicability.LogicalConnectives.LOGICAL_DISJUNCTION, "OR"),
+            (Applicability.LogicalConnectives.LOGICAL_CONJUNCTION, "AND"),
+            (None, "-"),
+        ],
+    )
+    def test_full(self, logical_connectives, logical_operator):
         applicability = Applicability(
             in_ballast=True,
             category_of_cargo=[
@@ -172,9 +206,30 @@ class TestApplicabilityStr:
             logical_connectives=logical_connectives,
         )
         applicability.save()
+        VesselsMeasurements.objects.create(
+            applicability=applicability,
+            vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
+            comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
+            vessels_characteristics_value=Decimal("1.1"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
+        )
+        VesselsMeasurements.objects.create(
+            applicability=applicability,
+            vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
+            comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
+            vessels_characteristics_value=Decimal("1.2"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
+        )
+
         assert (
-            str(applicability)
-            == f"In ballast {logical_operator} Liquid or Livestock or Heavy Lift {logical_operator} Imdg Code Class 1 Div 1 1 or Harmful Substances In Packaged Form or Imdg Code Class 3 {logical_operator} Tug And Tow {logical_operator} Domestic {logical_operator} Thickness of ice capability: 1 {logical_operator} Your boat should be the …"
+            str(applicability) == f"In ballast, "
+            f"Liquid or Livestock or Heavy Lift, "
+            f"Imdg Code Class 1 Div 1 1 or Harmful Substances In Packaged Form or Imdg Code Class 3, "
+            f"Tug And Tow, "
+            f"Domestic, "
+            f"Thickness of ice capability: 1, "
+            f"Your boat should be the …, "
+            f"Length Overall > 1.1 Metre {logical_operator} Length Overall > 1.2 Metre"
         )
 
 
