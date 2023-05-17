@@ -2,9 +2,11 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 
 import s100.models
+from carting.fields import ChoiceArrayField
 from s127.models.feature_type import PilotageDistrict
+from s127.models.organisation_contact_area import PilotBoardingPlace
 
-from .shared import BOOLEAN_CHOICES, ChoiceArrayField, ReportableServiceArea
+from .shared import BOOLEAN_CHOICES, ReportableServiceArea
 
 
 class PilotService(ReportableServiceArea):
@@ -39,6 +41,7 @@ class PilotService(ReportableServiceArea):
         null=True,
         help_text="An area within which a pilotage direction exists.",
     )
+    pilot_boarding_places = models.ManyToManyField(PilotBoardingPlace)
     category_of_pilot = ChoiceArrayField(
         base_field=models.CharField(
             max_length=255,

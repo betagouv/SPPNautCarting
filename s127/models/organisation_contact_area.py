@@ -3,7 +3,9 @@ from django.contrib.gis.geos import GeometryCollection, Point, Polygon
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 
-from .shared import CategoryOfVessel, ChoiceArrayField, OrganisationContactArea
+from carting.fields import ChoiceArrayField
+
+from .shared import CategoryOfVessel, OrganisationContactArea
 
 
 def validate_point_or_surface(collection: GeometryCollection):

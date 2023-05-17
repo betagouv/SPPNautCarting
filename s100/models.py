@@ -65,9 +65,7 @@ class FeatureName(GenericComplexAttributeType):
     )
 
     def __str__(self):
-        return f"{self.language} - {self.name}" + (
-            " - display" if self.display_name else ""
-        )
+        return f"{self.name} ({'✓ ' if self.display_name else ''}{self.language})"
 
     class Meta:
         constraints = [
@@ -89,6 +87,9 @@ class Information(GenericComplexAttributeType):
     language = models.CharField(max_length=3, choices=ISO639_3.choices)
     headline = models.CharField(max_length=255, blank=True)
     text = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.language} - {self.headline}"
 
 
 class TextContent(GenericComplexAttributeType):
@@ -112,6 +113,12 @@ class FeatureType(models.Model):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        if feature_name := self.feature_names.order_by("-display_name").first():
+            return str(feature_name)
+
+        return super().__str__()
 
 
 class InformationType(models.Model):
