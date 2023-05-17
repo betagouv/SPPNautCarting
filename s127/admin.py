@@ -56,7 +56,7 @@ class PilotServiceInlineMixin:
 
 
 class FullPilotServiceInline(PilotServiceInlineMixin, FeatureTypeInline):
-    exclude = ["pilot_boarding_places", "geometry"]
+    exclude = ["geometry"]
 
 
 class SimplePilotServiceInline(
