@@ -3,6 +3,7 @@ from typing import cast
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.helpers import AdminForm
 from django.contrib.gis.admin import GISModelAdmin
 from django.urls import reverse
 from django.utils.html import format_html_join
@@ -51,35 +52,35 @@ class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
             list[forms.BaseInlineFormSet],
             context["inline_admin_formsets"],
         )
-        admin_fieldsets = context["adminform"]
-        fieldsets_and_inlines_order = (
-            admin_fieldsets.model_admin.fieldsets_and_inlines_order
-        )
+        adminform = cast(AdminForm, context["adminform"])
+        fieldsets_and_inlines_order = adminform.model_admin.fieldsets_and_inlines_order
 
         fieldsets_and_inlines = []
         for fieldset_or_inline in fieldsets_and_inlines_order:
-            fieldsets_and_inlines.extend(
-                fieldset.name
-                for fieldset in admin_fieldsets
-                if fieldset.name == fieldset_or_inline
-            )
-            fieldsets_and_inlines.extend(
-                formset
-                for formset in admin_inlines_formsets
-                if isinstance(formset.opts, fieldset_or_inline)
-            )
+            match fieldset_or_inline:
+                case str() | None:
+                    fieldsets_and_inlines.extend(
+                        fieldset
+                        for fieldset in adminform
+                        if fieldset.name == fieldset_or_inline
+                    )
+                case _:
+                    fieldsets_and_inlines.extend(
+                        formset
+                        for formset in admin_inlines_formsets
+                        if isinstance(formset.opts, fieldset_or_inline)
+                    )
 
         fieldsets_and_inlines.extend(
-            filter(
-                lambda x: x.name not in fieldsets_and_inlines_order,
-                admin_fieldsets,
-            )
+            fieldset
+            for fieldset in adminform
+            if fieldset.name not in fieldsets_and_inlines_order
         )
+
         fieldsets_and_inlines.extend(
-            filter(
-                lambda x: x.opts.verbose_name not in fieldsets_and_inlines_order,
-                admin_inlines_formsets,
-            )
+            formset
+            for formset in admin_inlines_formsets
+            if type(formset.opts) not in fieldsets_and_inlines_order
         )
 
         return fieldsets_and_inlines
