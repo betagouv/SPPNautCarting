@@ -151,7 +151,19 @@ class FullPilotageAdmin(
 ):
     search_fields = ["id"]
     inlines = [FullPilotServiceInline]
-    fieldsets_and_inlines_order = (FeatureNameInline,)
+    fieldsets_and_inlines_order = (
+        FeatureNameInline,
+        "communication channel",
+        "geometry",
+        FullPilotServiceInline,
+    )
+    fieldsets = [
+        ("communication channel", {"fields": ["communication_channel"]}),
+        ("geometry", {"fields": ["geometry"]}),
+    ]
+
+
+# FIXME : Les géométries à part c'est cool parce que la carte attire l'attention
 
 
 @admin.register(s127.models.PilotService)
