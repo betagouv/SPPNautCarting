@@ -277,7 +277,10 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
             return (
                 f"{self.VesselsCharacteristics(self.vessels_characteristics).label} "
                 f"{self.ComparisonOperator(self.comparison_operator).label} "
-                f"{self.vessels_characteristics_value} "
+                # .normalize() is required on a decimal value to remove trailing zeros.
+                # It prevents variation between the output of the decimal value when the
+                # object has been fetched from the database or directly instantiated.
+                f"{self.vessels_characteristics_value.normalize()} "
                 f"{self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).label}"
             )
         return super().__str__()
