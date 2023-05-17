@@ -23,3 +23,4 @@ class TextContentInline(nested_admin.NestedGenericStackedInline):
     inlines = [InformationInline]
     extra = 0
     max_num = 1
+    # classes = ["collapse"] FIXME
