@@ -1,13 +1,8 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
-<<<<<<< HEAD
-||||||| parent of a7ac090 (Contact Details Modelization)
-from django.core.exceptions import ValidationError
-=======
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
->>>>>>> a7ac090 (Contact Details Modelization)
 from django.core.validators import MinValueValidator
 from django.utils.text import Truncator
 

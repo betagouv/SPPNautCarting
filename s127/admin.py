@@ -18,16 +18,16 @@ class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
 
 
 class ContactAddressInline(admin.StackedInline):
-    model = models.ContactAddress
+    model = s127.models.ContactAddress
     extra = 0
 
 
 class TelecommunicationsInline(admin.StackedInline):
-    model = models.Telecommunications
+    model = s127.models.Telecommunications
     extra = 1
 
 
-@admin.register(models.ContactDetails)
+@admin.register(s127.models.ContactDetails)
 class ContactDetailsAdmin(admin.ModelAdmin):
     search_fields = ["id"]
     inlines = [TelecommunicationsInline, ContactAddressInline, InformationInline]
@@ -39,7 +39,17 @@ class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
     extra = 0
 
 
-class FeatureTypePermissionTypeInline(GenericTabularInline):
+class SrvContactInline(nested_admin.NestedGenericTabularInline):
+    ct_field = "feature_content_type"
+    ct_fk_field = "feature_object_id"
+    model = s127.models.SrvContact
+
+    min_num = 0
+    extra = 0
+    autocomplete_fields = ["contact_details"]
+
+
+class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     ct_field = "feature_content_type"
     ct_fk_field = "feature_object_id"
     model = s127.models.PermissionType
@@ -104,7 +114,7 @@ class ReportableServiceAreaAdmin(admin.ModelAdmin):
     inlines.extend(SupervisedAreaAdmin.inlines)
 
 
-@admin.register(models.PilotageDistrict)
+@admin.register(s127.models.PilotageDistrict)
 class PilotageDistrictAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
     search_fields = ["id"]
 
@@ -139,11 +149,15 @@ class FullPilotageAdmin(
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
+# FIXME Add ContactInline
+# FIXME Ajouter dans les inlines du simple et full form
 @admin.register(s127.models.PilotService)
 class PilotServiceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
 
 
+# FIXME Add ContactInline
+# FIXME Ajouter dans les inlines du simple et full form
 @admin.register(s127.models.PilotBoardingPlace)
 class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
     search_fields = ["id"]
