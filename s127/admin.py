@@ -96,11 +96,7 @@ class SimplePilotageAdmin(
     ]
 
     inlines = [SimplePilotServiceInline] + FeatureTypeAdmin.inlines
-    fieldsets_and_inlines_order = (
-        FeatureNameInline,
-        # FIXME: On n'a pas besoin du None aujourd'hui mais avant de merger, écrivons un test ou décidons de ne pas supporter ce cas
-        # None,
-    )
+    fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 @admin.register(s127.models.FullPilotageDistrictProxy)
@@ -109,11 +105,7 @@ class FullPilotageAdmin(
 ):
     search_fields = ["id"]
     inlines = FeatureTypeInlinesMixin.inlines + [FullPilotServiceInline]
-    fieldsets_and_inlines_order = (
-        FeatureNameInline,
-        # FIXME: On n'a pas besoin du None aujourd'hui mais avant de merger, écrivons un test ou décidons de ne pas supporter ce cas
-        # None,
-    )
+    fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 @admin.register(s127.models.PilotService)
