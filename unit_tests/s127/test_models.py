@@ -23,25 +23,25 @@ class TestVesselsMeasurementsStr:
 
     @pytest.fixture
     def basic_vessels_measurements(self, saved_applicability):
-        return VesselsMeasurements(
+        basic_vessels_measurements = VesselsMeasurements(
             applicability=saved_applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
             vessels_characteristics_value=Decimal("1.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
+        basic_vessels_measurements.save()
+        return basic_vessels_measurements
 
     def test_empty(self):
         assert str(VesselsMeasurements()) == "VesselsMeasurements object (None)"
 
     @pytest.mark.django_db
     def test_basic(self, basic_vessels_measurements):
-        basic_vessels_measurements.save()
         assert str(basic_vessels_measurements) == f"Length Overall > 1.1 Metre"
 
     @pytest.mark.django_db
     def test_str_instanciate_vs_from_db(self, basic_vessels_measurements):
-        basic_vessels_measurements.save()
         basic_vessels_measurements_instanciated_str = str(basic_vessels_measurements)
         basic_vessels_measurements.refresh_from_db()
         assert basic_vessels_measurements_instanciated_str == str(
