@@ -1,4 +1,40 @@
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = ["setuptools", "wheel"] # PEP 508 specifications.
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"
 env_files = [".env.template"]
 addopts = "--reuse-db"
+
+[project]
+name = "sppnaut"
+version = "0.1"
+dependencies = [
+    "Django",
+    "django-extensions",
+    "django-nested-admin",
+    "django-tree-queries",
+    "lxml",
+    "natsort",
+    "psycopg2",
+    "python-decouple",
+    "requests",
+    "sentry-sdk",
+    "whitenoise",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "django-browser-reload",
+    "django-debug-toolbar",
+    "honcho",
+    "pytest",
+    "pytest-django",
+    "pytest-dotenv",
+    "requests-mock",
+]
+
+[tool.setuptools]
+packages = ["carting", "core", "home", "s100", "s127", "spo"]
