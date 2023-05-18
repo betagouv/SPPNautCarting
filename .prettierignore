@@ -8,6 +8,7 @@ __pycache__
 static/collected
 static/compiled
 node_modules
+*.egg-info
 
 # Directories that include a .gitignore
 .*_cache
