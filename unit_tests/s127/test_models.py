@@ -20,17 +20,20 @@ class TestVesselsMeasurementsStr:
 
     @pytest.mark.django_db
     def test_basic(self):
-        applicability = Applicability()
-        applicability.save()
-        vessels_measurements = VesselsMeasurements(
-            applicability=applicability,
+        vessels_measurements = VesselsMeasurements.objects.create(
+            applicability=Applicability.objects.create(),
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
             vessels_characteristics_value=Decimal("1.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
         vessels_measurements.save()
-        assert str(vessels_measurements) == f"Length Overall > 1.1 Metre"
+        assert str(vessels_measurements) == "Length Overall > 1.1 Metre"
+
+        str_from_memory = str(vessels_measurements)
+        vessels_measurements.refresh_from_db()
+        str_from_db = str(vessels_measurements)
+        assert str_from_db == str_from_memory
 
 
 class TestApplicabilityStr:
@@ -128,7 +131,6 @@ class TestApplicabilityStr:
         applicability.save()
         assert str(applicability) == "Your boat should be the …"
 
-    @pytest.mark.xfail
     @pytest.mark.django_db
     def test_with_vessels_measurements(self):
         applicability = Applicability()
@@ -141,9 +143,8 @@ class TestApplicabilityStr:
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
         vessels_measurements.save()
-        assert str(applicability) == f"Length Overall > 1.1 Metre"
+        assert str(applicability) == "Length Overall > 1.1 Metre"
 
-    @pytest.mark.xfail
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "logical_connectives,logical_operator",
@@ -179,7 +180,6 @@ class TestApplicabilityStr:
             == f"Length Overall > 1.1 Metre {logical_operator} Length Overall > 1.2 Metre"
         )
 
-    @pytest.mark.xfail
     @pytest.mark.django_db
     @pytest.mark.parametrize(
         "logical_connectives,logical_operator",
