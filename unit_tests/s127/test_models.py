@@ -15,38 +15,25 @@ from s127.models.shared import CategoryOfVessel
 
 
 class TestVesselsMeasurementsStr:
-    @pytest.fixture
-    def saved_applicability(self):
-        applicability = Applicability()
-        applicability.save()
-        return applicability
+    def test_empty(self):
+        assert str(VesselsMeasurements()) == "VesselsMeasurements object (None)"
 
-    @pytest.fixture
-    def basic_vessels_measurements(self, saved_applicability):
-        basic_vessels_measurements = VesselsMeasurements(
-            applicability=saved_applicability,
+    @pytest.mark.django_db
+    def test_basic(self):
+        vessels_measurements = VesselsMeasurements.objects.create(
+            applicability=Applicability.objects.create(),
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
             vessels_characteristics_value=Decimal("1.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
-        basic_vessels_measurements.save()
-        return basic_vessels_measurements
+        vessels_measurements.save()
+        assert str(vessels_measurements) == "Length Overall > 1.1 Metre"
 
-    def test_empty(self):
-        assert str(VesselsMeasurements()) == "VesselsMeasurements object (None)"
-
-    @pytest.mark.django_db
-    def test_basic(self, basic_vessels_measurements):
-        assert str(basic_vessels_measurements) == f"Length Overall > 1.1 Metre"
-
-    @pytest.mark.django_db
-    def test_str_instanciate_vs_from_db(self, basic_vessels_measurements):
-        basic_vessels_measurements_instanciated_str = str(basic_vessels_measurements)
-        basic_vessels_measurements.refresh_from_db()
-        assert basic_vessels_measurements_instanciated_str == str(
-            basic_vessels_measurements
-        )
+        str_from_memory = str(vessels_measurements)
+        vessels_measurements.refresh_from_db()
+        str_from_db = str(vessels_measurements)
+        assert str_from_db == str_from_memory
 
 
 class TestApplicabilityStr:
@@ -156,7 +143,7 @@ class TestApplicabilityStr:
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
         vessels_measurements.save()
-        assert str(applicability) == f"Length Overall > 1.1 Metre"
+        assert str(applicability) == "Length Overall > 1.1 Metre"
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
