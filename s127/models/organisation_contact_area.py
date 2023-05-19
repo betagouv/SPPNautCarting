@@ -87,6 +87,7 @@ class PilotBoardingPlace(OrganisationContactArea):
         help_text="Classification of vessels by function or use",
     )
 
+    # https://github.com/betagouv/SPPNautInterface/issues/261
     communication_channel = ArrayField(
         models.CharField(max_length=255),
         default=list,

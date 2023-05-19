@@ -326,6 +326,7 @@ class ContactDetails(s100.models.InformationType):
         # No description in XSD
     )
 
+    # https://github.com/betagouv/SPPNautInterface/issues/261
     communication_channel = ArrayField(
         models.CharField(max_length=255),
         default=list,
