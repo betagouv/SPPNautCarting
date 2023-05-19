@@ -10,7 +10,12 @@ from django.contrib.gis.geos import (
 )
 from django.core.exceptions import ValidationError
 
-from s127.models import Applicability, PilotBoardingPlace, VesselsMeasurements
+from s127.models import (
+    Applicability,
+    ContactDetails,
+    PilotBoardingPlace,
+    VesselsMeasurements,
+)
 from s127.models.shared import CategoryOfVessel
 
 
@@ -325,3 +330,37 @@ class TestPilotBoardingPlaceGeometry:
             field: [error.code for error in error_list]
             for field, error_list in excinfo.value.error_dict.items()
         } == {"geometry": ["point_or_surface"]}
+
+
+class TestContactDetailsMMSICode:
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "123456789",
+            "",
+            "000000000",
+        ],
+    )
+    def test_accepts(self, value):
+        assert (
+            ContactDetails(mmsi_code=value).clean_fields(exclude=["language"]) == None
+        )
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            000000000,
+            "coucou",
+            "12345678",
+            "1234561.8",
+            "1234567810",
+        ],
+    )
+    def test_rejects(self, value):
+        with pytest.raises(ValidationError) as excinfo:
+            ContactDetails(mmsi_code=value).clean_fields(exclude=["language"])
+
+        assert {
+            field: [error.code for error in error_list]
+            for field, error_list in excinfo.value.error_dict.items()
+        } == {"mmsi_code": ["invalid"]}

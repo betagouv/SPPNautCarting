@@ -354,7 +354,6 @@ class ContactDetails(s100.models.InformationType):
         blank=True,
         null=True,
         help_text="The Maritime Mobile Service Identity (MMSI) Code is formed of a series of nine digits which are transmitted over the radio path in order to uniquely identify ship stations, ship earth stations, coast stations, coast earth stations, and group calls. These identities are formed in such a way that the identity or part thereof can be used by telephone and telex subscribers connected to the general telecommunications network principally to call ships automatically.",
-        # FIXME: write a test
         validators=[RegexValidator(regex=r"^\d{9}$")],
     )
 
@@ -367,7 +366,6 @@ class ContactDetails(s100.models.InformationType):
 # PDF page 39
 class SrvContact(s100.models.GenericManyToMany):
     # ManyToMany
-    # FIXME Rename `feature` to `organisation`
     contactable_content_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE, related_name="+"
     )
