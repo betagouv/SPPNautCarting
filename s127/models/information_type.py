@@ -389,10 +389,9 @@ class ContactAddress(s100.models.ComplexAttributeType):
         ContactDetails, on_delete=models.CASCADE, related_name="contact_addresses"
     )
 
-    delivery_point = ArrayField(
-        models.CharField(max_length=255),
-        default=list,
+    delivery_point = models.TextField(
         blank=True,
+        null=True,
         help_text="Details of where post can be delivered such as the apartment, name and/or number of a street, building or PO Box.",
     )
 
