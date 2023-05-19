@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from carting.fields import ChoiceArrayField
 
-from .shared import CategoryOfVessel, OrganisationContactArea
+from .shared import CategoryOfVessel, ContactableArea
 
 
 def validate_point_or_surface(collection: GeometryCollection):
@@ -13,7 +13,7 @@ def validate_point_or_surface(collection: GeometryCollection):
         raise ValidationError(message="OH MY GOD !", code="point_or_surface")
 
 
-class PilotBoardingPlace(OrganisationContactArea):
+class PilotBoardingPlace(ContactableArea):
     class CategoryOfPilotBoardingPlace(models.TextChoices):
         # fmt: off
         BOARDING_BY_PILOT_CRUISING_VESSEL = "boarding by pilot-cruising vessel" # Pilot boards from a cruising vessel.

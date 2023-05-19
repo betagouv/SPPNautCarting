@@ -1,12 +1,15 @@
 import s100.models
 
 
-class OrganisationContactArea(s100.models.FeatureType):
+class _OrganisationContactArea(s100.models.FeatureType):
     class Meta:
         abstract = True
 
 
-class SupervisedArea(OrganisationContactArea):
+ContactableArea = _OrganisationContactArea
+
+
+class SupervisedArea(ContactableArea):
     class Meta:
         abstract = True
 

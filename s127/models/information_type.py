@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.utils.text import Truncator
 
 import s100.models
@@ -341,12 +341,10 @@ class ContactDetails(s100.models.InformationType):
         help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
     )
 
-    information = GenericRelation(s100.models.Information)
-
+    # Language is not mandatory in the spec. We think it's because the language can be defined once at the XML root level and then is implied.
+    # We make it mandatory because we need to know explicitly.
     language = models.CharField(
         max_length=3,
-        blank=True,
-        null=True,
         choices=s100.models.ISO639_3.choices,
         # No description in XSD
     )
@@ -356,21 +354,27 @@ class ContactDetails(s100.models.InformationType):
         blank=True,
         null=True,
         help_text="The Maritime Mobile Service Identity (MMSI) Code is formed of a series of nine digits which are transmitted over the radio path in order to uniquely identify ship stations, ship earth stations, coast stations, coast earth stations, and group calls. These identities are formed in such a way that the identity or part thereof can be used by telephone and telex subscribers connected to the general telecommunications network principally to call ships automatically.",
+        # FIXME: write a test
+        validators=[RegexValidator(regex=r"^\d{9}$")],
     )
+
+    information = GenericRelation(s100.models.Information)
 
     class Meta:
         verbose_name_plural = "Contact Details"
 
 
+# PDF page 39
 class SrvContact(s100.models.GenericManyToMany):
     # ManyToMany
     # FIXME Rename `feature` to `organisation`
-    # FIXME Veut-on une dépendance pour les GM2M vu le nombre qu'on va devoir créer ?
-    feature_content_type = models.ForeignKey(
+    contactable_content_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE, related_name="+"
     )
-    feature_object_id = models.BigIntegerField()
-    feature_object = GenericForeignKey("feature_content_type", "feature_object_id")
+    contactable_object_id = models.BigIntegerField()
+    contactable_object = GenericForeignKey(
+        "contactable_content_type", "contactable_object_id"
+    )
     contact_details = models.ForeignKey(ContactDetails, on_delete=models.CASCADE)
 
 

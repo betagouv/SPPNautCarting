@@ -40,8 +40,8 @@ class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
 
 
 class SrvContactInline(nested_admin.NestedGenericTabularInline):
-    ct_field = "feature_content_type"
-    ct_fk_field = "feature_object_id"
+    ct_field = "contactable_content_type"
+    ct_fk_field = "contactable_object_id"
     model = s127.models.SrvContact
 
     min_num = 0
@@ -84,11 +84,11 @@ class FeatureTypeInline(FeatureTypeInlinesMixin, nested_admin.NestedStackedInlin
     pass
 
 
-class OrganisationContactAreaAdmin(FeatureTypeAdmin):
+class ContactableAreaAdmin(FeatureTypeAdmin):
     inlines = [SrvContactInline]
 
 
-class SupervisedAreaAdmin(OrganisationContactAreaAdmin):
+class SupervisedAreaAdmin(ContactableAreaAdmin):
     pass
 
 
