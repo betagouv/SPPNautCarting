@@ -363,6 +363,8 @@ class ContactDetails(s100.models.InformationType):
 
 class SrvContact(s100.models.GenericManyToMany):
     # ManyToMany
+    # FIXME Rename `feature` to `organisation`
+    # FIXME Veut-on une dépendance pour les GM2M vu le nombre qu'on va devoir créer ?
     feature_content_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE, related_name="+"
     )

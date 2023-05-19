@@ -59,7 +59,16 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     autocomplete_fields = ["applicability"]
 
 
-class FeatureTypeInlinesMixin:
+# FIXME: Write tests, better variable names
+class AccumulatedInlines:
+    def get_inlines(self, *args, **kwargs):
+        foo = []
+        for bar in type(self).mro():
+            foo.extend(getattr(bar, "inlines", []))
+        return list(dict.fromkeys(foo).keys())
+
+
+class FeatureTypeInlinesMixin(AccumulatedInlines):
     inlines = [
         FeatureNameInline,
         FeatureTypePermissionTypeInline,
@@ -72,6 +81,18 @@ class FeatureTypeAdmin(FeatureTypeInlinesMixin, nested_admin.NestedModelAdmin):
 
 
 class FeatureTypeInline(FeatureTypeInlinesMixin, nested_admin.NestedStackedInline):
+    pass
+
+
+class OrganisationContactAreaAdmin(FeatureTypeAdmin):
+    inlines = [SrvContactInline]
+
+
+class SupervisedAreaAdmin(OrganisationContactAreaAdmin):
+    pass
+
+
+class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
     pass
 
 
@@ -99,21 +120,6 @@ class ApplicabilityAdmin(nested_admin.NestedModelAdmin, GISModelAdminWithRasterM
     inlines = [InformationInline, VesselsMeasurementsInline]
 
 
-class OrganisationContactAreaAdmin(admin.ModelAdmin):
-    inlines = [SrvContactInline]
-    inlines.extend(FeatureTypeAdmin.inlines)
-
-
-class SupervisedAreaAdmin(admin.ModelAdmin):
-    inlines = []
-    inlines.extend(OrganisationContactAreaAdmin.inlines)
-
-
-class ReportableServiceAreaAdmin(admin.ModelAdmin):
-    inlines = []
-    inlines.extend(SupervisedAreaAdmin.inlines)
-
-
 @admin.register(s127.models.PilotageDistrict)
 class PilotageDistrictAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
     search_fields = ["id"]
@@ -136,7 +142,7 @@ class SimplePilotageAdmin(
         ),
     ]
 
-    inlines = [SimplePilotServiceInline] + FeatureTypeAdmin.inlines
+    inlines = [SimplePilotServiceInline]
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
@@ -145,19 +151,17 @@ class FullPilotageAdmin(
     ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
 ):
     search_fields = ["id"]
-    inlines = FeatureTypeInlinesMixin.inlines + [FullPilotServiceInline]
+    inlines = [FullPilotServiceInline]
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
-# FIXME Add ContactInline
-# FIXME Ajouter dans les inlines du simple et full form
 @admin.register(s127.models.PilotService)
-class PilotServiceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
+class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
 
 
-# FIXME Add ContactInline
-# FIXME Ajouter dans les inlines du simple et full form
 @admin.register(s127.models.PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
+class PilotBoardingPlaceAdmin(
+    GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin
+):
     search_fields = ["id"]
