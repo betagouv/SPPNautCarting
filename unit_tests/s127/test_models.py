@@ -147,10 +147,10 @@ class TestApplicabilityStr:
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("2.1"),
+            vessels_characteristics_value=Decimal("1.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
-        assert str(applicability) == "Length Overall > 2.1 Metres"
+        assert str(applicability) == "Length Overall > 1.1 Metre"
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
@@ -171,20 +171,20 @@ class TestApplicabilityStr:
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("3.1"),
+            vessels_characteristics_value=Decimal("1.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
         VesselsMeasurements.objects.create(
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("4.2"),
-            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.FOOT,
+            vessels_characteristics_value=Decimal("1.2"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
 
         assert (
             str(applicability)
-            == f"Length Overall > 3.1 Metres {logical_operator} Length Overall > 4.2 Feet"
+            == f"Length Overall > 1.1 Metre {logical_operator} Length Overall > 1.2 Metre"
         )
 
     @pytest.mark.django_db
