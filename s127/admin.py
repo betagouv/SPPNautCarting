@@ -267,8 +267,43 @@ class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmi
 
 
 @admin.register(s127.models.PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, ContactableAreaAdmin):
+class PilotBoardingPlaceAdmin(
+    ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, ContactableAreaAdmin
+):
     search_fields = ["id"]
+    fieldsets_and_inlines_order = (
+        FeatureNameInline,
+        "Geometry",
+        "Communication",
+        "Details",
+    )
+
+    fieldsets = (
+        (
+            "Communication",
+            {
+                "fields": (
+                    "communication_channel",
+                    "call_sign",
+                ),
+            },
+        ),
+        (
+            "Details",
+            {
+                "fields": (
+                    "category_of_pilot_boarding_place",
+                    "category_of_preference",
+                    "category_of_vessel",
+                    "destination",
+                    "pilot_movement",
+                    "pilot_vessel",
+                    "status",
+                ),
+            },
+        ),
+        ("Geometry", {"fields": ["geometry"]}),
+    )
 
 
 @admin.register(s127.models.FullPilotServiceProxy)
