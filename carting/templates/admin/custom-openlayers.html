@@ -1,14 +1,19 @@
 {% extends "gis/openlayers-osm.html" %}
 {% load i18n l10n %}
 
+{% block options %}{{ block.super }}
+options['map_epsg'] = '{{ map_epsg }}';
+options['dataset_epsg'] = '{{ dataset_epsg }}';
+{% endblock %}
+
 {% block base_layer %}
 const {{ module }}_layers = [
     // We keep RASTER_MARINE_50_WMSR_3857 because RASTER_MARINE_3857_WMSR is missing tiles at high zoom levels
     { layer: "RASTER_MARINE_50_WMSR_3857", minZoom: 13 },
     { layer: "RASTER_MARINE_3857_WMSR" },
-];
+]
 
-const {{ module }}_base_layer = {{ module }}_layers.map(({ layer, minZoom }) => {
+var base_layer = {{ module }}_layers.map(({ layer, minZoom }) => {
     return new ol.layer.Tile({
         source: new ol.source.TileWMS({
             url: "https://services.data.shom.fr/u2kejlcaaf2ar8v69kvvqef6/wms/r",
@@ -18,9 +23,9 @@ const {{ module }}_base_layer = {{ module }}_layers.map(({ layer, minZoom }) => 
         preload: Infinity,
         minZoom,
     })
-});
+})
 {% endblock base_layer %}
-
+{% comment %}
 {% block options %}
 var options = {
     base_layer: {{ module }}_base_layer,
@@ -31,8 +36,10 @@ var options = {
     name: '{{ name }}',
     map_epsg: '{{ map_epsg }}',
     dataset_epsg:  '{{ dataset_epsg }}'
-};
+}
 
 console.log({ options })
 
 {% endblock %}
+
+{% endcomment %}
