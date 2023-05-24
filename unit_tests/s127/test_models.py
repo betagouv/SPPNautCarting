@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 
 from s100.admin import TextContentInline
 from s127.admin import (
+    AccumulatedInlines,
     ContactableAreaAdmin,
     FeatureTypeAdmin,
     PilotBoardingPlaceAdmin,
@@ -87,7 +88,6 @@ class TestApplicabilityStr:
 
     @pytest.mark.django_db
     def test_with_dangerous_or_hazardous_cargo(self):
-        "FIXME est-ce qu'on veut tester le non multiple ?"
         applicability = Applicability.objects.create(
             category_of_dangerous_or_hazardous_cargo=[
                 Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_1_DIV_1_1
@@ -367,11 +367,31 @@ class TestContactDetailsMMSICode:
         } == {"mmsi_code": ["invalid"]}
 
 
-class TestAdminInlinesOrder:
-    pilot_boarding_place = PilotBoardingPlaceAdmin(PilotBoardingPlace, AdminSite())
+class TestAccumulatedInlines:
+    class ParentInline(AccumulatedInlines):
+        inlines = [1, 2]
 
-    assert len(pilot_boarding_place.get_inlines()) == (
-        len(ContactableAreaAdmin.inlines) + len(FeatureTypeAdmin.inlines)
-    )
-    assert pilot_boarding_place.get_inlines()[-1] == TextContentInline
-    assert pilot_boarding_place.get_inlines()[0] == SrvContactInline
+    class ChildInline(ParentInline):
+        pass
+
+    class GrandChildInline(ChildInline):
+        inlines = [1, 3]
+
+    def test_get_inlines(self):
+        assert self.ParentInline().get_inlines() == [1, 2]
+
+    def test_get_inlines_on_inherited_inline(self):
+        assert self.ChildInline().get_inlines() == [1, 2]
+
+    def test_last_inherited_inlines_go_first(self):
+        assert (
+            self.GrandChildInline().get_inlines()[0] == self.GrandChildInline.inlines[0]
+        )
+
+    def test_parent_inlines_go_last(self):
+        assert (
+            self.GrandChildInline().get_inlines()[-1] == self.ParentInline.inlines[-1]
+        )
+
+    def test_get_inlines_with_accumulated_inlines(self):
+        assert self.GrandChildInline().get_inlines() == [1, 3, 2]
