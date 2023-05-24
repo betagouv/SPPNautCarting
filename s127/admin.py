@@ -59,13 +59,12 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     autocomplete_fields = ["applicability"]
 
 
-# FIXME: Write tests, better variable names
 class AccumulatedInlines:
     def get_inlines(self, *args, **kwargs):
-        foo = []
-        for bar in type(self).mro():
-            foo.extend(getattr(bar, "inlines", []))
-        return list(dict.fromkeys(foo).keys())
+        accumulated_inlines = []
+        for parent_class in type(self).mro():
+            accumulated_inlines.extend(getattr(parent_class, "inlines", []))
+        return list(dict.fromkeys(accumulated_inlines).keys())
 
 
 class FeatureTypeInlinesMixin(AccumulatedInlines):
@@ -161,7 +160,5 @@ class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmi
 
 
 @admin.register(s127.models.PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(
-    GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin
-):
+class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, ContactableAreaAdmin):
     search_fields = ["id"]

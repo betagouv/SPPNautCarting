@@ -236,6 +236,14 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
         SUEZ_CANAL_GROSS_TONNAGE = "Suez Canal Gross Tonnage" # The Suez Canal Gross Tonnage (SCGT) is derived with a number of modifications from the former net register tonnage of the Moorsom System and was established by the International Commission of Constantinople in its Protocol of 18 December 1873. It is still in use, as amended by the Rules of Navigation of the Suez Canal Authority, and is registered in the Suez Canal Tonnage Certificate.
         # fmt: on
 
+        def pluralize(self):
+            if self.value == self.FOOT:
+                return "Feet"
+            # https://github.com/betagouv/SPPNautInterface/issues/270
+            if self.value in (self.CUBIC_METRES, self.NONE):
+                return self.label
+            return f"{self.label}s"
+
     class VesselsCharacteristics(models.TextChoices):
         # fmt: off
         LENGTH_OVERALL = "length overall" # The maximum length of the ship (L.O.A.). (http://en.wikipedia.org/wiki/Ship_measurements; 24 July 2010)
@@ -283,7 +291,7 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
                 # It prevents variation between the output of the decimal value when the
                 # object has been fetched from the database or directly instantiated.
                 f"{self.vessels_characteristics_value.normalize()} "
-                f"{self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).label}"
+                f"{self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).pluralize() if self.vessels_characteristics_value.normalize() >= 2 else self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).label}"
             )
         return super().__str__()
 
@@ -387,6 +395,7 @@ class ContactAddress(s100.models.ComplexAttributeType):
         ContactDetails, on_delete=models.CASCADE, related_name="contact_addresses"
     )
 
+    # https://github.com/betagouv/SPPNautInterface/issues/262
     delivery_point = models.TextField(
         blank=True,
         null=True,

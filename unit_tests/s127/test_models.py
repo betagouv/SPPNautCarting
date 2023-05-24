@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import pytest
+from django.contrib.admin.sites import AdminSite
 from django.contrib.gis.geos import (
     GeometryCollection,
     LinearRing,
@@ -10,6 +11,13 @@ from django.contrib.gis.geos import (
 )
 from django.core.exceptions import ValidationError
 
+from s100.admin import TextContentInline
+from s127.admin import (
+    ContactableAreaAdmin,
+    FeatureTypeAdmin,
+    PilotBoardingPlaceAdmin,
+    SrvContactInline,
+)
 from s127.models import (
     Applicability,
     ContactDetails,
@@ -29,10 +37,9 @@ class TestVesselsMeasurementsStr:
             applicability=Applicability.objects.create(),
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("1.1"),
+            vessels_characteristics_value=Decimal("1.100"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
-        vessels_measurements.save()
         assert str(vessels_measurements) == "Length Overall > 1.1 Metre"
 
         str_from_memory = str(vessels_measurements)
@@ -47,56 +54,56 @@ class TestApplicabilityStr:
 
     @pytest.mark.django_db
     def test_empty_saved(self):
-        applicability = Applicability()
-        applicability.save()
+        applicability = Applicability.objects.create()
         assert str(applicability) == f"Applicability object ({applicability.pk})"
 
     @pytest.mark.django_db
     def test_with_in_ballast_true(self):
-        applicability = Applicability(in_ballast=True)
-        applicability.save()
+        applicability = Applicability.objects.create(in_ballast=True)
         assert str(applicability) == "In ballast"
 
     @pytest.mark.django_db
     def test_with_in_ballast_false(self):
-        applicability = Applicability(in_ballast=False)
-        applicability.save()
+        applicability = Applicability.objects.create(in_ballast=False)
         assert str(applicability) == "Not in ballast"
 
     @pytest.mark.django_db
     def test_with_category_of_cargo(self):
-        applicability = Applicability(
+        applicability = Applicability.objects.create(
             category_of_cargo=[Applicability.CategoryOfCargo.LIQUID]
         )
-        applicability.save()
         assert str(applicability) == "Liquid"
 
     @pytest.mark.django_db
     def test_with_multiple_category_of_cargo(self):
-        applicability = Applicability(
+        applicability = Applicability.objects.create(
             category_of_cargo=[
                 Applicability.CategoryOfCargo.LIQUID,
                 Applicability.CategoryOfCargo.LIVESTOCK,
                 Applicability.CategoryOfCargo.HEAVY_LIFT,
             ]
         )
-        applicability.save()
         assert str(applicability) == "Liquid or Livestock or Heavy Lift"
 
     @pytest.mark.django_db
     def test_with_dangerous_or_hazardous_cargo(self):
         "FIXME est-ce qu'on veut tester le non multiple ?"
+        applicability = Applicability.objects.create(
+            category_of_dangerous_or_hazardous_cargo=[
+                Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_1_DIV_1_1
+            ]
+        )
+        assert str(applicability) == "Imdg Code Class 1 Div 1 1"
 
     @pytest.mark.django_db
     def test_with_multiple_dangerous_or_hazardous_cargo(self):
-        applicability = Applicability(
+        applicability = Applicability.objects.create(
             category_of_dangerous_or_hazardous_cargo=[
                 Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_1_DIV_1_1,
                 Applicability.CategoryOfDangerousOrHazardousCargo.HARMFUL_SUBSTANCES_IN_PACKAGED_FORM,
                 Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_3,
             ]
         )
-        applicability.save()
         assert (
             str(applicability)
             == "Imdg Code Class 1 Div 1 1 or Harmful Substances In Packaged Form or Imdg Code Class 3"
@@ -104,51 +111,46 @@ class TestApplicabilityStr:
 
     @pytest.mark.django_db
     def test_with_category_of_vessel(self):
-        applicability = Applicability(category_of_vessel=CategoryOfVessel.TUG_AND_TOW)
-        applicability.save()
+        applicability = Applicability.objects.create(
+            category_of_vessel=CategoryOfVessel.TUG_AND_TOW
+        )
         assert str(applicability) == "Tug And Tow"
 
     @pytest.mark.django_db
     def test_with_category_of_vessel_registry(self):
-        applicability = Applicability(
+        applicability = Applicability.objects.create(
             category_of_vessel_registry=Applicability.CategoryOfVesselRegistry.DOMESTIC
         )
-        applicability.save()
         assert str(applicability) == "Domestic"
 
     @pytest.mark.django_db
     def test_with_thickness_of_ice_capability(self):
-        applicability = Applicability(thickness_of_ice_capability=1)
-        applicability.save()
+        applicability = Applicability.objects.create(thickness_of_ice_capability=1)
         assert str(applicability) == "Thickness of ice capability: 1"
 
     @pytest.mark.django_db
     def test_with_vessel_performance(self):
-        applicability = Applicability(vessel_performance="Cool boat")
-        applicability.save()
+        applicability = Applicability.objects.create(vessel_performance="Cool boat")
         assert str(applicability) == "Cool boat"
 
     @pytest.mark.django_db
     def test_with_vessel_performance_greather_than_25_char(self):
-        applicability = Applicability(
+        applicability = Applicability.objects.create(
             vessel_performance="Your boat should be the best of the best"
         )
-        applicability.save()
         assert str(applicability) == "Your boat should be the …"
 
     @pytest.mark.django_db
     def test_with_vessels_measurements(self):
-        applicability = Applicability()
-        applicability.save()
-        vessels_measurements = VesselsMeasurements(
+        applicability = Applicability.objects.create()
+        VesselsMeasurements.objects.create(
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("1.1"),
+            vessels_characteristics_value=Decimal("2.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
-        vessels_measurements.save()
-        assert str(applicability) == "Length Overall > 1.1 Metre"
+        assert str(applicability) == "Length Overall > 2.1 Metres"
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
@@ -169,20 +171,20 @@ class TestApplicabilityStr:
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("1.1"),
+            vessels_characteristics_value=Decimal("3.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
         VesselsMeasurements.objects.create(
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("1.2"),
-            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
+            vessels_characteristics_value=Decimal("4.2"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.FOOT,
         )
 
         assert (
             str(applicability)
-            == f"Length Overall > 1.1 Metre {logical_operator} Length Overall > 1.2 Metre"
+            == f"Length Overall > 3.1 Metres {logical_operator} Length Overall > 4.2 Feet"
         )
 
     @pytest.mark.django_db
@@ -195,7 +197,7 @@ class TestApplicabilityStr:
         ],
     )
     def test_full(self, logical_connectives, logical_operator):
-        applicability = Applicability(
+        applicability = Applicability.objects.create(
             in_ballast=True,
             category_of_cargo=[
                 Applicability.CategoryOfCargo.LIQUID,
@@ -213,7 +215,6 @@ class TestApplicabilityStr:
             vessel_performance="Your boat should be the best of the best",
             logical_connectives=logical_connectives,
         )
-        applicability.save()
         VesselsMeasurements.objects.create(
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
@@ -364,3 +365,13 @@ class TestContactDetailsMMSICode:
             field: [error.code for error in error_list]
             for field, error_list in excinfo.value.error_dict.items()
         } == {"mmsi_code": ["invalid"]}
+
+
+class TestAdminInlinesOrder:
+    pilot_boarding_place = PilotBoardingPlaceAdmin(PilotBoardingPlace, AdminSite())
+
+    assert len(pilot_boarding_place.get_inlines()) == (
+        len(ContactableAreaAdmin.inlines) + len(FeatureTypeAdmin.inlines)
+    )
+    assert pilot_boarding_place.get_inlines()[-1] == TextContentInline
+    assert pilot_boarding_place.get_inlines()[0] == SrvContactInline
