@@ -7,6 +7,7 @@ from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
+    verbose_name_plural = "Vessel measurements"
     model = s127.models.VesselsMeasurements
     extra = 0
 
@@ -143,9 +144,61 @@ class NoticeTimeInline(nested_admin.NestedStackedInline):
 
 
 @admin.register(s127.models.Applicability)
-class ApplicabilityAdmin(nested_admin.NestedModelAdmin, GISModelAdminWithRasterMarine):
+class ApplicabilityAdmin(
+    ModelAdminWithOrderedFormsets,
+    nested_admin.NestedModelAdmin,
+    GISModelAdminWithRasterMarine,
+):
     search_fields = ["id"]
     inlines = [InformationInline, VesselsMeasurementsInline]
+    fieldsets_and_inlines_order = (
+        None,
+        VesselsMeasurementsInline,
+    )
+
+    fieldsets = [
+        (
+            None,
+            {
+                "fields": [
+                    "logical_connectives",
+                ]
+            },
+        ),
+        (
+            "Ballast & Performances",
+            {
+                "fields": [
+                    "in_ballast",
+                    "thickness_of_ice_capability",
+                    "vessel_performance",
+                ]
+            },
+        ),
+        (
+            "Cargo category",
+            {
+                "fields": [
+                    "category_of_cargo",
+                    "category_of_dangerous_or_hazardous_cargo",
+                ]
+            },
+        ),
+        (
+            "Vessels category",
+            {
+                "fields": [
+                    "category_of_vessel",
+                    "category_of_vessel_registry",
+                ]
+            },
+        ),
+    ]
+
+    # fieldsets = [
+    #     ("Geometry", {"fields": ["geometry"]}),
+    #     ("Communication channel", {"fields": ["communication_channel"]}),
+    # ]
 
 
 @admin.register(s127.models.PilotageDistrict)
