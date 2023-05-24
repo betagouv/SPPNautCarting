@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 import pytest
-from django.contrib.admin.sites import AdminSite
 from django.contrib.gis.geos import (
     GeometryCollection,
     LinearRing,
@@ -11,13 +10,8 @@ from django.contrib.gis.geos import (
 )
 from django.core.exceptions import ValidationError
 
-from s100.admin import TextContentInline
 from s127.admin import (
     AccumulatedInlines,
-    ContactableAreaAdmin,
-    FeatureTypeAdmin,
-    PilotBoardingPlaceAdmin,
-    SrvContactInline,
 )
 from s127.models import (
     Applicability,
