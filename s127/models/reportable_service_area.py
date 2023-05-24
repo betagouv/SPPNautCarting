@@ -3,8 +3,8 @@ from django.contrib.postgres.fields import ArrayField
 
 import s100.models
 from carting.fields import ChoiceArrayField
+from s127.models.contactable_area import PilotBoardingPlace
 from s127.models.feature_type import PilotageDistrict
-from s127.models.organisation_contact_area import PilotBoardingPlace
 
 from .shared import BOOLEAN_CHOICES, ReportableServiceArea
 

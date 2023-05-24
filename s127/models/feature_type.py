@@ -5,6 +5,7 @@ import s100.models
 
 
 class PilotageDistrict(s100.models.FeatureType):
+    # https://github.com/betagouv/SPPNautInterface/issues/261
     communication_channel = ArrayField(
         models.CharField(max_length=255),
         default=list,

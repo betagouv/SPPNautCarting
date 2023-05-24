@@ -8,7 +8,7 @@ from django.db import migrations, models
 
 import carting.fields
 import s100.models
-import s127.models.organisation_contact_area
+import s127.models.contactable_area
 import s127.models.shared
 
 
@@ -424,7 +424,7 @@ class Migration(migrations.Migration):
                     django.contrib.gis.db.models.fields.GeometryCollectionField(
                         srid=4326,
                         validators=[
-                            s127.models.organisation_contact_area.validate_point_or_surface
+                            s127.models.contactable_area.validate_point_or_surface
                         ],
                     ),
                 ),

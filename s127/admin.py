@@ -17,10 +17,36 @@ class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     extra = 0
 
 
+class ContactAddressInline(admin.StackedInline):
+    model = s127.models.ContactAddress
+    extra = 0
+
+
+class TelecommunicationsInline(admin.StackedInline):
+    model = s127.models.Telecommunications
+    extra = 1
+
+
+@admin.register(s127.models.ContactDetails)
+class ContactDetailsAdmin(admin.ModelAdmin):
+    search_fields = ["id"]
+    inlines = [TelecommunicationsInline, ContactAddressInline, InformationInline]
+
+
 class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
     inlines = [FeatureNameInline]
     model = s127.models.PilotBoardingPlace
     extra = 0
+
+
+class SrvContactInline(nested_admin.NestedGenericTabularInline):
+    ct_field = "contactable_content_type"
+    ct_fk_field = "contactable_object_id"
+    model = s127.models.SrvContact
+
+    min_num = 0
+    extra = 0
+    autocomplete_fields = ["contact_details"]
 
 
 class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
@@ -33,7 +59,15 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     autocomplete_fields = ["applicability"]
 
 
-class FeatureTypeInlinesMixin:
+class AccumulatedInlines:
+    def get_inlines(self, *args, **kwargs):
+        accumulated_inlines = []
+        for ancestor_class in type(self).mro():
+            accumulated_inlines.extend(getattr(ancestor_class, "inlines", []))
+        return list(dict.fromkeys(accumulated_inlines).keys())
+
+
+class FeatureTypeInlinesMixin(AccumulatedInlines):
     inlines = [
         FeatureNameInline,
         FeatureTypePermissionTypeInline,
@@ -46,6 +80,18 @@ class FeatureTypeAdmin(FeatureTypeInlinesMixin, nested_admin.NestedModelAdmin):
 
 
 class FeatureTypeInline(FeatureTypeInlinesMixin, nested_admin.NestedStackedInline):
+    pass
+
+
+class ContactableAreaAdmin(FeatureTypeAdmin):
+    inlines = [SrvContactInline]
+
+
+class SupervisedAreaAdmin(ContactableAreaAdmin):
+    pass
+
+
+class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
     pass
 
 
@@ -95,7 +141,7 @@ class SimplePilotageAdmin(
         ),
     ]
 
-    inlines = [SimplePilotServiceInline] + FeatureTypeAdmin.inlines
+    inlines = [SimplePilotServiceInline]
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
@@ -104,15 +150,15 @@ class FullPilotageAdmin(
     ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
 ):
     search_fields = ["id"]
-    inlines = FeatureTypeInlinesMixin.inlines + [FullPilotServiceInline]
+    inlines = [FullPilotServiceInline]
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 @admin.register(s127.models.PilotService)
-class PilotServiceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
+class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
 
 
 @admin.register(s127.models.PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
+class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, ContactableAreaAdmin):
     search_fields = ["id"]
