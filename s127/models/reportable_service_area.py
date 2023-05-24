@@ -105,7 +105,8 @@ class NoticeTime(s100.models.ComplexAttributeType):
         models.DurationField(),
         default=list,
         blank=True,
-        help_text="The time duration prior to the time the service is needed, when notice must be provided to the service provider.",
+        help_text="The time duration prior to the time the service is needed, when notice must be provided to the service provider."
+        " ℹ️ Write comma separated values to define multiple.",
     )
     notice_time_text = models.TextField(
         blank=True,

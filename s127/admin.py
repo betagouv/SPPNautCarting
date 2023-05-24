@@ -30,6 +30,28 @@ class TelecommunicationsInline(admin.StackedInline):
 @admin.register(s127.models.ContactDetails)
 class ContactDetailsAdmin(admin.ModelAdmin):
     search_fields = ["id"]
+
+    def get_fieldsets(self, request, obj=None):
+        """
+        Hook for specifying fieldsets.
+        """
+        # if self.fieldsets:
+        #     return self.fieldsets
+        return [
+            (
+                "Language",
+                {"fields": ["language"]},
+            ),
+            (
+                "Main Radiocommunication",
+                {
+                    "fields": [
+                        x for x in self.get_fields(request, obj) if x != "language"
+                    ]
+                },
+            ),
+        ]
+
     inlines = [TelecommunicationsInline, ContactAddressInline, InformationInline]
 
 
@@ -112,6 +134,12 @@ class SimplePilotServiceInline(
     fields = ["pilot_boarding_places", "remote_pilot"]
     # TODO : add ShipReportInline below when models has been implemented
     inlines = [FeatureNameInline]
+
+
+class NoticeTimeInline(nested_admin.NestedStackedInline):
+    model = s127.models.NoticeTime
+    extra = 0
+    max_num = 2
 
 
 @admin.register(s127.models.Applicability)
@@ -197,29 +225,27 @@ class FullPilotServiceAdmin(
     ReportableServiceAreaAdmin,
 ):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
+    inlines = [NoticeTimeInline]
+
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Geometry",
         "Pilotage district",
         SrvContactInline,
-        "Category of pilot",
+        FeatureTypePermissionTypeInline,
+        "Pilot boarding places",
+        NoticeTimeInline,
     )
 
     fieldsets = [
-        (
-            "Category of pilot",
-            {
-                "fields": ["category_of_pilot"],
-                "description": "C'est vraiment super cool de pouvoir mettre des descriptions ici.",
-            },
-        ),
         ("Geometry", {"fields": ["geometry"]}),
         ("Pilotage district", {"fields": ["pilotage_district"]}),
+        ("Pilot boarding places", {"fields": ["pilot_boarding_places"]}),
         (
-            None,
+            "Pilot details",
             {
                 "fields": [
-                    "pilot_boarding_places",
+                    "category_of_pilot",
                     "remote_pilot",
                     "pilot_qualification",
                     "pilot_request",

@@ -7,17 +7,27 @@ div.choice-array-field {
     display: grid;
 }
 
+div.choice-array-field-inline {
+    grid-template-columns: repeat(auto-fill, 45rem);
+    display: grid;
+}
+
+div.choice-array-field-inline label {
+    width: 500px;
+}
+
 fieldset.module, /* fieldsets django */
 .inline-group, /* inlines django */
 .inline-group.djn-group-nested /* Override un sélecteur spécifique provenant de django_nested_admin qui ajoute un border: none; */ {
     border: 1px solid var(--primary); /* --primary est définie par django */
+    border: 1px solid var(--admin-interface-module-background-color); /* --admin-interface-module-background-color est définie par django-admin-interface */
 }
 
 :is(fieldset.module, /* fieldsets django */
 .inline-group, /* inlines django */
 /* .inline-group.djn-group-nested Override un sélecteur spécifique provenant de django_nested_admin qui ajoute un border: none; */
 ) h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     text-transform: capitalize;
 }
 :is(fieldset.module, /* fieldsets django */
@@ -36,7 +46,7 @@ fieldset.module, /* fieldsets django */
 }
 
 .add-handler {
-    border: 1px solid white;
+    border: 1px solid var(--admin-interface-module-background-color);
     padding: 0.2rem 1rem;
 }
 
@@ -44,4 +54,11 @@ fieldset.module, /* fieldsets django */
 .inline-group .tabular tr.add-row td a {
     /* FIXME : remove this important  */
     background-position: 2px 50% !important;
+}
+
+label.required::after {
+    content: " (required)" !important;
+    vertical-align: inherit !important;
+    padding-top: 4px;
+    color: var(--admin-interface-module-background-color);
 }
