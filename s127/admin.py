@@ -43,6 +43,7 @@ class SrvContactInline(nested_admin.NestedGenericTabularInline):
     ct_field = "contactable_content_type"
     ct_fk_field = "contactable_object_id"
     model = s127.models.SrvContact
+    verbose_name = "Contact Detail"
 
     min_num = 0
     extra = 0
@@ -120,8 +121,21 @@ class ApplicabilityAdmin(nested_admin.NestedModelAdmin, GISModelAdminWithRasterM
 
 
 @admin.register(s127.models.PilotageDistrict)
-class PilotageDistrictAdmin(GISModelAdminWithRasterMarine, FeatureTypeAdmin):
+class PilotageDistrictAdmin(
+    ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
+):
     search_fields = ["id"]
+
+    fieldsets_and_inlines_order = (
+        FeatureNameInline,
+        "Geometry",
+        "Communication channel",
+    )
+
+    fieldsets = [
+        ("Geometry", {"fields": ["geometry"]}),
+        ("Communication channel", {"fields": ["communication_channel"]}),
+    ]
 
 
 @admin.register(s127.models.SimplePilotageDistrictProxy)
@@ -174,3 +188,42 @@ class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmi
 @admin.register(s127.models.PilotBoardingPlace)
 class PilotBoardingPlaceAdmin(GISModelAdminWithRasterMarine, ContactableAreaAdmin):
     search_fields = ["id"]
+
+
+@admin.register(s127.models.FullPilotServiceProxy)
+class FullPilotServiceAdmin(
+    ModelAdminWithOrderedFormsets,
+    GISModelAdminWithRasterMarine,
+    ReportableServiceAreaAdmin,
+):
+    autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
+    fieldsets_and_inlines_order = (
+        FeatureNameInline,
+        "Geometry",
+        "Pilotage district",
+        SrvContactInline,
+        "Category of pilot",
+    )
+
+    fieldsets = [
+        (
+            "Category of pilot",
+            {
+                "fields": ["category_of_pilot"],
+                "description": "C'est vraiment super cool de pouvoir mettre des descriptions ici.",
+            },
+        ),
+        ("Geometry", {"fields": ["geometry"]}),
+        ("Pilotage district", {"fields": ["pilotage_district"]}),
+        (
+            None,
+            {
+                "fields": [
+                    "pilot_boarding_places",
+                    "remote_pilot",
+                    "pilot_qualification",
+                    "pilot_request",
+                ]
+            },
+        ),
+    ]

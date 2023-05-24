@@ -121,3 +121,10 @@ class NoticeTime(s100.models.ComplexAttributeType):
         null=True,
         help_text="Indicates whether the minimum or maximum value should be used to describe a condition or in application processing",
     )
+
+
+class FullPilotServiceProxy(PilotService):
+    class Meta:
+        proxy = True
+        verbose_name = "Pilot service (full form)"
+        verbose_name_plural = "Pilot services (full form)"

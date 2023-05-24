@@ -5,9 +5,7 @@ import s100.models
 
 class FeatureNameInline(nested_admin.NestedGenericTabularInline):
     model = s100.models.FeatureName
-    extra = 0
-    min_num = 1
-    max_num = 1
+    extra = 1
 
 
 class InformationInline(nested_admin.NestedGenericStackedInline):

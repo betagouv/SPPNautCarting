@@ -18,6 +18,7 @@ fieldset.module, /* fieldsets django */
 /* .inline-group.djn-group-nested Override un sélecteur spécifique provenant de django_nested_admin qui ajoute un border: none; */
 ) h2 {
     font-size: 2rem;
+    text-transform: capitalize;
 }
 :is(fieldset.module, /* fieldsets django */
 .inline-group, /* inlines django */
@@ -32,4 +33,15 @@ fieldset.module, /* fieldsets django */
 
 .inline-group.djn-group-nested h3 {
     font-size: 1.2rem !important;
+}
+
+.add-handler {
+    border: 1px solid white;
+    padding: 0.2rem 1rem;
+}
+
+/* .inline-group ul.tools a.add, .inline-group div.add-row a,  */
+.inline-group .tabular tr.add-row td a {
+    /* FIXME : remove this important  */
+    background-position: 2px 50% !important;
 }
