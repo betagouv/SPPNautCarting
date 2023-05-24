@@ -62,8 +62,8 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
 class AccumulatedInlines:
     def get_inlines(self, *args, **kwargs):
         accumulated_inlines = []
-        for parent_class in type(self).mro():
-            accumulated_inlines.extend(getattr(parent_class, "inlines", []))
+        for ancestor_class in type(self).mro():
+            accumulated_inlines.extend(getattr(ancestor_class, "inlines", []))
         return list(dict.fromkeys(accumulated_inlines).keys())
 
 

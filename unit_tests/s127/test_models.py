@@ -10,9 +10,6 @@ from django.contrib.gis.geos import (
 )
 from django.core.exceptions import ValidationError
 
-from s127.admin import (
-    AccumulatedInlines,
-)
 from s127.models import (
     Applicability,
     ContactDetails,
@@ -359,33 +356,3 @@ class TestContactDetailsMMSICode:
             field: [error.code for error in error_list]
             for field, error_list in excinfo.value.error_dict.items()
         } == {"mmsi_code": ["invalid"]}
-
-
-class TestAccumulatedInlines:
-    class ParentInline(AccumulatedInlines):
-        inlines = [1, 2]
-
-    class ChildInline(ParentInline):
-        pass
-
-    class GrandChildInline(ChildInline):
-        inlines = [1, 3]
-
-    def test_get_inlines(self):
-        assert self.ParentInline().get_inlines() == [1, 2]
-
-    def test_get_inlines_on_inherited_inline(self):
-        assert self.ChildInline().get_inlines() == [1, 2]
-
-    def test_last_inherited_inlines_go_first(self):
-        assert (
-            self.GrandChildInline().get_inlines()[0] == self.GrandChildInline.inlines[0]
-        )
-
-    def test_parent_inlines_go_last(self):
-        assert (
-            self.GrandChildInline().get_inlines()[-1] == self.ParentInline.inlines[-1]
-        )
-
-    def test_get_inlines_with_accumulated_inlines(self):
-        assert self.GrandChildInline().get_inlines() == [1, 3, 2]
