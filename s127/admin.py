@@ -2,8 +2,12 @@ import nested_admin
 from django.contrib import admin
 
 import s127
-from carting.admin import GISModelAdminWithRasterMarine, ModelAdminWithOrderedFormsets
+from carting.admin import (
+    GISModelAdminWithRasterMarine,
+    ModelAdminWithOrderedFormsets,
+)
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
+from carting.widgets import CustomOSMWidget
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
@@ -56,6 +60,7 @@ class PilotServiceInlineMixin:
 
 
 class FullPilotServiceInline(PilotServiceInlineMixin, FeatureTypeInline):
+    gis_widget = CustomOSMWidget
     exclude = ["geometry"]
 
 
