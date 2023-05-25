@@ -6,6 +6,7 @@ import s100.models
 class FeatureNameInline(nested_admin.NestedGenericTabularInline):
     model = s100.models.FeatureName
     extra = 1
+    # FIXME overwrite get_extra to expose only one form when it is empty
 
 
 class InformationInline(nested_admin.NestedGenericStackedInline):

@@ -2,18 +2,20 @@
     On a eu besoin de spécifier le div pour appliquer la classe uniquement
     sur le parent et pas toutes les checkbox.
 */
-div.choice-array-field {
+div.choice-array-field-15rem {
     grid-template-columns: repeat(auto-fill, 15rem);
     display: grid;
 }
 
-div.choice-array-field-inline {
-    grid-template-columns: repeat(auto-fill, 45rem);
+div.choice-array-field-100pc {
+    grid-template-columns: 1fr;
     display: grid;
 }
 
-div.choice-array-field-inline label {
-    width: 500px;
+div.choice-array-field-15rem label,
+div.choice-array-field-100pc label {
+    /* FIXME : check why the last line over more than 3 has a higher space before */
+    width: 100%;
 }
 
 fieldset.module, /* fieldsets django */

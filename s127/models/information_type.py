@@ -1,4 +1,5 @@
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
@@ -83,7 +84,6 @@ class Applicability(s100.models.InformationType):
             choices=CategoryOfDangerousOrHazardousCargo.choices,
         ),
         default=list,
-        widget_class="choice-array-field-inline",
         blank=True,
         help_text="Classification of dangerous goods or hazardous materials based on the International Maritime Dangerous Goods Code"
         " (<a href='https://www.imo.org/fr/OurWork/Safety/Pages/DangerousGoods-default.aspx' target='_blank'>IMDG Code</a>)",
