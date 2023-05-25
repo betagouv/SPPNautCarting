@@ -65,7 +65,7 @@ class PilotBoardingPlace(ContactableArea):
         default=list,
         blank=True,
         help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
-        "ℹ️ Write comma separated values to define multiple.",
+        "Separate multiple values with a comma.<br/>",
     )
 
     call_sign = models.CharField(
