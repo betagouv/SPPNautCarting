@@ -4,18 +4,17 @@ from django.contrib.postgres.fields import ArrayField
 
 class ChoiceArrayField(ArrayField):
     def formfield(self, **kwargs):
-        choice_with_max_len_label = max(
-            [choice[1] for choice in self.base_field.choices], key=len
-        )
-        widget_class_following_choices_length = "choice-array-field-15rem"
-        if len(choice_with_max_len_label) > 30:
-            widget_class_following_choices_length = "choice-array-field-100pc"
+        max_label_length = max(len(label) for value, label in self.base_field.choices)
+        columns_widget_class = "choice-array-field-several-columns"
+        if max_label_length > 30:
+            columns_widget_class = "choice-array-field-one-column"
+
         defaults = {
             "form_class": forms.MultipleChoiceField,
             "choices": self.base_field.choices,
             "widget": forms.CheckboxSelectMultiple(
-                # FIXME : Les classes s'appliquent sur les labels des checkbox en plus du parent
-                attrs={"class": widget_class_following_choices_length},
+                # FIXME : Les classes s'appliquent sur chaque input[checkbox] en plus du div les contenant toutes
+                attrs={"class": "choice-array-field " + columns_widget_class},
             ),
         }
         defaults.update(kwargs)
