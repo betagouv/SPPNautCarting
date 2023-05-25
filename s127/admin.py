@@ -28,6 +28,16 @@ class TelecommunicationsInline(nested_admin.NestedStackedInline):
     extra = 1
 
 
+class RadiocommunicationsInline(nested_admin.NestedStackedInline):
+    model = s127.models.Radiocommunications
+    extra = 1
+
+
+class FrequencyPairInline(nested_admin.NestedGenericStackedInline):
+    model = s127.models.FrequencyPair
+    extra = 0
+
+
 @admin.register(s127.models.ContactDetails)
 class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
     search_fields = ["id"]
@@ -52,7 +62,13 @@ class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
             ),
         ]
 
-    inlines = [TelecommunicationsInline, ContactAddressInline, InformationInline]
+    inlines = [
+        RadiocommunicationsInline,
+        FrequencyPairInline,
+        TelecommunicationsInline,
+        ContactAddressInline,
+        InformationInline,
+    ]
 
 
 class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
