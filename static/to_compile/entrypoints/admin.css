@@ -54,8 +54,7 @@ fieldset.module, /* fieldsets django */
 
 /* .inline-group ul.tools a.add, .inline-group div.add-row a,  */
 .inline-group .tabular tr.add-row td a {
-    /* FIXME : remove this important  */
-    background-position: 2px 50% !important;
+    background-position: 2px 50%;
 }
 
 label.required::after {
