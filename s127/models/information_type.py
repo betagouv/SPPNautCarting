@@ -298,6 +298,34 @@ class CategoryOfCommPref(models.TextChoices):
     # fmt: on
 
 
+# https://github.com/betagouv/SPPNautInterface/issues/244
+class FrequencyPair(s100.models.GenericComplexAttributeType):
+    """
+    A pair of frequencies for transmitting and receiving radio signals.
+    The shore station transmits and receives on the frequencies indicated
+    """
+
+    frequency_shore_station_transmits = models.DecimalField(
+        max_digits=6,
+        decimal_places=1,
+        validators=[MinValueValidator(0)],
+        help_text="The shore station transmitter frequency expressed in kHz to one decimal place. Units: kHZ, Resolution: 0.1, Format: XXXXXX Examples: 4379.1 kHz becomes 043791; 13162.8 kHz becomes 131628",
+    )
+
+    frequency_shore_station_receives = models.DecimalField(
+        max_digits=6,
+        decimal_places=1,
+        validators=[MinValueValidator(0)],
+        help_text="The shore station receiver frequency expressed in kHz to one decimal place. Units: kHz, Resolution: 0.1, Format: XXXXXX Examples: 4379.1 kHz becomes 043791; 13162.8 kHz becomes 131628",
+    )
+
+    contact_instructions = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
+    )
+
+
 # PDF page 26
 class ContactDetails(s100.models.InformationType):
     """
@@ -343,12 +371,13 @@ class ContactDetails(s100.models.InformationType):
         # No description in XSD
     )
 
+    frequency_pair = GenericRelation(FrequencyPair)
+
     contact_instructions = models.TextField(
         blank=True,
         null=True,
         help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
     )
-
     mmsi_code = models.CharField(
         max_length=255,
         blank=True,
@@ -425,6 +454,125 @@ class ContactAddress(s100.models.ComplexAttributeType):
 
     class Meta:
         verbose_name_plural = "Contact Addresses"
+
+
+class Radiocommunications(s100.models.ComplexAttributeType):
+    """
+    Detailed radiocommunications description with channels, frequencies,
+    preferences and time schedules.
+    """
+
+    class CategoryOfMaritimeBroadcast(models.TextChoices):
+        # fmt: off
+        NAVIGATIONAL_WARNING = "navigational warning" # message containing urgent information relevant to safe navigation broadcast to ships in accordance with the provisions of the International Convention for the Safety of Life at Sea, 1974, as amended
+        METEOROLOGICAL_WARNING = "meteorological warning" # warning of adverse weather conditions
+        ICE_REPORT = "ice report" # report of the ice situation and restrictions to shipping
+        SAR_INFORMATION = "SAR information" # broadcast message with information about an ongoing SAR operation
+        PIRATE_ATTACK_WARNING = "pirate attack warning" # warning of possible attack by pirates
+        METEOROLOGICAL_FORECAST = "meteorological forecast" # broadcast message containing meteorological forecast
+        PILOT_SERVICE_MESSAGE = "pilot service message" # broadcast message about pilot service
+        AIS_INFORMATION = "AIS information" # broadcast message about AIS information
+        LORAN_MESSAGE = "LORAN message" # broadcast message about the LORAN service
+        SATNAV_MESSAGE = "SATNAV message" # broadcast message about Satellite Navigation service
+        GALE_WARNING = "gale warning" # warning of winds of Beaufort force 8 or 9
+        STORM_WARNING = "storm warning" # warning of winds of Beaufort force 10 or over
+        TROPICAL_REVOLVING_STORM_WARNING = "tropical revolving storm warning" # warning of hurricanes in the North Atlantic and eastern North Pacific, typhoons in the Western Pacific, cyclones in the Indian Ocean and cyclones of similar nature in other regions
+        NAVAREA_WARNING = "NAVAREA warning" # navigational warning or in-force bulletin promulgated as part of a numbered series by a NAVAREA coordinator (Maritime Safety Information Manual 2009)
+        COASTAL_WARNING = "coastal warning" # navigational warning promulgated as part of a numbered series by a National coordinator (Maritime Safety Information Manual 2009)
+        LOCAL_WARNING = "local warning" # warning which covers inshore waters, often within the limits of jurisdiction of a harbour or port authority (Maritime Safety Information Manual 2009)
+        LOW_WATER_LEVEL_WARNING_NEGATIVE_TIDAL_SURGE = "low water level warning/negative tidal surge" # warning of actual or expected low water level
+        ICING_WARNING = "icing warning" # warning of accretion of ice on ships
+        TSUNAMI_BROADCAST = "tsunami broadcast" # broadcasts about tsunamis, including watches, advisories, and other types of messages relating to tsunamis or potential tsunamis
+        # fmt: on
+
+    class CategoryOfRadioMethods(models.TextChoices):
+        # fmt: off
+        LOW_FREQUENCY_LF_VOICE_TRAFFIC = "Low Frequency (LF) voice traffic" # Frequency in a frequency range between 30 and 300 kHz used for voice traffic
+        MEDIUM_FREQUENCY_MF_VOICE_TRAFFIC = "Medium Frequency (MF) voice traffic" # Frequency in a frequency range between 300 and 3 000kHz used for voice traffic
+        HIGH_FREQUENCY_HF_VOICE_TRAFFIC = "High Frequency (HF) voice traffic" # Frequency in a frequency range between 3 and 30 MHz used for voice traffic
+        VERY_HIGH_FREQUENCY_VHF_VOICE_TRAFFIC = "Very High Frequency (VHF) voice traffic" # Frequency in a frequency range between 30 and 300 MHz used for voice traffic
+        HIGH_FREQUENCY_NARROW_BAND_DIRECT_PRINTING = "High Frequency Narrow Band Direct Printing" # High Frequency Narrow Band Direct Printing
+        NAVTEX = "NAVTEX" # Narrow-band direct-printing telegraphy system for transmission of maritime safety information.
+        SAFETY_NET = "SafetyNET" # SafetyNET is an international automatic direct- printing satellite-based service for the promulgation of navigational and meteorological warnings, meteorological forecasts and other urgent safety-related messages - maritime safety information (MSI) - to ships.
+        NBDP_TELEGRAPHY_NARROW_BAND_DIRECT_PRINTING_TELEGRAPHY = "NBDP Telegraphy (Narrow Band Direct Printing Telegraphy)" # Narrow Band Direct Printing Telegraphy. A communications system consisting of teletypewriters connected to a telephonic network to send and receive wireless signals.
+        FACSIMILE = "facsimile" # A method or device for transmitting documents, drawings, photographs, or the like, by means of radio or telephone for exact reproduction elsewhere.
+        NAVIP = "NAVIP" # A Russian system transmitting navigational information, send by radio and containing information relevant to coastal waters of foreign countries and high seas.
+        LOW_FREQUENCY_LF_DIGITAL_TRAFFIC = "Low Frequency (LF) digital traffic" # Frequency in a frequency range between 30 and 300 kHz used for digital traffic
+        MEDIUM_FREQUENCY_MF_DIGITAL_TRAFFIC = "Medium Frequency (MF) digital traffic" # Frequency in a frequency range between 300 and 3000kHz used for digital traffic
+        HIGH_FREQUENCY_HF_DIGITAL_TRAFFIC = "High Frequency (HF) digital traffic" # Frequency in a frequency range between 3 and 30 MHz used for digital traffic
+        VERY_HIGH_FREQUENCY_VHF_DIGITAL_TRAFFIC = "Very High Frequency (VHF) digital traffic" # Frequency in a frequency range between 30 and 300 MHz used for digital traffic
+        LOW_FREQUENCY_LF_TELEGRAPH_TRAFFIC = "Low Frequency (LF) telegraph traffic" # Frequency in a frequency range between 30 and 300 kHz used for telegraph traffic
+        MEDIUM_FREQUENCY_MF_TELEGRAPH_TRAFFIC = "Medium Frequency (MF) telegraph traffic" # Frequency in a frequency range between 300 and 3 000kHz used for telegraph traffic
+        HIGH_FREQUENCY_HF_TELEGRAPH_TRAFFIC = "High Frequency (HF) telegraph traffic" # Frequency in a frequency range between 3 and 30 MHz used for telegraph traffic
+        MEDIUM_FREQUENCY_MF_DIGITAL_SELECTIVE_CALL_TRAFFIC = "Medium Frequency (MF) Digital Selective Call traffic" # Frequency in a frequency range between 300 and 3000kHz used for Digital Selective Call traffic
+        HIGH_FREQUENCY_HF_DIGITAL_SELECTIVE_CALL_TRAFFIC = "High Frequency (HF) Digital Selective Call traffic" # Frequency in a frequency range between 3 and 30 MHz used for Digital Selective Call traffic
+        VERY_HIGH_FREQUENCY_VHF_DIGITAL_SELECTIVE_CALL_TRAFFIC = "Very High Frequency (VHF) Digital Selective Call traffic" # Frequency in a frequency range between 30 and 300 MHz used for Digital Selective Call traffic
+        # fmt: on
+
+    contact_details = models.ForeignKey(
+        ContactDetails, on_delete=models.CASCADE, related_name="radiocommunications"
+    )
+
+    category_of_comm_pref = models.CharField(
+        max_length=255,
+        choices=CategoryOfCommPref.choices,
+        blank=True,
+        null=True,
+        # No description in XSD
+    )
+
+    category_of_maritime_broadcast = ChoiceArrayField(
+        base_field=models.CharField(
+            max_length=255,
+            choices=CategoryOfMaritimeBroadcast.choices,
+        ),
+        default=list,
+        blank=True,
+        help_text="Classification of maritime broadcast based on the nature of information conveyed.",
+    )
+
+    category_of_radio_methods = ChoiceArrayField(
+        base_field=models.CharField(
+            max_length=255,
+            choices=CategoryOfRadioMethods.choices,
+        ),
+        default=list,
+        blank=True,
+        help_text="Categories of radiocommunications based on frequency band and radio traffic method.",
+    )
+
+    communication_channel = ArrayField(
+        models.CharField(max_length=255),
+        default=list,
+        blank=True,
+        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
+        "ℹ️ Write comma separated values to define multiple.",
+    )
+
+    contact_instructions = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
+    )
+
+    # Complex attribute used by multiple classes
+    frequency_pair = GenericRelation(FrequencyPair)
+
+    # https://github.com/betagouv/SPPNautInterface/issues/240
+    signal_frequency = ArrayField(
+        models.IntegerField(),
+        default=list,
+        blank=True,
+        # No description in XSD
+    )
+
+    # https://github.com/betagouv/SPPNautInterface/issues/241
+    transmission_content = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Content of transmission. Remarks: Not to be used if CATMAB is populated",
+    )
 
 
 class Telecommunications(s100.models.ComplexAttributeType):
