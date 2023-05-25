@@ -389,6 +389,40 @@ class ContactDetails(s100.models.InformationType):
     # FIXME : adding or removing information doesn't work in contactdetails modal
     information = GenericRelation(s100.models.Information)
 
+    def __str__(self):
+        parts = []
+
+        if self.call_name:
+            parts.append(f"Call name: {self.call_name}")
+
+        if self.call_sign:
+            parts.append(f"Call sign: {self.call_sign}")
+
+        if self.communication_channel:
+            parts.append(" or ".join(x for x in self.communication_channel))
+
+        if self.mmsi_code:
+            parts.append(f"Call sign: {self.mmsi_code}")
+
+        if self.language:
+            parts.append(f"Lang: {self.language}")
+
+        if self.pk and self.telecommunications.all():
+            parts.append(
+                "Telecoms: "
+                + " or ".join(str(x) for x in self.telecommunications.all())
+            )
+
+        if self.pk and self.radiocommunications.all():
+            parts.append(
+                "Radiocoms: "
+                + " or ".join(str(x) for x in self.radiocommunications.all())
+            )
+
+        if not parts:
+            return super().__str__()
+        return ", ".join(parts)
+
     class Meta:
         verbose_name_plural = "Contact Details"
 
@@ -574,6 +608,21 @@ class Radiocommunications(s100.models.ComplexAttributeType):
         help_text="Content of transmission. Remarks: Not to be used if CATMAB is populated",
     )
 
+    def __str__(self):
+        parts = []
+
+        if self.communication_channel:
+            parts.append(" or ".join(x for x in self.communication_channel))
+
+        if self.category_of_comm_pref:
+            parts.append(
+                f"Com Pref: {CategoryOfCommPref(self.category_of_comm_pref).label}"
+            )
+
+        if not parts:
+            return super().__str__()
+        return ", ".join(parts)
+
 
 class Telecommunications(s100.models.ComplexAttributeType):
     """
@@ -632,6 +681,24 @@ class Telecommunications(s100.models.ComplexAttributeType):
         null=True,
         help_text="The name of provider or type of carrier for a telecommunications service",
     )
+
+    def __str__(self):
+        parts = []
+
+        if self.telecommunication_identifier:
+            parts.append(f"Tel identifier: {self.telecommunication_identifier}")
+
+        if self.telecommunication_service:
+            parts.append(
+                " or ".join(
+                    self.TelecommunicationService(x).label
+                    for x in self.telecommunication_service
+                )
+            )
+
+        if not parts:
+            return super().__str__()
+        return ", ".join(parts)
 
     class Meta:
         verbose_name_plural = "Telecommunications"
