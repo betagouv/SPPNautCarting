@@ -33,11 +33,6 @@ class ContactDetailsAdmin(admin.ModelAdmin):
     search_fields = ["id"]
 
     def get_fieldsets(self, request, obj=None):
-        """
-        Hook for specifying fieldsets.
-        """
-        # if self.fieldsets:
-        #     return self.fieldsets
         return [
             (
                 "Language",
@@ -139,8 +134,8 @@ class SimplePilotServiceInline(
 
 class NoticeTimeInline(nested_admin.NestedStackedInline):
     model = s127.models.NoticeTime
-    extra = 0
-    max_num = 2
+    extra = 1
+    max_num = 1
 
 
 @admin.register(s127.models.Applicability)
@@ -194,11 +189,6 @@ class ApplicabilityAdmin(
             },
         ),
     ]
-
-    # fieldsets = [
-    #     ("Geometry", {"fields": ["geometry"]}),
-    #     ("Communication channel", {"fields": ["communication_channel"]}),
-    # ]
 
 
 @admin.register(s127.models.PilotageDistrict)
@@ -256,9 +246,6 @@ class FullPilotageAdmin(
         ("communication channel", {"fields": ["communication_channel"]}),
         ("geometry", {"fields": ["geometry"]}),
     ]
-
-
-# FIXME : Les géométries à part c'est cool parce que la carte attire l'attention
 
 
 @admin.register(s127.models.PilotService)
