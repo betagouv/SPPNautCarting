@@ -1,5 +1,4 @@
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-                                                GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
@@ -35,7 +34,7 @@ class Applicability(s100.models.InformationType):
         IMDG_CODE_CLASS_7 = "IMDG Code Class 7", "Radioactive material"
         IMDG_CODE_CLASS_8 = "IMDG Code Class 8", "Corrosive substances"
         IMDG_CODE_CLASS_9 = "IMDG Code Class 9", "Miscellaneous dangerous substances and articles"
-        HARMFUL_SUBSTANCES_IN_PACKAGED_FORM = "Harmful Substances in packaged form", "Harmful substances are those substances which are identified as marine pollutants in the International Maritime Dangerous Goods Code (IMDG Code). Packaged form is defined as the forms of containment specified for harmful substances in the IMDG Code. (MARPOL (73/78) Annex III)"
+        HARMFUL_SUBSTANCES_IN_PACKAGED_FORM = "Harmful Substances in packaged form", # Harmful substances are those substances which are identified as marine pollutants in the International Maritime Dangerous Goods Code (IMDG Code). Packaged form is defined as the forms of containment specified for harmful substances in the IMDG Code. (MARPOL (73/78) Annex III)
         # fmt: on
 
     class CategoryOfCargo(models.TextChoices):
