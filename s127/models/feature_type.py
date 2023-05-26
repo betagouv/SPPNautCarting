@@ -11,7 +11,7 @@ class PilotageDistrict(s100.models.FeatureType):
         default=list,
         blank=True,
         help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
-        "ℹ️ Write comma separated values to define multiple.",
+        "Separate multiple values with a comma.<br/>",
     )
 
     # Spec says it is optional. We've decided to make it mandatory.

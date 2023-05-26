@@ -84,7 +84,10 @@ class TestApplicabilityStr:
                 Applicability.CategoryOfDangerousOrHazardousCargo.IMDG_CODE_CLASS_1_DIV_1_1
             ]
         )
-        assert str(applicability) == "Imdg Code Class 1 Div 1 1"
+        assert (
+            str(applicability)
+            == "Explosives, Division 1: substances and articles which have a mass explosion hazard"
+        )
 
     @pytest.mark.django_db
     def test_with_multiple_dangerous_or_hazardous_cargo(self):
@@ -97,7 +100,7 @@ class TestApplicabilityStr:
         )
         assert (
             str(applicability)
-            == "Imdg Code Class 1 Div 1 1 or Harmful Substances In Packaged Form or Imdg Code Class 3"
+            == "Explosives, Division 1: substances and articles which have a mass explosion hazard or Harmful Substances In Packaged Form or flammable liquids"
         )
 
     @pytest.mark.django_db
@@ -222,13 +225,13 @@ class TestApplicabilityStr:
         )
 
         assert (
-            str(applicability) == f"In ballast, "
-            f"Liquid or Livestock or Heavy Lift, "
-            f"Imdg Code Class 1 Div 1 1 or Harmful Substances In Packaged Form or Imdg Code Class 3, "
-            f"Tug And Tow, "
-            f"Domestic, "
-            f"Thickness of ice capability: 1, "
-            f"Your boat should be the …, "
+            str(applicability) == "In ballast, "
+            "Liquid or Livestock or Heavy Lift, "
+            "Explosives, Division 1: substances and articles which have a mass explosion hazard or Harmful Substances In Packaged Form or flammable liquids, "
+            "Tug And Tow, "
+            "Domestic, "
+            "Thickness of ice capability: 1, "
+            "Your boat should be the …, "
             f"Length Overall > 1.1 Metre {logical_operator} Length Overall > 1.2 Metre"
         )
 

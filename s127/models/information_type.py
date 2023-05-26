@@ -14,27 +14,27 @@ from s127.models.shared import BOOLEAN_CHOICES, CategoryOfVessel
 class Applicability(s100.models.InformationType):
     class CategoryOfDangerousOrHazardousCargo(models.TextChoices):
         # fmt: off
-        IMDG_CODE_CLASS_1_DIV_1_1 = "IMDG Code Class 1 Div. 1.1" # Explosives, Division 1: substances and articles which have a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_2 = "IMDG Code Class 1 Div. 1.2" # Explosives, Division 2: substances and articles which have a projection hazard but not a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_3 = "IMDG Code Class 1 Div. 1.3" # Explosives, Division 3: substances and articles which have a fire hazard and either a minor blast hazard or a minor projection hazard or both, but not a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_4 = "IMDG Code Class 1 Div. 1.4" # Explosives, Division 4: substances and articles which present no significant hazard
-        IMDG_CODE_CLASS_1_DIV_1_5 = "IMDG Code Class 1 Div. 1.5" # Explosives, Division 5: very insensitive substances which have a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_6 = "IMDG Code Class 1 Div. 1.6" # Explosives, Division 6: extremely insensitive articles which do not have a mass explosion hazard
-        IMDG_CODE_CLASS_2_DIV_2_1 = "IMDG Code Class 2 Div. 2.1" # Gases, flammable gases
-        IMDG_CODE_CLASS_2_DIV_2_2 = "IMDG Code Class 2 Div. 2.2" # Gases, non-flammable, non-toxic gases
-        IMDG_CODE_CLASS_2_DIV_2_3 = "IMDG Code Class 2 Div. 2.3" # Gases, toxic gases
-        IMDG_CODE_CLASS_3 = "IMDG Code Class 3" # flammable liquids
-        IMDG_CODE_CLASS_4_DIV_4_1 = "IMDG Code Class 4 Div. 4.1" # flammable solids, self-reactive substances and desensitized explosives
-        IMDG_CODE_CLASS_4_DIV_4_2 = "IMDG Code Class 4 Div. 4.2" # substances liable to spontaneous combustion
-        IMDG_CODE_CLASS_4_DIV_4_3 = "IMDG Code Class 4 Div. 4.3" # substances which, in contact with water, emit flammable gases
-        IMDG_CODE_CLASS_5_DIV_5_1 = "IMDG Code Class 5 Div. 5.1" # oxidizing substances
-        IMDG_CODE_CLASS_5_DIV_5_2 = "IMDG Code Class 5 Div. 5.2" # organic peroxides
-        IMDG_CODE_CLASS_6_DIV_6_1 = "IMDG Code Class 6 Div. 6.1" # toxic substances
-        IMDG_CODE_CLASS_6_DIV_6_2 = "IMDG Code Class 6 Div. 6.2" # infectious substances
-        IMDG_CODE_CLASS_7 = "IMDG Code Class 7" # Radioactive material
-        IMDG_CODE_CLASS_8 = "IMDG Code Class 8" # Corrosive substances
-        IMDG_CODE_CLASS_9 = "IMDG Code Class 9" # Miscellaneous dangerous substances and articles
-        HARMFUL_SUBSTANCES_IN_PACKAGED_FORM = "Harmful Substances in packaged form" # Harmful substances are those substances which are identified as marine pollutants in the International Maritime Dangerous Goods Code (IMDG Code). Packaged form is defined as the forms of containment specified for harmful substances in the IMDG Code. (MARPOL (73/78) Annex III)
+        IMDG_CODE_CLASS_1_DIV_1_1 = "IMDG Code Class 1 Div. 1.1", "Explosives, Division 1: substances and articles which have a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_2 = "IMDG Code Class 1 Div. 1.2", "Explosives, Division 2: substances and articles which have a projection hazard but not a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_3 = "IMDG Code Class 1 Div. 1.3", "Explosives, Division 3: substances and articles which have a fire hazard and either a minor blast hazard or a minor projection hazard or both, but not a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_4 = "IMDG Code Class 1 Div. 1.4", "Explosives, Division 4: substances and articles which present no significant hazard"
+        IMDG_CODE_CLASS_1_DIV_1_5 = "IMDG Code Class 1 Div. 1.5", "Explosives, Division 5: very insensitive substances which have a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_6 = "IMDG Code Class 1 Div. 1.6", "Explosives, Division 6: extremely insensitive articles which do not have a mass explosion hazard"
+        IMDG_CODE_CLASS_2_DIV_2_1 = "IMDG Code Class 2 Div. 2.1", "Gases, flammable gases"
+        IMDG_CODE_CLASS_2_DIV_2_2 = "IMDG Code Class 2 Div. 2.2", "Gases, non-flammable, non-toxic gases"
+        IMDG_CODE_CLASS_2_DIV_2_3 = "IMDG Code Class 2 Div. 2.3", "Gases, toxic gases"
+        IMDG_CODE_CLASS_3 = "IMDG Code Class 3", "flammable liquids"
+        IMDG_CODE_CLASS_4_DIV_4_1 = "IMDG Code Class 4 Div. 4.1", "flammable solids, self-reactive substances and desensitized explosives"
+        IMDG_CODE_CLASS_4_DIV_4_2 = "IMDG Code Class 4 Div. 4.2", "substances liable to spontaneous combustion"
+        IMDG_CODE_CLASS_4_DIV_4_3 = "IMDG Code Class 4 Div. 4.3", "substances which, in contact with water, emit flammable gases"
+        IMDG_CODE_CLASS_5_DIV_5_1 = "IMDG Code Class 5 Div. 5.1", "oxidizing substances"
+        IMDG_CODE_CLASS_5_DIV_5_2 = "IMDG Code Class 5 Div. 5.2", "organic peroxides"
+        IMDG_CODE_CLASS_6_DIV_6_1 = "IMDG Code Class 6 Div. 6.1", "toxic substances"
+        IMDG_CODE_CLASS_6_DIV_6_2 = "IMDG Code Class 6 Div. 6.2", "infectious substances"
+        IMDG_CODE_CLASS_7 = "IMDG Code Class 7", "Radioactive material"
+        IMDG_CODE_CLASS_8 = "IMDG Code Class 8", "Corrosive substances"
+        IMDG_CODE_CLASS_9 = "IMDG Code Class 9", "Miscellaneous dangerous substances and articles"
+        HARMFUL_SUBSTANCES_IN_PACKAGED_FORM = "Harmful Substances in packaged form", # Harmful substances are those substances which are identified as marine pollutants in the International Maritime Dangerous Goods Code (IMDG Code). Packaged form is defined as the forms of containment specified for harmful substances in the IMDG Code. (MARPOL (73/78) Annex III)
         # fmt: on
 
     class CategoryOfCargo(models.TextChoices):
@@ -58,8 +58,8 @@ class Applicability(s100.models.InformationType):
 
     class LogicalConnectives(models.TextChoices):
         # fmt: off
-        LOGICAL_CONJUNCTION = "logical conjunction" # all the conditions described by the other attributes of the object, or sub-attributes of the same complex attribute, are true
-        LOGICAL_DISJUNCTION = "logical disjunction" # at least one of the conditions described by the other attributes of the object, or sub-attributes of the same complex attributes, is true
+        LOGICAL_CONJUNCTION = "logical conjunction", "Logical conjunction (AND)" # all the conditions described by the other attributes of the object, or sub-attributes of the same complex attribute, are true
+        LOGICAL_DISJUNCTION = "logical disjunction", "Logical disjunction (OR)" # at least one of the conditions described by the other attributes of the object, or sub-attributes of the same complex attributes, is true
         # fmt: on
 
     in_ballast = models.BooleanField(
@@ -87,6 +87,7 @@ class Applicability(s100.models.InformationType):
         help_text="Classification of dangerous goods or hazardous materials based on the International Maritime Dangerous Goods Code"
         " (<a href='https://www.imo.org/fr/OurWork/Safety/Pages/DangerousGoods-default.aspx' target='_blank'>IMDG Code</a>)",
     )
+
     category_of_vessel = models.CharField(
         max_length=255,
         choices=CategoryOfVessel.choices,
@@ -304,6 +305,14 @@ class ContactDetails(s100.models.InformationType):
     telephone, telex and radio systems.
     """
 
+    # https://github.com/betagouv/SPPNautInterface/issues/261
+    communication_channel = ArrayField(
+        models.CharField(max_length=255),
+        default=list,
+        blank=True,
+        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
+        "Separate multiple values with a comma.<br/>",
+    )
     call_name = models.CharField(
         max_length=255,
         blank=True,
@@ -318,6 +327,14 @@ class ContactDetails(s100.models.InformationType):
         help_text="The designated call-sign of a radio station.",
     )
 
+    # Language is not mandatory in the spec. We think it's because the language can be defined once at the XML root level and then is implied.
+    # We make it mandatory because we need to know explicitly.
+    language = models.CharField(
+        max_length=3,
+        choices=s100.models.ISO639_3.choices,
+        # No description in XSD
+    )
+
     category_of_comm_pref = models.CharField(
         max_length=255,
         choices=CategoryOfCommPref.choices,
@@ -326,27 +343,10 @@ class ContactDetails(s100.models.InformationType):
         # No description in XSD
     )
 
-    # https://github.com/betagouv/SPPNautInterface/issues/261
-    communication_channel = ArrayField(
-        models.CharField(max_length=255),
-        default=list,
-        blank=True,
-        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
-        "ℹ️ Write comma separated values to define multiple.",
-    )
-
     contact_instructions = models.TextField(
         blank=True,
         null=True,
         help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
-    )
-
-    # Language is not mandatory in the spec. We think it's because the language can be defined once at the XML root level and then is implied.
-    # We make it mandatory because we need to know explicitly.
-    language = models.CharField(
-        max_length=3,
-        choices=s100.models.ISO639_3.choices,
-        # No description in XSD
     )
 
     mmsi_code = models.CharField(
@@ -444,6 +444,21 @@ class Telecommunications(s100.models.ComplexAttributeType):
         EMAIL = "email" # Messages and other data exchanged between individuals using computers in a network.
         # fmt: on
 
+    telecommunication_service = ChoiceArrayField(
+        base_field=models.CharField(
+            max_length=255,
+            choices=TelecommunicationService.choices,
+        ),
+        default=list,
+        blank=True,
+        help_text="Type of telecommunications service",
+    )
+
+    telecommunication_identifier = models.CharField(
+        max_length=255,
+        help_text="Identifier used for contact by means of a telecommunications service, such as a telephone number",
+    )
+
     contact_details = models.ForeignKey(
         ContactDetails, on_delete=models.CASCADE, related_name="telecommunications"
     )
@@ -467,21 +482,6 @@ class Telecommunications(s100.models.ComplexAttributeType):
         blank=True,
         null=True,
         help_text="The name of provider or type of carrier for a telecommunications service",
-    )
-
-    telecommunication_identifier = models.CharField(
-        max_length=255,
-        help_text="Identifier used for contact by means of a telecommunications service, such as a telephone number",
-    )
-
-    telecommunication_service = ChoiceArrayField(
-        base_field=models.CharField(
-            max_length=255,
-            choices=TelecommunicationService.choices,
-        ),
-        default=list,
-        blank=True,
-        help_text="Type of telecommunications service",
     )
 
     class Meta:
