@@ -10,10 +10,10 @@ class OneExtraWhenEmptyMixin:
             return 1
 
         related_content_type = ContentType.objects.get_for_model(obj)
-        plop = self.model.objects.filter(
+        existing_objects = self.model.objects.filter(
             content_type__pk=related_content_type.pk, object_id=obj.pk
         )
-        if plop.count():
+        if existing_objects.count():
             return 0
         return 1
 

@@ -6,7 +6,7 @@ div.choice-array-field {
     display: grid;
 }
 div.choice-array-field-several-columns {
-    grid-template-columns: repeat(auto-fill, 15rem);
+    grid-template-columns: repeat(auto-fill, 35ch);
 }
 div.choice-array-field-one-column {
     grid-template-columns: 1fr;
@@ -19,7 +19,6 @@ div.choice-array-field-one-column {
 fieldset.module, /* fieldsets django */
 .inline-group, /* inlines django */
 .inline-group.djn-group-nested /* Override un sélecteur spécifique provenant de django_nested_admin qui ajoute un border: none; */ {
-    border: 1px solid var(--primary); /* --primary est définie par django */
     border: 1px solid var(--admin-interface-module-background-color); /* --admin-interface-module-background-color est définie par django-admin-interface */
 }
 
@@ -48,11 +47,7 @@ fieldset.module, /* fieldsets django */
 .add-handler {
     border: 1px solid var(--admin-interface-module-background-color);
     padding: 0.2rem 1rem;
-}
-
-/* .inline-group ul.tools a.add, .inline-group div.add-row a,  */
-.inline-group .tabular tr.add-row td a {
-    background-position: 2px 50%;
+    background-position: 2px 50% !important;
 }
 
 label.required::after {

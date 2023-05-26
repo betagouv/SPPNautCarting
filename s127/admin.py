@@ -42,7 +42,11 @@ class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
                 "Main Radiocommunication",
                 {
                     "fields": [
-                        x for x in self.get_fields(request, obj) if x != "language"
+                        # FIXME: Write a generic concept to "dump" the fields
+                        # that were not mentioned in other fieldsets
+                        x
+                        for x in self.get_fields(request, obj)
+                        if x != "language"
                     ]
                 },
             ),
