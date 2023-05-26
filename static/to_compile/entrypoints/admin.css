@@ -22,17 +22,11 @@ fieldset.module, /* fieldsets django */
     border: 1px solid var(--admin-interface-module-background-color); /* --admin-interface-module-background-color est définie par django-admin-interface */
 }
 
-:is(fieldset.module, /* fieldsets django */
-.inline-group, /* inlines django */
-/* .inline-group.djn-group-nested Override un sélecteur spécifique provenant de django_nested_admin qui ajoute un border: none; */
-) h2 {
+:is(fieldset.module /* fieldsets django */, .inline-group /* inlines django */) h2 {
     font-size: 1.5rem;
     text-transform: capitalize;
 }
-:is(fieldset.module, /* fieldsets django */
-.inline-group, /* inlines django */
-/* .inline-group.djn-group-nested Override un sélecteur spécifique provenant de django_nested_admin qui ajoute un border: none;*/
-) h3 {
+:is(fieldset.module /* fieldsets django */, .inline-group /* inlines django */) h3 {
     font-size: 1.5rem;
 }
 

@@ -58,8 +58,8 @@ class Applicability(s100.models.InformationType):
 
     class LogicalConnectives(models.TextChoices):
         # fmt: off
-        LOGICAL_CONJUNCTION = "logical conjunction" # all the conditions described by the other attributes of the object, or sub-attributes of the same complex attribute, are true
-        LOGICAL_DISJUNCTION = "logical disjunction" # at least one of the conditions described by the other attributes of the object, or sub-attributes of the same complex attributes, is true
+        LOGICAL_CONJUNCTION = "logical conjunction", "Logical conjunction (AND)" # all the conditions described by the other attributes of the object, or sub-attributes of the same complex attribute, are true
+        LOGICAL_DISJUNCTION = "logical disjunction", "Logical disjunction (OR)" # at least one of the conditions described by the other attributes of the object, or sub-attributes of the same complex attributes, is true
         # fmt: on
 
     in_ballast = models.BooleanField(
