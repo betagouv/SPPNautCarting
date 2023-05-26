@@ -13,7 +13,7 @@ div.choice-array-field-one-column {
 }
 .choice-array-field label {
     /* FIXME : check why the last line over more than 3 has a higher space before */
-    width: 100%;
+    width: 100% !important;
 }
 
 fieldset.module, /* fieldsets django */
