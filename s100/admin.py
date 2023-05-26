@@ -22,6 +22,7 @@ class FeatureNameInline(
     OneExtraWhenEmptyMixin, nested_admin.NestedGenericTabularInline
 ):
     model = s100.models.FeatureName
+    is_sortable = False
 
 
 class InformationInline(nested_admin.NestedGenericStackedInline):
