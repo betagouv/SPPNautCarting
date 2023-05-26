@@ -357,7 +357,6 @@ class ContactDetails(s100.models.InformationType):
         validators=[RegexValidator(regex=r"^\d{9}$")],
     )
 
-    # FIXME : adding or removing information doesn't work in contactdetails modal
     information = GenericRelation(s100.models.Information)
 
     class Meta:
