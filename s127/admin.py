@@ -18,18 +18,18 @@ class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     extra = 0
 
 
-class ContactAddressInline(admin.StackedInline):
+class ContactAddressInline(nested_admin.NestedStackedInline):
     model = s127.models.ContactAddress
     extra = 0
 
 
-class TelecommunicationsInline(admin.StackedInline):
+class TelecommunicationsInline(nested_admin.NestedStackedInline):
     model = s127.models.Telecommunications
     extra = 1
 
 
 @admin.register(s127.models.ContactDetails)
-class ContactDetailsAdmin(admin.ModelAdmin):
+class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
     search_fields = ["id"]
 
     def get_fieldsets(self, request, obj=None):
