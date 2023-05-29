@@ -71,7 +71,7 @@ class PilotService(ReportableServiceArea):
         "False: remote pilot is not available: Remote pilotage is not available.",
     )
     # https://github.com/betagouv/SPPNautInterface/issues/228
-    geometry = s100.models.GMMultiSurface()
+    geometry = s100.models.GMMultiSurface(null=True, blank=True)
 
     # Uncomment when upgrading to django 4.2
     # class Meta:

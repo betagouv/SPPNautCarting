@@ -308,16 +308,16 @@ class FullPilotServiceAdmin(
 
     fieldsets_and_inlines_order = (
         FeatureNameInline,
-        "Geometry",
         "Pilotage district",
+        "Pilot boarding places",
         SrvContactInline,
         FeatureTypePermissionTypeInline,
-        "Pilot boarding places",
         NoticeTimeInline,
+        "Geometry",
     )
 
     fieldsets = [
-        ("Geometry", {"fields": ["geometry"]}),
+        ("Geometry", {"fields": ["geometry"], "classes": ["collapse"]}),
         ("Pilotage district", {"fields": ["pilotage_district"]}),
         ("Pilot boarding places", {"fields": ["pilot_boarding_places"]}),
         (
