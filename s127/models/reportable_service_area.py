@@ -3,8 +3,8 @@ from django.contrib.postgres.fields import ArrayField
 
 import s100.models
 from carting.fields import ChoiceArrayField
+from s127.models.contactable_area import PilotBoardingPlace
 from s127.models.feature_type import PilotageDistrict
-from s127.models.organisation_contact_area import PilotBoardingPlace
 
 from .shared import BOOLEAN_CHOICES, ReportableServiceArea
 
@@ -71,7 +71,7 @@ class PilotService(ReportableServiceArea):
         "False: remote pilot is not available: Remote pilotage is not available.",
     )
     # https://github.com/betagouv/SPPNautInterface/issues/228
-    geometry = s100.models.GMMultiSurface()
+    geometry = s100.models.GMMultiSurface(null=True, blank=True)
 
     # Uncomment when upgrading to django 4.2
     # class Meta:
@@ -105,7 +105,9 @@ class NoticeTime(s100.models.ComplexAttributeType):
         models.DurationField(),
         default=list,
         blank=True,
-        help_text="The time duration prior to the time the service is needed, when notice must be provided to the service provider.",
+        help_text="Format : hh:mm:ss <br/>"
+        "Separate multiple values with a comma.<br/>"
+        "The time duration prior to the time the service is needed, when notice must be provided to the service provider.<br/>",
     )
     notice_time_text = models.TextField(
         blank=True,
@@ -121,3 +123,10 @@ class NoticeTime(s100.models.ComplexAttributeType):
         null=True,
         help_text="Indicates whether the minimum or maximum value should be used to describe a condition or in application processing",
     )
+
+
+class FullPilotServiceProxy(PilotService):
+    class Meta:
+        proxy = True
+        verbose_name = "Pilot service (full form)"
+        verbose_name_plural = "Pilot services (full form)"

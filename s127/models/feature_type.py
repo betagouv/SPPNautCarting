@@ -5,12 +5,13 @@ import s100.models
 
 
 class PilotageDistrict(s100.models.FeatureType):
+    # https://github.com/betagouv/SPPNautInterface/issues/261
     communication_channel = ArrayField(
         models.CharField(max_length=255),
         default=list,
         blank=True,
         help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
-        "ℹ️ Write comma separated values to define multiple.",
+        "Separate multiple values with a comma.<br/>",
     )
 
     # Spec says it is optional. We've decided to make it mandatory.
