@@ -361,40 +361,6 @@ class ContactDetails(s100.models.InformationType):
     information = GenericRelation(s100.models.Information)
 
     def __str__(self):
-        parts = []
-
-        if self.call_name:
-            parts.append(f"Call name: {self.call_name}")
-
-        if self.call_sign:
-            parts.append(f"Call sign: {self.call_sign}")
-
-        if self.communication_channel:
-            parts.append(" or ".join(x for x in self.communication_channel))
-
-        if self.mmsi_code:
-            parts.append(f"Call sign: {self.mmsi_code}")
-
-        if self.language:
-            parts.append(f"Lang: {self.language}")
-
-        if self.pk and self.telecommunications.all():
-            parts.append(
-                "Telecoms: "
-                + " or ".join(str(x) for x in self.telecommunications.all())
-            )
-
-        if self.pk and self.radiocommunications.all():
-            parts.append(
-                "Radiocoms: "
-                + " or ".join(str(x) for x in self.radiocommunications.all())
-            )
-
-        if not parts:
-            return super().__str__()
-        return ", ".join(parts)
-
-    def __str__(self):
         if feature_name := self.feature_names.order_by("-display_name").first():
             return str(feature_name)
 
