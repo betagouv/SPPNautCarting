@@ -298,35 +298,9 @@ class CategoryOfCommPref(models.TextChoices):
     # fmt: on
 
 
-# https://github.com/betagouv/SPPNautInterface/issues/244
-class FrequencyPair(s100.models.GenericComplexAttributeType):
-    """
-    A pair of frequencies for transmitting and receiving radio signals.
-    The shore station transmits and receives on the frequencies indicated
-    """
-
-    frequency_shore_station_transmits = models.DecimalField(
-        max_digits=6,
-        decimal_places=1,
-        validators=[MinValueValidator(0)],
-        help_text="The shore station transmitter frequency expressed in kHz to one decimal place. Units: kHZ, Resolution: 0.1, Format: XXXXXX Examples: 4379.1 kHz becomes 043791; 13162.8 kHz becomes 131628",
-    )
-
-    frequency_shore_station_receives = models.DecimalField(
-        max_digits=6,
-        decimal_places=1,
-        validators=[MinValueValidator(0)],
-        help_text="The shore station receiver frequency expressed in kHz to one decimal place. Units: kHz, Resolution: 0.1, Format: XXXXXX Examples: 4379.1 kHz becomes 043791; 13162.8 kHz becomes 131628",
-    )
-
-    contact_instructions = models.TextField(
-        blank=True,
-        null=True,
-        help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
-    )
-
-
 # PDF page 26
+# FrequencyPair: Based on Shom Feedback, we decide to not modelized this relation
+# FrequencyPair: https://github.com/betagouv/SPPNautInterface/issues/244
 class ContactDetails(s100.models.InformationType):
     """
     Information on how to reach a person or organisation by postal, internet,
@@ -370,8 +344,6 @@ class ContactDetails(s100.models.InformationType):
         null=True,
         # No description in XSD
     )
-
-    frequency_pair = GenericRelation(FrequencyPair)
 
     contact_instructions = models.TextField(
         blank=True,
@@ -421,6 +393,12 @@ class ContactDetails(s100.models.InformationType):
         if not parts:
             return super().__str__()
         return ", ".join(parts)
+
+    def __str__(self):
+        if feature_name := self.feature_names.order_by("-display_name").first():
+            return str(feature_name)
+
+        return super().__str__()
 
     class Meta:
         verbose_name_plural = "Contact Details"
@@ -489,6 +467,8 @@ class ContactAddress(s100.models.ComplexAttributeType):
         verbose_name_plural = "Contact Addresses"
 
 
+# FrequencyPair: Based on Shom Feedback, we decide to not modelized this relation
+# FrequencyPair: https://github.com/betagouv/SPPNautInterface/issues/244
 class Radiocommunications(s100.models.ComplexAttributeType):
     """
     Detailed radiocommunications description with channels, frequencies, preferences and time schedules.
@@ -521,7 +501,7 @@ class Radiocommunications(s100.models.ComplexAttributeType):
         default=list,
         blank=True,
         help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
-        "ℹ️ Write comma separated values to define multiple.",
+        "Separate multiple values with a comma.<br/>",
     )
 
     contact_instructions = models.TextField(
@@ -529,9 +509,6 @@ class Radiocommunications(s100.models.ComplexAttributeType):
         null=True,
         help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
     )
-
-    # Complex attribute used by multiple classes
-    frequency_pair = GenericRelation(FrequencyPair)
 
     def __str__(self):
         parts = []

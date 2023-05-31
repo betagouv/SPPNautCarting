@@ -38,12 +38,6 @@ class RadiocommunicationsInline(nested_admin.NestedStackedInline):
     is_sortable = False
 
 
-class FrequencyPairInline(nested_admin.NestedGenericStackedInline):
-    model = s127.models.FrequencyPair
-    extra = 0
-    is_sortable = False
-
-
 @admin.register(s127.models.ContactDetails)
 class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
     search_fields = ["id"]
@@ -70,7 +64,6 @@ class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
 
     inlines = [
         RadiocommunicationsInline,
-        FrequencyPairInline,
         TelecommunicationsInline,
         ContactAddressInline,
         InformationInline,

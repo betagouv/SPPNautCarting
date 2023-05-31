@@ -359,3 +359,31 @@ class TestContactDetailsMMSICode:
             field: [error.code for error in error_list]
             for field, error_list in excinfo.value.error_dict.items()
         } == {"mmsi_code": ["invalid"]}
+
+
+class TestContactDetailsStr:
+    @pytest.mark.django_db
+    def test_not_saved(self):
+        assert str(ContactDetails()) == "ContactDetails object (None)"
+
+    @pytest.mark.django_db
+    def test_without_feature_name(self):
+        contact_details = ContactDetails.objects.create()
+        assert str(contact_details) == f"ContactDetails object ({contact_details.pk})"
+
+    @pytest.mark.django_db
+    def test_with_multiple_feature_names(self):
+        contact_details = ContactDetails.objects.create()
+        contact_details.feature_names.create(name="first", language="fra")
+        contact_details.feature_names.create(name="second", language="fra")
+        assert str(contact_details) == "first (fra)"
+
+    @pytest.mark.django_db
+    def test_uses_the_display_name(self):
+        contact_details = ContactDetails.objects.create()
+        contact_details.feature_names.create(name="first", language="fra")
+        contact_details.feature_names.create(
+            name="first display", language="fra", display_name=True
+        )
+        contact_details.feature_names.create(name="second", language="fra")
+        assert str(contact_details) == "first display (✓ fra)"
