@@ -1,7 +1,9 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
-from django.core.validators import MinValueValidator
+from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, RegexValidator
 from django.utils.text import Truncator
 
 import s100.models
@@ -12,27 +14,27 @@ from s127.models.shared import BOOLEAN_CHOICES, CategoryOfVessel
 class Applicability(s100.models.InformationType):
     class CategoryOfDangerousOrHazardousCargo(models.TextChoices):
         # fmt: off
-        IMDG_CODE_CLASS_1_DIV_1_1 = "IMDG Code Class 1 Div. 1.1" # Explosives, Division 1: substances and articles which have a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_2 = "IMDG Code Class 1 Div. 1.2" # Explosives, Division 2: substances and articles which have a projection hazard but not a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_3 = "IMDG Code Class 1 Div. 1.3" # Explosives, Division 3: substances and articles which have a fire hazard and either a minor blast hazard or a minor projection hazard or both, but not a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_4 = "IMDG Code Class 1 Div. 1.4" # Explosives, Division 4: substances and articles which present no significant hazard
-        IMDG_CODE_CLASS_1_DIV_1_5 = "IMDG Code Class 1 Div. 1.5" # Explosives, Division 5: very insensitive substances which have a mass explosion hazard
-        IMDG_CODE_CLASS_1_DIV_1_6 = "IMDG Code Class 1 Div. 1.6" # Explosives, Division 6: extremely insensitive articles which do not have a mass explosion hazard
-        IMDG_CODE_CLASS_2_DIV_2_1 = "IMDG Code Class 2 Div. 2.1" # Gases, flammable gases
-        IMDG_CODE_CLASS_2_DIV_2_2 = "IMDG Code Class 2 Div. 2.2" # Gases, non-flammable, non-toxic gases
-        IMDG_CODE_CLASS_2_DIV_2_3 = "IMDG Code Class 2 Div. 2.3" # Gases, toxic gases
-        IMDG_CODE_CLASS_3 = "IMDG Code Class 3" # flammable liquids
-        IMDG_CODE_CLASS_4_DIV_4_1 = "IMDG Code Class 4 Div. 4.1" # flammable solids, self-reactive substances and desensitized explosives
-        IMDG_CODE_CLASS_4_DIV_4_2 = "IMDG Code Class 4 Div. 4.2" # substances liable to spontaneous combustion
-        IMDG_CODE_CLASS_4_DIV_4_3 = "IMDG Code Class 4 Div. 4.3" # substances which, in contact with water, emit flammable gases
-        IMDG_CODE_CLASS_5_DIV_5_1 = "IMDG Code Class 5 Div. 5.1" # oxidizing substances
-        IMDG_CODE_CLASS_5_DIV_5_2 = "IMDG Code Class 5 Div. 5.2" # organic peroxides
-        IMDG_CODE_CLASS_6_DIV_6_1 = "IMDG Code Class 6 Div. 6.1" # toxic substances
-        IMDG_CODE_CLASS_6_DIV_6_2 = "IMDG Code Class 6 Div. 6.2" # infectious substances
-        IMDG_CODE_CLASS_7 = "IMDG Code Class 7" # Radioactive material
-        IMDG_CODE_CLASS_8 = "IMDG Code Class 8" # Corrosive substances
-        IMDG_CODE_CLASS_9 = "IMDG Code Class 9" # Miscellaneous dangerous substances and articles
-        HARMFUL_SUBSTANCES_IN_PACKAGED_FORM = "Harmful Substances in packaged form" # Harmful substances are those substances which are identified as marine pollutants in the International Maritime Dangerous Goods Code (IMDG Code). Packaged form is defined as the forms of containment specified for harmful substances in the IMDG Code. (MARPOL (73/78) Annex III)
+        IMDG_CODE_CLASS_1_DIV_1_1 = "IMDG Code Class 1 Div. 1.1", "Explosives, Division 1: substances and articles which have a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_2 = "IMDG Code Class 1 Div. 1.2", "Explosives, Division 2: substances and articles which have a projection hazard but not a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_3 = "IMDG Code Class 1 Div. 1.3", "Explosives, Division 3: substances and articles which have a fire hazard and either a minor blast hazard or a minor projection hazard or both, but not a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_4 = "IMDG Code Class 1 Div. 1.4", "Explosives, Division 4: substances and articles which present no significant hazard"
+        IMDG_CODE_CLASS_1_DIV_1_5 = "IMDG Code Class 1 Div. 1.5", "Explosives, Division 5: very insensitive substances which have a mass explosion hazard"
+        IMDG_CODE_CLASS_1_DIV_1_6 = "IMDG Code Class 1 Div. 1.6", "Explosives, Division 6: extremely insensitive articles which do not have a mass explosion hazard"
+        IMDG_CODE_CLASS_2_DIV_2_1 = "IMDG Code Class 2 Div. 2.1", "Gases, flammable gases"
+        IMDG_CODE_CLASS_2_DIV_2_2 = "IMDG Code Class 2 Div. 2.2", "Gases, non-flammable, non-toxic gases"
+        IMDG_CODE_CLASS_2_DIV_2_3 = "IMDG Code Class 2 Div. 2.3", "Gases, toxic gases"
+        IMDG_CODE_CLASS_3 = "IMDG Code Class 3", "flammable liquids"
+        IMDG_CODE_CLASS_4_DIV_4_1 = "IMDG Code Class 4 Div. 4.1", "flammable solids, self-reactive substances and desensitized explosives"
+        IMDG_CODE_CLASS_4_DIV_4_2 = "IMDG Code Class 4 Div. 4.2", "substances liable to spontaneous combustion"
+        IMDG_CODE_CLASS_4_DIV_4_3 = "IMDG Code Class 4 Div. 4.3", "substances which, in contact with water, emit flammable gases"
+        IMDG_CODE_CLASS_5_DIV_5_1 = "IMDG Code Class 5 Div. 5.1", "oxidizing substances"
+        IMDG_CODE_CLASS_5_DIV_5_2 = "IMDG Code Class 5 Div. 5.2", "organic peroxides"
+        IMDG_CODE_CLASS_6_DIV_6_1 = "IMDG Code Class 6 Div. 6.1", "toxic substances"
+        IMDG_CODE_CLASS_6_DIV_6_2 = "IMDG Code Class 6 Div. 6.2", "infectious substances"
+        IMDG_CODE_CLASS_7 = "IMDG Code Class 7", "Radioactive material"
+        IMDG_CODE_CLASS_8 = "IMDG Code Class 8", "Corrosive substances"
+        IMDG_CODE_CLASS_9 = "IMDG Code Class 9", "Miscellaneous dangerous substances and articles"
+        HARMFUL_SUBSTANCES_IN_PACKAGED_FORM = "Harmful Substances in packaged form", # Harmful substances are those substances which are identified as marine pollutants in the International Maritime Dangerous Goods Code (IMDG Code). Packaged form is defined as the forms of containment specified for harmful substances in the IMDG Code. (MARPOL (73/78) Annex III)
         # fmt: on
 
     class CategoryOfCargo(models.TextChoices):
@@ -56,8 +58,8 @@ class Applicability(s100.models.InformationType):
 
     class LogicalConnectives(models.TextChoices):
         # fmt: off
-        LOGICAL_CONJUNCTION = "logical conjunction" # all the conditions described by the other attributes of the object, or sub-attributes of the same complex attribute, are true
-        LOGICAL_DISJUNCTION = "logical disjunction" # at least one of the conditions described by the other attributes of the object, or sub-attributes of the same complex attributes, is true
+        LOGICAL_CONJUNCTION = "logical conjunction", "Logical conjunction (AND)" # all the conditions described by the other attributes of the object, or sub-attributes of the same complex attribute, are true
+        LOGICAL_DISJUNCTION = "logical disjunction", "Logical disjunction (OR)" # at least one of the conditions described by the other attributes of the object, or sub-attributes of the same complex attributes, is true
         # fmt: on
 
     in_ballast = models.BooleanField(
@@ -85,6 +87,7 @@ class Applicability(s100.models.InformationType):
         help_text="Classification of dangerous goods or hazardous materials based on the International Maritime Dangerous Goods Code"
         " (<a href='https://www.imo.org/fr/OurWork/Safety/Pages/DangerousGoods-default.aspx' target='_blank'>IMDG Code</a>)",
     )
+
     category_of_vessel = models.CharField(
         max_length=255,
         choices=CategoryOfVessel.choices,
@@ -284,3 +287,202 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
                 f"{self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).label}"
             )
         return super().__str__()
+
+
+class CategoryOfCommPref(models.TextChoices):
+    # fmt: off
+    PREFERRED_CALLING = "preferred calling" # the first choice channel or frequency to be used when calling a radio station
+    ALTERNATE_CALLING = "alternate calling" # a channel or frequency to be used for calling a radio station when the preferred channel or frequency is busy or is suffering from interference
+    PREFERRED_WORKING = "preferred working" # the first choice channel or frequency to be used when working with a radio station
+    ALTERNATE_WORKING = "alternate working" # a channel or frequency to be used for working with a radio station when the preferred working channel or frequency is busy or is suffering from interference
+    # fmt: on
+
+
+# PDF page 26
+class ContactDetails(s100.models.InformationType):
+    """
+    Information on how to reach a person or organisation by postal, internet,
+    telephone, telex and radio systems.
+    """
+
+    # https://github.com/betagouv/SPPNautInterface/issues/261
+    communication_channel = ArrayField(
+        models.CharField(max_length=255),
+        default=list,
+        blank=True,
+        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
+        "Separate multiple values with a comma.<br/>",
+    )
+    call_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The designated call name of a station, e.g. radio station, radar station, pilot. Remarks: This is the name used when calling a radio station by radio i.e. 'Singapore Pilots'.",
+    )
+
+    call_sign = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The designated call-sign of a radio station.",
+    )
+
+    # Language is not mandatory in the spec. We think it's because the language can be defined once at the XML root level and then is implied.
+    # We make it mandatory because we need to know explicitly.
+    language = models.CharField(
+        max_length=3,
+        choices=s100.models.ISO639_3.choices,
+        # No description in XSD
+    )
+
+    category_of_comm_pref = models.CharField(
+        max_length=255,
+        choices=CategoryOfCommPref.choices,
+        blank=True,
+        null=True,
+        # No description in XSD
+    )
+
+    contact_instructions = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
+    )
+
+    mmsi_code = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The Maritime Mobile Service Identity (MMSI) Code is formed of a series of nine digits which are transmitted over the radio path in order to uniquely identify ship stations, ship earth stations, coast stations, coast earth stations, and group calls. These identities are formed in such a way that the identity or part thereof can be used by telephone and telex subscribers connected to the general telecommunications network principally to call ships automatically.",
+        validators=[RegexValidator(regex=r"^\d{9}$")],
+    )
+
+    information = GenericRelation(s100.models.Information)
+
+    class Meta:
+        verbose_name_plural = "Contact Details"
+
+
+# PDF page 39
+class SrvContact(s100.models.GenericManyToMany):
+    # ManyToMany
+    contactable_content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="+"
+    )
+    contactable_object_id = models.BigIntegerField()
+    contactable_object = GenericForeignKey(
+        "contactable_content_type", "contactable_object_id"
+    )
+    contact_details = models.ForeignKey(ContactDetails, on_delete=models.CASCADE)
+
+
+class ContactAddress(s100.models.ComplexAttributeType):
+    """
+    Direction or superscription of a letter, package, etc., specifying the name
+    of the place to which it is directed, and optionally a contact person or
+    organisation who should receive it.
+    """
+
+    contact_details = models.ForeignKey(
+        ContactDetails, on_delete=models.CASCADE, related_name="contact_addresses"
+    )
+
+    # https://github.com/betagouv/SPPNautInterface/issues/262
+    delivery_point = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Details of where post can be delivered such as the apartment, name and/or number of a street, building or PO Box.",
+    )
+
+    city_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The name of a town or city.",
+    )
+
+    postal_code = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Known in various countries as a postcode, or ZIP code, the postal code is a series of letters and/or digits that identifies each postal delivery area.",
+    )
+
+    administrative_division = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Administrative division is a generic term for an administrative region within a country at a level below that of the sovereign state.",
+    )
+
+    country_name = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The name of a nation. (Adapted from The American Heritage Dictionaries)",
+    )
+
+    class Meta:
+        verbose_name_plural = "Contact Addresses"
+
+
+class Telecommunications(s100.models.ComplexAttributeType):
+    """
+    A means or channel of communicating at a distance by electrical or
+    electromagnetic means such as telegraphy, telephony, or broadcasting.
+    """
+
+    class TelecommunicationService(s100.models.CodeList):
+        # fmt: off
+        VOICE = "voice" # The transfer or exchange of information by using sounds that are being made by mouth and throat when speaking
+        FACSIMILE = "facsimile" # a system of transmitting and reproducing graphic matter (as printing or still pictures) by means of signals sent over telephone lines
+        SMS = "sms" # Short Message Service, a form of text messaging communication on phones and mobile phones
+        DATA = "data" # facts or information used usually to calculate, analyze, or plan something
+        STREAMED_DATA = "streamedData" # Streamed data is data that that is constantly received by and presented to an end-user while being delivered by a provider.
+        TELEX = "telex" # a system of communication in which messages are sent over long distances by using a telephone system and are printed by using a special machine (called a teletypewriter)
+        TELEGRAPH = "telegraph" # an apparatus, system, or process for communication at a distance by electric transmission over wire
+        EMAIL = "email" # Messages and other data exchanged between individuals using computers in a network.
+        # fmt: on
+
+    telecommunication_service = ChoiceArrayField(
+        base_field=models.CharField(
+            max_length=255,
+            choices=TelecommunicationService.choices,
+        ),
+        default=list,
+        blank=True,
+        help_text="Type of telecommunications service",
+    )
+
+    telecommunication_identifier = models.CharField(
+        max_length=255,
+        help_text="Identifier used for contact by means of a telecommunications service, such as a telephone number",
+    )
+
+    contact_details = models.ForeignKey(
+        ContactDetails, on_delete=models.CASCADE, related_name="telecommunications"
+    )
+
+    category_of_comm_pref = models.CharField(
+        max_length=255,
+        choices=CategoryOfCommPref.choices,
+        blank=True,
+        null=True,
+        # No description in XSD
+    )
+
+    contact_instructions = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Instructions on how and when to contact an individual or organisation",
+    )
+
+    telcom_carrier = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="The name of provider or type of carrier for a telecommunications service",
+    )
+
+    class Meta:
+        verbose_name_plural = "Telecommunications"

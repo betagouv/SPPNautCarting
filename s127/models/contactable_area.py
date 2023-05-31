@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from carting.fields import ChoiceArrayField
 
-from .shared import CategoryOfVessel, OrganisationContactArea
+from .shared import CategoryOfVessel, ContactableArea
 
 
 def validate_point_or_surface(collection: GeometryCollection):
@@ -13,7 +13,7 @@ def validate_point_or_surface(collection: GeometryCollection):
         raise ValidationError(message="OH MY GOD !", code="point_or_surface")
 
 
-class PilotBoardingPlace(OrganisationContactArea):
+class PilotBoardingPlace(ContactableArea):
     class CategoryOfPilotBoardingPlace(models.TextChoices):
         # fmt: off
         BOARDING_BY_PILOT_CRUISING_VESSEL = "boarding by pilot-cruising vessel" # Pilot boards from a cruising vessel.
@@ -59,6 +59,15 @@ class PilotBoardingPlace(OrganisationContactArea):
     # We choose to skip this relation as we believe it's implicit through PilotService
     # pilotage_district = models.ForeignKey(PilotageDistrict, on_delete=models.CASCADE)
 
+    # https://github.com/betagouv/SPPNautInterface/issues/261
+    communication_channel = ArrayField(
+        models.CharField(max_length=255),
+        default=list,
+        blank=True,
+        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
+        "Separate multiple values with a comma.<br/>",
+    )
+
     call_sign = models.CharField(
         max_length=255,
         blank=True,
@@ -87,13 +96,6 @@ class PilotBoardingPlace(OrganisationContactArea):
         help_text="Classification of vessels by function or use",
     )
 
-    communication_channel = ArrayField(
-        models.CharField(max_length=255),
-        default=list,
-        blank=True,
-        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
-        "ℹ️ Write comma separated values to define multiple.",
-    )
     destination = models.CharField(
         max_length=255,
         blank=True,
