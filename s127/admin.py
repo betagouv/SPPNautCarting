@@ -10,26 +10,36 @@ class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
     verbose_name_plural = "Vessel measurements"
     model = s127.models.VesselsMeasurements
     extra = 0
+    is_sortable = False
 
 
 class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
     model = s127.models.Applicability
     inlines = [InformationInline, VesselsMeasurementsInline]
     extra = 0
+    is_sortable = False
 
 
 class ContactAddressInline(nested_admin.NestedStackedInline):
     model = s127.models.ContactAddress
     extra = 0
+    is_sortable = False
 
 
 class TelecommunicationsInline(nested_admin.NestedStackedInline):
     model = s127.models.Telecommunications
     extra = 1
+    is_sortable = False
+
+
+class RadiocommunicationsInline(nested_admin.NestedStackedInline):
+    model = s127.models.Radiocommunications
+    extra = 0
+    is_sortable = False
 
 
 @admin.register(s127.models.ContactDetails)
-class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
+class ContactDetailsAdmin(ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin):
     search_fields = ["id"]
 
     def get_fieldsets(self, request, obj=None):
@@ -52,13 +62,21 @@ class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
             ),
         ]
 
-    inlines = [TelecommunicationsInline, ContactAddressInline, InformationInline]
+    inlines = [
+        FeatureNameInline,
+        RadiocommunicationsInline,
+        TelecommunicationsInline,
+        ContactAddressInline,
+        InformationInline,
+    ]
+    fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
     inlines = [FeatureNameInline]
     model = s127.models.PilotBoardingPlace
     extra = 0
+    is_sortable = False
 
 
 class SrvContactInline(nested_admin.NestedGenericTabularInline):
@@ -70,6 +88,7 @@ class SrvContactInline(nested_admin.NestedGenericTabularInline):
     min_num = 0
     extra = 0
     autocomplete_fields = ["contact_details"]
+    is_sortable = False
 
 
 class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
@@ -80,6 +99,7 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     min_num = 0
     extra = 0
     autocomplete_fields = ["applicability"]
+    is_sortable = False
 
 
 class AccumulatedInlines:

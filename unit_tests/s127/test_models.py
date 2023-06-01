@@ -14,6 +14,7 @@ from s127.models import (
     Applicability,
     ContactDetails,
     PilotBoardingPlace,
+    Telecommunications,
     VesselsMeasurements,
 )
 from s127.models.shared import CategoryOfVessel
@@ -359,3 +360,39 @@ class TestContactDetailsMMSICode:
             field: [error.code for error in error_list]
             for field, error_list in excinfo.value.error_dict.items()
         } == {"mmsi_code": ["invalid"]}
+
+
+class TestTelecommunicationsStr:
+    def test_empty(self):
+        assert str(Telecommunications()) == "Telecommunications object (None)"
+
+    def test_telecommunication_identifier(self):
+        assert str(Telecommunications(telecommunication_identifier="a")) == "a"
+
+    def test_one_telecommunication_service(self):
+        assert (
+            str(
+                Telecommunications(
+                    telecommunication_identifier="a",
+                    telecommunication_service=[
+                        Telecommunications.TelecommunicationService.VOICE
+                    ],
+                )
+            )
+            == "Voice: a"
+        )
+
+    def test_several_telecommunication_service(self):
+        assert (
+            str(
+                Telecommunications(
+                    telecommunication_identifier="a",
+                    telecommunication_service=[
+                        Telecommunications.TelecommunicationService.VOICE,
+                        Telecommunications.TelecommunicationService.SMS,
+                        Telecommunications.TelecommunicationService.FACSIMILE,
+                    ],
+                )
+            )
+            == "Voice/Sms/Facsimile: a"
+        )

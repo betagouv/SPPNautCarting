@@ -299,6 +299,8 @@ class CategoryOfCommPref(models.TextChoices):
 
 
 # PDF page 26
+# FrequencyPair: Based on Shom Feedback, we decide to not modelized this relation
+# FrequencyPair: https://github.com/betagouv/SPPNautInterface/issues/244
 class ContactDetails(s100.models.InformationType):
     """
     Information on how to reach a person or organisation by postal, internet,
@@ -348,7 +350,6 @@ class ContactDetails(s100.models.InformationType):
         null=True,
         help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
     )
-
     mmsi_code = models.CharField(
         max_length=255,
         blank=True,
@@ -426,6 +427,47 @@ class ContactAddress(s100.models.ComplexAttributeType):
         verbose_name_plural = "Contact Addresses"
 
 
+# FrequencyPair: Based on Shom Feedback, we decide to not modelized this relation
+# FrequencyPair: https://github.com/betagouv/SPPNautInterface/issues/244
+# signalFrequency: https://github.com/betagouv/SPPNautInterface/issues/240
+# transmissionContent: https://github.com/betagouv/SPPNautInterface/issues/241
+# contactDetails: https://github.com/betagouv/SPPNautInterface/issues/273
+class Radiocommunications(s100.models.ComplexAttributeType):
+    """
+    Detailed radiocommunications description with channels, frequencies, preferences and time schedules.
+    """
+
+    contact_details = models.ForeignKey(
+        ContactDetails, on_delete=models.CASCADE, related_name="radiocommunications"
+    )
+
+    # Maybe an alias for categoryOfChannelOrFrequencyPreference?
+    category_of_comm_pref = models.CharField(
+        max_length=255,
+        choices=CategoryOfCommPref.choices,
+        blank=True,
+        null=True,
+        # No description in XSD
+    )
+
+    communication_channel = ArrayField(
+        models.CharField(max_length=255),
+        default=list,
+        blank=True,
+        help_text="A channel number assigned to a specific radio frequency, frequencies or frequency band.<br/>"
+        "Separate multiple values with a comma.<br/>",
+    )
+
+    contact_instructions = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
+    )
+
+    class Meta:
+        verbose_name_plural = "Radiocommunications"
+
+
 class Telecommunications(s100.models.ComplexAttributeType):
     """
     A means or channel of communicating at a distance by electrical or
@@ -483,6 +525,23 @@ class Telecommunications(s100.models.ComplexAttributeType):
         null=True,
         help_text="The name of provider or type of carrier for a telecommunications service",
     )
+
+    def __str__(self):
+        parts = []
+
+        if self.telecommunication_service:
+            parts.append(
+                "/".join(
+                    self.TelecommunicationService(x).label
+                    for x in self.telecommunication_service
+                )
+            )
+        if self.telecommunication_identifier:
+            parts.append(f"{self.telecommunication_identifier}")
+
+        if not parts:
+            return super().__str__()
+        return ": ".join(parts)
 
     class Meta:
         verbose_name_plural = "Telecommunications"
