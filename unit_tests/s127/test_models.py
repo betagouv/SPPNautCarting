@@ -14,6 +14,7 @@ from s127.models import (
     Applicability,
     ContactDetails,
     PilotBoardingPlace,
+    Telecommunications,
     VesselsMeasurements,
 )
 from s127.models.shared import CategoryOfVessel
@@ -361,29 +362,37 @@ class TestContactDetailsMMSICode:
         } == {"mmsi_code": ["invalid"]}
 
 
-class TestContactDetailsStr:
-    @pytest.mark.django_db
-    def test_not_saved(self):
-        assert str(ContactDetails()) == "ContactDetails object (None)"
+class TestTelecommunicationsStr:
+    def test_empty(self):
+        assert str(Telecommunications()) == "Telecommunications object (None)"
 
-    @pytest.mark.django_db
-    def test_without_feature_name(self):
-        contact_details = ContactDetails.objects.create()
-        assert str(contact_details) == f"ContactDetails object ({contact_details.pk})"
+    def test_telecommunication_identifier(self):
+        assert str(Telecommunications(telecommunication_identifier="a")) == "a"
 
-    @pytest.mark.django_db
-    def test_with_multiple_feature_names(self):
-        contact_details = ContactDetails.objects.create()
-        contact_details.feature_names.create(name="first", language="fra")
-        contact_details.feature_names.create(name="second", language="fra")
-        assert str(contact_details) == "first (fra)"
-
-    @pytest.mark.django_db
-    def test_uses_the_display_name(self):
-        contact_details = ContactDetails.objects.create()
-        contact_details.feature_names.create(name="first", language="fra")
-        contact_details.feature_names.create(
-            name="first display", language="fra", display_name=True
+    def test_one_telecommunication_service(self):
+        assert (
+            str(
+                Telecommunications(
+                    telecommunication_identifier="a",
+                    telecommunication_service=[
+                        Telecommunications.TelecommunicationService.VOICE
+                    ],
+                )
+            )
+            == "Voice: a"
         )
-        contact_details.feature_names.create(name="second", language="fra")
-        assert str(contact_details) == "first display (✓ fra)"
+
+    def test_several_telecommunication_service(self):
+        assert (
+            str(
+                Telecommunications(
+                    telecommunication_identifier="a",
+                    telecommunication_service=[
+                        Telecommunications.TelecommunicationService.VOICE,
+                        Telecommunications.TelecommunicationService.SMS,
+                        Telecommunications.TelecommunicationService.FACSIMILE,
+                    ],
+                )
+            )
+            == "Voice/Sms/Facsimile: a"
+        )

@@ -360,12 +360,6 @@ class ContactDetails(s100.models.InformationType):
 
     information = GenericRelation(s100.models.Information)
 
-    def __str__(self):
-        if feature_name := self.feature_names.order_by("-display_name").first():
-            return str(feature_name)
-
-        return super().__str__()
-
     class Meta:
         verbose_name_plural = "Contact Details"
 
@@ -476,21 +470,6 @@ class Radiocommunications(s100.models.ComplexAttributeType):
         help_text="Supplemental instructions on how or when to contact the individual, organisation, or service",
     )
 
-    def __str__(self):
-        parts = []
-
-        if self.communication_channel:
-            parts.append(" or ".join(x for x in self.communication_channel))
-
-        if self.category_of_comm_pref:
-            parts.append(
-                f"Com Pref: {CategoryOfCommPref(self.category_of_comm_pref).label}"
-            )
-
-        if not parts:
-            return super().__str__()
-        return ", ".join(parts)
-
     class Meta:
         verbose_name_plural = "Radiocommunications"
 
@@ -556,20 +535,19 @@ class Telecommunications(s100.models.ComplexAttributeType):
     def __str__(self):
         parts = []
 
-        if self.telecommunication_identifier:
-            parts.append(f"Tel identifier: {self.telecommunication_identifier}")
-
         if self.telecommunication_service:
             parts.append(
-                " or ".join(
+                "/".join(
                     self.TelecommunicationService(x).label
                     for x in self.telecommunication_service
                 )
             )
+        if self.telecommunication_identifier:
+            parts.append(f"{self.telecommunication_identifier}")
 
         if not parts:
             return super().__str__()
-        return ", ".join(parts)
+        return ": ".join(parts)
 
     class Meta:
         verbose_name_plural = "Telecommunications"

@@ -115,7 +115,9 @@ class FeatureType(models.Model):
         abstract = True
 
     def __str__(self):
-        if feature_name := self.feature_names.order_by("-display_name").first():
+        if self.pk and (
+            feature_name := self.feature_names.order_by("-display_name").first()
+        ):
             return str(feature_name)
 
         return super().__str__()
@@ -126,6 +128,14 @@ class InformationType(models.Model):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        if self.pk and (
+            feature_name := self.feature_names.order_by("-display_name").first()
+        ):
+            return str(feature_name)
+
+        return super().__str__()
 
 
 class GenericManyToMany(models.Model):
