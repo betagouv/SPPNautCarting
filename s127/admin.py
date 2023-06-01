@@ -121,9 +121,10 @@ class ContactDetailsAdmin(InformationTypeAdmin):
 
     inlines = [
         FeatureNameInline,
-        RadiocommunicationsInline,
         TelecommunicationsInline,
-        ContactAddressInline,
+        RadiocommunicationsInline,  # to collapse
+        ContactAddressInline,  # to collapse
+        InformationInline,  # to collapse
     ]
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
@@ -219,12 +220,17 @@ class PilotageDistrictAdmin(FeatureTypeAdmin):
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Geometry",
+        FeatureTypePermissionTypeInline,
+        TextContentInline,  # Collapse if possible
         "Communication channel",
     )
 
     fieldsets = [
         ("Geometry", {"fields": ["geometry"]}),
-        ("Communication channel", {"fields": ["communication_channel"]}),
+        (
+            "Communication channel",
+            {"fields": ["communication_channel"], "classes": ["collapse"]},
+        ),
     ]
 
     @admin.display(description="Pilot Services")
@@ -255,8 +261,11 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Geometry",
-        "Communication",
         "Details",
+        "Communication",
+        SrvContactInline,  # Collapse if possible
+        FeatureTypePermissionTypeInline,  # Collapse if possible
+        TextContentInline,  # Collapse if possible
     )
 
     fieldsets = (
@@ -267,6 +276,7 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
                     "communication_channel",
                     "call_sign",
                 ),
+                "classes": ["collapse"],
             },
         ),
         (
@@ -328,13 +338,16 @@ class FullPilotServiceAdmin(PilotServiceAdmin):
     autocomplete_fields = ["pilotage_district"]
     inlines = [NoticeTimeInline, PilotServicePilotBoardingPlaceInline]
 
+    # NestedGenericTabularInline -> march pas avec ct_admin.GenericTabularInline
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Pilotage district",
         PilotServicePilotBoardingPlaceInline,
         SrvContactInline,
-        FeatureTypePermissionTypeInline,
+        FeatureTypePermissionTypeInline,  # Collapse if possible
         NoticeTimeInline,
+        "Pilot details",
+        TextContentInline,  # Collapse if possible
         "Geometry",
     )
 
@@ -345,8 +358,8 @@ class FullPilotServiceAdmin(PilotServiceAdmin):
             "Pilot details",
             {
                 "fields": [
-                    "category_of_pilot",
                     "remote_pilot",
+                    "category_of_pilot",
                     "pilot_qualification",
                     "pilot_request",
                 ]
