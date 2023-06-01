@@ -9,3 +9,4 @@ static/collected
 static/compiled
 node_modules
 *.egg-info
+pgdata

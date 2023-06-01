@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     "django.contrib.gis",
     "django_extensions",
     "nested_admin",
-    "spo",
     "carting",
     "s100",
     "s127",
@@ -93,7 +92,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "spo.context_processors.menu",
             ],
         },
     },
@@ -224,7 +222,6 @@ sentry_sdk.init(
     # something more human-readable.
     # release="myapp@1.0.0",
 )
-LOGIN_REDIRECT_URL = "spo:ouvrages_by_name"
 LANGUAGE_CODE = "fr"
 
 SHELL_PLUS_PRINT_SQL = True

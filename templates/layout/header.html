@@ -34,19 +34,6 @@
                         <p class="fr-header__service-tagline fr-text--sm"><i>Plateforme interactive et géolocalisée</i></p>
                     </div>
                 </div>
-                <div class="fr-header__tools">
-                    <div class="fr-header__tools-links">
-                        <ul class="fr-btns-group">
-                            {% if user.is_authenticated %}
-                                <li>
-                                    <a class="fr-btn fr-icon-logout-box-r-line" href="{% url 'logout' %}">
-                                        Se déconnecter
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
 
             </div>
         </div>
