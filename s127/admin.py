@@ -34,12 +34,12 @@ class TelecommunicationsInline(nested_admin.NestedStackedInline):
 
 class RadiocommunicationsInline(nested_admin.NestedStackedInline):
     model = s127.models.Radiocommunications
-    extra = 1
+    extra = 0
     is_sortable = False
 
 
 @admin.register(s127.models.ContactDetails)
-class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
+class ContactDetailsAdmin(ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin):
     search_fields = ["id"]
 
     def get_fieldsets(self, request, obj=None):
@@ -63,11 +63,13 @@ class ContactDetailsAdmin(nested_admin.NestedModelAdmin):
         ]
 
     inlines = [
+        FeatureNameInline,
         RadiocommunicationsInline,
         TelecommunicationsInline,
         ContactAddressInline,
         InformationInline,
     ]
+    fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
