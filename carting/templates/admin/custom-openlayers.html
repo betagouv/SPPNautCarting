@@ -1,9 +1,28 @@
 {% extends "gis/openlayers-osm.html" %}
 
-{% block options %}{{ block.super }}
+{% block options %}
+{{ block.super }}
 options['map_epsg'] = '{{ map_epsg }}';
 options['dataset_epsg'] = '{{ dataset_epsg }}';
-{% endblock %}
+options["style"] = new ol.style.Style({
+    fill: new ol.style.Fill({ color: "rgba(255,0,0,.5)" }),
+    stroke: new ol.style.Stroke({
+        color: "red",
+        width: 2,
+    }),
+    image: new ol.style.Circle({
+        radius: 7,
+        fill: new ol.style.Fill({
+            color: "rgba(255, 0,0)",
+        }),
+        stroke: new ol.style.Stroke({
+            color: "white",
+            width: 2,
+        }),
+    }),
+})
+
+{% endblock options %}
 
 {% block base_layer %}
 const layerPerZoom = [
