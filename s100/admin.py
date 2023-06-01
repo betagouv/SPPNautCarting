@@ -4,25 +4,11 @@ from django.contrib.contenttypes.models import ContentType
 import s100.models
 
 
-class OneExtraWhenEmptyMixin:
-    def get_extra(self, request, obj=None, **kwargs):
-        if not obj:
-            return 1
-
-        related_content_type = ContentType.objects.get_for_model(obj)
-        existing_objects = self.model.objects.filter(
-            content_type__pk=related_content_type.pk, object_id=obj.pk
-        )
-        if existing_objects.count():
-            return 0
-        return 1
-
-
-class FeatureNameInline(
-    OneExtraWhenEmptyMixin, nested_admin.NestedGenericTabularInline
-):
+class FeatureNameInline(nested_admin.NestedGenericTabularInline):
     model = s100.models.FeatureName
     is_sortable = False
+    min_num = 1
+    extra = 0
 
 
 class InformationInline(nested_admin.NestedGenericStackedInline):

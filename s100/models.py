@@ -74,7 +74,11 @@ class FeatureName(GenericComplexAttributeType):
                 fields=["content_type", "object_id", "display_name"],
                 condition=models.Q(display_name=True),
                 name="unique_display_name",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["content_type", "name", "language"],
+                name="unique_name_per_feature_type_and_language",
+            ),
         ]
 
         # Uncomment when upgrading to django 4.2
