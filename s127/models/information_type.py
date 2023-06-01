@@ -429,25 +429,19 @@ class ContactAddress(s100.models.ComplexAttributeType):
 
 # FrequencyPair: Based on Shom Feedback, we decide to not modelized this relation
 # FrequencyPair: https://github.com/betagouv/SPPNautInterface/issues/244
+# signalFrequency: https://github.com/betagouv/SPPNautInterface/issues/240
+# transmissionContent: https://github.com/betagouv/SPPNautInterface/issues/241
+# contactDetails: https://github.com/betagouv/SPPNautInterface/issues/273
 class Radiocommunications(s100.models.ComplexAttributeType):
     """
     Detailed radiocommunications description with channels, frequencies, preferences and time schedules.
-
-    https://github.com/betagouv/SPPNautInterface/issues/273
-    https://github.com/betagouv/SPPNautInterface/issues/240
-    https://github.com/betagouv/SPPNautInterface/issues/241
-    When bound to ContactDetails, only the listed sub-attributes may be used:
-        - communicationChannel
-        - contactinstructions
-        - frequencypair
-        - categoryOfChannelOrFrequencyPreference => categoryOfCommPref ?
-        - timeIntervalsByDayOfWeek => Not modelized yet
     """
 
     contact_details = models.ForeignKey(
         ContactDetails, on_delete=models.CASCADE, related_name="radiocommunications"
     )
 
+    # Maybe an alias for categoryOfChannelOrFrequencyPreference?
     category_of_comm_pref = models.CharField(
         max_length=255,
         choices=CategoryOfCommPref.choices,
