@@ -41,4 +41,4 @@ class TextContentInline(nested_admin.NestedGenericStackedInline):
     extra = 0
     max_num = 1
     is_sortable = False
-    # classes = ["collapse"] FIXME
+    classes = ["collapse"]
