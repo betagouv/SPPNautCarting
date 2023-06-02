@@ -68,6 +68,7 @@ class FeatureName(GenericComplexAttributeType):
         return f"{self.name} ({'✓ ' if self.display_name else ''}{self.language})"
 
     class Meta:
+        unique_together = [["content_type", "name", "language"]]
         constraints = [
             # https://github.com/betagouv/SPPNautInterface/issues/227
             models.UniqueConstraint(
@@ -75,10 +76,10 @@ class FeatureName(GenericComplexAttributeType):
                 condition=models.Q(display_name=True),
                 name="unique_display_name",
             ),
-            models.UniqueConstraint(
-                fields=["content_type", "name", "language"],
-                name="unique_name_per_feature_type_and_language",
-            ),
+            # models.UniqueConstraint(
+            #     fields=["content_type", "name", "language"],
+            #     name="unique_name_per_feature_type_and_language",
+            # ),
         ]
 
         # Uncomment when upgrading to django 4.2
