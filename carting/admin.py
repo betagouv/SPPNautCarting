@@ -39,6 +39,34 @@ def children(instance: TreeNode):
 
 
 class Toto:
+    def __init__(self, inlines=None, fields=None):
+        self.inlines = inlines
+        self.fields = fields
+        self.formsets = []
+
+    def retrieve_formsets_and_fieldsets(self, request, admin):
+        print(type(admin), admin)
+        if self.inlines:
+            admin.inlines = self.inlines
+
+            formsets = []
+            inline_instances = []
+
+            for formset, inline in admin.get_formsets_with_inlines(request, None):
+                formsets.append(formset)
+                inline_instances.append(inline)
+
+            self.formsets = admin.get_inline_formsets(
+                request, formsets, inline_instances, obj=None
+            )
+
+        # self.fieldsets = [admin.get_form()]
+
+    @property
+    def coucou(self):
+        print(self.formsets)
+        return self.formsets
+
     toto = "coucou"
 
 
@@ -49,12 +77,14 @@ class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
     def render_change_form(self, request, context, *args, **kwargs):
         context.update(
             {
-                "fieldsets_and_inlines": self._get_fieldsets_and_inlines(context),
+                "fieldsets_and_inlines": self._get_fieldsets_and_inlines(
+                    context, request
+                ),
             }
         )
         return super().render_change_form(request, context, *args, **kwargs)
 
-    def _get_fieldsets_and_inlines(self, context):
+    def _get_fieldsets_and_inlines(self, context, request):
         admin_inlines_formsets = cast(
             list[forms.BaseInlineFormSet],
             context["inline_admin_formsets"],
@@ -66,6 +96,7 @@ class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
         for fieldset_or_inline in fieldsets_and_inlines_order:
             match fieldset_or_inline:
                 case Toto():
+                    fieldset_or_inline.retrieve_formsets_and_fieldsets(request, self)
                     fieldsets_and_inlines.extend([fieldset_or_inline])
                 case str() | NoneType():
                     fieldsets_and_inlines.extend(

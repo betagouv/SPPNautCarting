@@ -13,10 +13,9 @@ from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
-    # title = "Coucou"
     verbose_name_plural = "Vessel measurements"
     model = s127.models.VesselsMeasurements
-    extra = 0
+    extra = 1
     is_sortable = False
 
 
@@ -138,7 +137,8 @@ class ContactDetailsAdmin(InformationTypeAdmin):
 class ApplicabilityAdmin(InformationTypeAdmin):
     search_fields = ["id"]
     inlines = [InformationInline, VesselsMeasurementsInline]
-    fieldsets_and_inlines_order = (Toto(), None, VesselsMeasurementsInline, Toto())
+    toto = Toto(inlines=[VesselsMeasurementsInline], fields=["logical_connectives"])
+    fieldsets_and_inlines_order = (None, VesselsMeasurementsInline, toto)
 
     # def get_foo(self, request):
     #     some_admin = self
