@@ -9,10 +9,12 @@ from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
+    title = "Coucou"
     verbose_name_plural = "Vessel measurements"
     model = s127.models.VesselsMeasurements
     extra = 0
     is_sortable = False
+    extra_fields = ["coucou", "youpi"]
 
 
 class ContactAddressInline(nested_admin.NestedStackedInline):
@@ -144,7 +146,8 @@ class ApplicabilityAdmin(InformationTypeAdmin):
             {
                 "fields": [
                     "logical_connectives",
-                ]
+                ],
+                "inlines": ["coucou", "youpi"],
             },
         ),
         (
