@@ -41,9 +41,15 @@ class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
     change_form_template = "admin/change_form_with_ordered_formsets.html"
     fieldsets_and_inlines_order = ()
 
+    def get_foo(self):
+        pass
+
     def render_change_form(self, request, context, *args, **kwargs):
         context.update(
-            {"fieldsets_and_inlines": self._get_fieldsets_and_inlines(context)}
+            {
+                "fieldsets_and_inlines": self._get_fieldsets_and_inlines(context),
+                "foo": self.get_foo(request),
+            }
         )
         return super().render_change_form(request, context, *args, **kwargs)
 

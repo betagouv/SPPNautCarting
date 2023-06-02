@@ -2,6 +2,16 @@
 
 {# Here we render mixed normal and inline fieldsets #}
 {% block field_sets %}
+
+<div style="background: pink;">
+  {{ foo.form }}
+  {% for formset, inline in foo.formsets %}
+    {% for form in formset %}
+    {{ form }}
+    {% endfor %}
+
+  {% endfor %}
+</div>
   {% for fieldset_or_inline in fieldsets_and_inlines %}
     {% if fieldset_or_inline.opts.template %}
       {% include fieldset_or_inline.opts.template with inline_admin_formset=fieldset_or_inline %}

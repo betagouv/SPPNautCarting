@@ -9,7 +9,7 @@ from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
-    title = "Coucou"
+    # title = "Coucou"
     verbose_name_plural = "Vessel measurements"
     model = s127.models.VesselsMeasurements
     extra = 0
@@ -140,6 +140,16 @@ class ApplicabilityAdmin(InformationTypeAdmin):
         VesselsMeasurementsInline,
     )
 
+    def get_foo(self, request):
+        # return [("logical_connectives", VesselsMeasurementsInline)]
+        some_admin = self
+        some_admin.fieldsets = [(None, {"fields": ["logical_connectives"]})]
+        some_admin.inlines = [VesselsMeasurementsInline]
+        return {
+            "form": some_admin.get_form(request),
+            "formsets": some_admin.get_formsets_with_inlines(request),
+        }
+
     fieldsets = [
         (
             None,
@@ -147,7 +157,6 @@ class ApplicabilityAdmin(InformationTypeAdmin):
                 "fields": [
                     "logical_connectives",
                 ],
-                "inlines": ["coucou", "youpi"],
             },
         ),
         (
