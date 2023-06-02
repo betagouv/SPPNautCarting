@@ -9,18 +9,14 @@
     data-inline-model="{{ inline_admin_formset.inline_model_id }}">
 
     {% ifinlineclasses %}<fieldset class="djn-fieldset module {{ inline_admin_formset.classes }}">{% endifinlineclasses %}
+    {% if not noheader %}
     <h2>
         {% if inline_admin_formset.opts.title %}{{ inline_admin_formset.opts.title }}{% else %}{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}{% endif %}
     </h2>
+    {% endif %}
 
     {{ inline_admin_formset.formset.management_form }}
     {{ inline_admin_formset.formset.non_form_errors }}
-
-    <div class="">
-        {% for field in inline_admin_formset.opts.extra_fields %}
-        {{ field }}
-        {% endfor %}
-    </div>
 
     <div class="items djn-items">
 

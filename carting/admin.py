@@ -1,4 +1,5 @@
 import logging
+from types import NoneType
 from typing import cast
 
 from django import forms
@@ -37,18 +38,18 @@ def children(instance: TreeNode):
     )
 
 
+class Toto:
+    toto = "coucou"
+
+
 class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
     change_form_template = "admin/change_form_with_ordered_formsets.html"
     fieldsets_and_inlines_order = ()
-
-    def get_foo(self):
-        pass
 
     def render_change_form(self, request, context, *args, **kwargs):
         context.update(
             {
                 "fieldsets_and_inlines": self._get_fieldsets_and_inlines(context),
-                "foo": self.get_foo(request),
             }
         )
         return super().render_change_form(request, context, *args, **kwargs)
@@ -64,7 +65,9 @@ class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
         fieldsets_and_inlines = []
         for fieldset_or_inline in fieldsets_and_inlines_order:
             match fieldset_or_inline:
-                case str() | None:
+                case Toto():
+                    fieldsets_and_inlines.extend([fieldset_or_inline])
+                case str() | NoneType():
                     fieldsets_and_inlines.extend(
                         fieldset
                         for fieldset in adminform

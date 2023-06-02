@@ -2,7 +2,11 @@ import nested_admin
 from django.contrib import admin
 
 import s127.models
-from carting.admin import GISModelAdminWithRasterMarine, ModelAdminWithOrderedFormsets
+from carting.admin import (
+    GISModelAdminWithRasterMarine,
+    ModelAdminWithOrderedFormsets,
+    Toto,
+)
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 # region Inlines
@@ -14,7 +18,6 @@ class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
     model = s127.models.VesselsMeasurements
     extra = 0
     is_sortable = False
-    extra_fields = ["coucou", "youpi"]
 
 
 class ContactAddressInline(nested_admin.NestedStackedInline):
@@ -134,21 +137,17 @@ class ContactDetailsAdmin(InformationTypeAdmin):
 @admin.register(s127.models.Applicability)
 class ApplicabilityAdmin(InformationTypeAdmin):
     search_fields = ["id"]
-    inlines = [VesselsMeasurementsInline]
-    fieldsets_and_inlines_order = (
-        None,
-        VesselsMeasurementsInline,
-    )
+    inlines = [InformationInline, VesselsMeasurementsInline]
+    fieldsets_and_inlines_order = (Toto(), None, VesselsMeasurementsInline, Toto())
 
-    def get_foo(self, request):
-        # return [("logical_connectives", VesselsMeasurementsInline)]
-        some_admin = self
-        some_admin.fieldsets = [(None, {"fields": ["logical_connectives"]})]
-        some_admin.inlines = [VesselsMeasurementsInline]
-        return {
-            "form": some_admin.get_form(request),
-            "formsets": some_admin.get_formsets_with_inlines(request),
-        }
+    # def get_foo(self, request):
+    #     some_admin = self
+    #     some_admin.fieldsets = [(None, {"fields": ["logical_connectives"]})]
+    #     some_admin.inlines = [VesselsMeasurementsInline]
+    #     return {
+    #         "form": some_admin.get_form(request),
+    #         "formsets": some_admin.get_formsets_with_inlines(request),
+    #     }
 
     fieldsets = [
         (
