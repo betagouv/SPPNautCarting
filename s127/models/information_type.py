@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
@@ -9,6 +11,12 @@ from django.utils.text import Truncator
 import s100.models
 from carting.fields import ChoiceArrayField
 from s127.models.shared import BOOLEAN_CHOICES, CategoryOfVessel
+
+
+def remove_exponent_and_trailing_zeros(decimal: Decimal) -> Decimal:
+    if decimal == decimal.to_integral():
+        return decimal.to_integral()
+    return decimal.normalize()
 
 
 class Applicability(s100.models.InformationType):
@@ -280,10 +288,7 @@ class VesselsMeasurements(s100.models.ComplexAttributeType):
             return (
                 f"{self.VesselsCharacteristics(self.vessels_characteristics).label} "
                 f"{self.ComparisonOperator(self.comparison_operator).label} "
-                # .normalize() is required on a decimal value to remove trailing zeros.
-                # It prevents variation between the output of the decimal value when the
-                # object has been fetched from the database or directly instantiated.
-                f"{self.vessels_characteristics_value.normalize()} "
+                f"{remove_exponent_and_trailing_zeros(self.vessels_characteristics_value)} "
                 f"{self.VesselsCharacteristicsUnit(self.vessels_characteristics_unit).label}"
             )
         return super().__str__()

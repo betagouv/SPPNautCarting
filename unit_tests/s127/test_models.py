@@ -24,16 +24,24 @@ class TestVesselsMeasurementsStr:
     def test_empty(self):
         assert str(VesselsMeasurements()) == "VesselsMeasurements object (None)"
 
+    @pytest.mark.parametrize(
+        "value_input, value_output",
+        [
+            ("1.100", "1.1"),
+            ("50", "50"),
+            ("50.60", "50.6"),
+        ],
+    )
     @pytest.mark.django_db
-    def test_basic(self):
+    def test_basic(self, value_input, value_output):
         vessels_measurements = VesselsMeasurements.objects.create(
             applicability=Applicability.objects.create(),
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("1.100"),
+            vessels_characteristics_value=Decimal(value_input),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
-        assert str(vessels_measurements) == "Length Overall > 1.1 Metre"
+        assert str(vessels_measurements) == f"Length Overall > {value_output} Metre"
 
         str_from_memory = str(vessels_measurements)
         vessels_measurements.refresh_from_db()
