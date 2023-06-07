@@ -50,3 +50,11 @@ label.required::after {
     padding-top: 4px;
     color: var(--admin-interface-module-background-color);
 }
+
+.change-form #content h1 {
+    position: sticky;
+    top: 0;
+    background-color: var(--body-bg);
+    z-index: 1;
+    padding: 1rem 0;
+}
