@@ -79,6 +79,18 @@ class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
     is_sortable = False
 
 
+class PilotServicePilotBoardingPlaceInline(nested_admin.NestedTabularInline):
+    model = s127.models.PilotService.pilot_boarding_places.through
+    verbose_name = "Pilot boarding place"
+
+    def get_extra(self, request, obj=None, **kwargs):
+        if not obj:
+            return 1
+        if obj.pilot_boarding_places.count():
+            return 0
+        return 1
+
+
 class SrvContactInline(nested_admin.NestedGenericTabularInline):
     ct_field = "contactable_content_type"
     ct_fk_field = "contactable_object_id"
@@ -323,13 +335,13 @@ class FullPilotServiceAdmin(
     GISModelAdminWithRasterMarine,
     ReportableServiceAreaAdmin,
 ):
-    autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
-    inlines = [NoticeTimeInline]
+    autocomplete_fields = ["pilotage_district"]
+    inlines = [NoticeTimeInline, PilotServicePilotBoardingPlaceInline]
 
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Pilotage district",
-        "Pilot boarding places",
+        PilotServicePilotBoardingPlaceInline,
         SrvContactInline,
         FeatureTypePermissionTypeInline,
         NoticeTimeInline,
@@ -339,7 +351,6 @@ class FullPilotServiceAdmin(
     fieldsets = [
         ("Geometry", {"fields": ["geometry"], "classes": ["collapse"]}),
         ("Pilotage district", {"fields": ["pilotage_district"]}),
-        ("Pilot boarding places", {"fields": ["pilot_boarding_places"]}),
         (
             "Pilot details",
             {
