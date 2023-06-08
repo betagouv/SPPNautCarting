@@ -230,7 +230,7 @@ class ApplicabilityAdmin(
 @admin.display(description="Pilot Services")
 def pilot_services_for_pilotage_district(obj):
     pilot_services = obj.pilot_services.all()
-    return ", ".join([str(pilot_service) for pilot_service in pilot_services])
+    return ", ".join(str(pilot_service) for pilot_service in pilot_services)
 
 
 @admin.register(s127.models.PilotageDistrict)
@@ -342,17 +342,14 @@ class PilotBoardingPlaceAdmin(
     @admin.display(description="Pilot Services")
     def pilot_services(self, obj):
         pilot_services = obj.pilotservice_set.all()
-        return ", ".join([str(pilot_service) for pilot_service in pilot_services])
+        return ", ".join(str(pilot_service) for pilot_service in pilot_services)
 
     @admin.display(description="Pilotage District")
     def pilotage_districts(self, obj):
-        pilot_services = obj.pilotservice_set.all()
-        pilotage_districts = list(
-            set([pilot_service.pilotage_district for pilot_service in pilot_services])
-        )
-        return ", ".join(
-            [str(pilotage_district) for pilotage_district in pilotage_districts]
-        )
+        pilot_service = obj.pilotservice_set.first()
+        if not pilot_service:
+            return ""
+        return str(pilot_service.pilotage_district)
 
 
 @admin.register(s127.models.FullPilotServiceProxy)
