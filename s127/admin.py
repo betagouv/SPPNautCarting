@@ -151,24 +151,6 @@ class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
     pass
 
 
-class PilotServiceInlineMixin:
-    autocomplete_fields = ["pilot_boarding_places"]
-    model = s127.models.PilotService
-    extra = 0
-
-
-class FullPilotServiceInline(PilotServiceInlineMixin, FeatureTypeInline):
-    exclude = ["geometry"]
-
-
-class SimplePilotServiceInline(
-    PilotServiceInlineMixin, nested_admin.NestedStackedInline
-):
-    fields = ["pilot_boarding_places", "remote_pilot"]
-    # TODO : add ShipReportInline below when models has been implemented
-    inlines = [FeatureNameInline]
-
-
 class NoticeTimeInline(nested_admin.NestedStackedInline):
     model = s127.models.NoticeTime
     extra = 1
@@ -263,45 +245,6 @@ class PilotageDistrictAdmin(
         return ", ".join(
             str(pilot_boarding_place) for pilot_boarding_place in pilot_boarding_places
         )
-
-
-@admin.register(s127.models.SimplePilotageDistrictProxy)
-class SimplePilotageAdmin(
-    ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
-):
-    search_fields = ["id"]
-    fieldsets = [
-        (
-            None,
-            {
-                "fields": [
-                    "geometry",
-                    "communication_channel",
-                ]
-            },
-        ),
-    ]
-
-    inlines = [SimplePilotServiceInline]
-    fieldsets_and_inlines_order = (FeatureNameInline,)
-
-
-@admin.register(s127.models.FullPilotageDistrictProxy)
-class FullPilotageAdmin(
-    ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
-):
-    search_fields = ["id"]
-    inlines = [FullPilotServiceInline]
-    fieldsets_and_inlines_order = (
-        FeatureNameInline,
-        "communication channel",
-        "geometry",
-        FullPilotServiceInline,
-    )
-    fieldsets = [
-        ("communication channel", {"fields": ["communication_channel"]}),
-        ("geometry", {"fields": ["geometry"]}),
-    ]
 
 
 @admin.display(description="Pilot Boarding Places")
