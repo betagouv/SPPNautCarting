@@ -27,7 +27,7 @@ class TestVesselsMeasurementsStr:
     @pytest.mark.parametrize(
         "value_input, value_output",
         [
-            ("1.100", "1.1"),
+            ("2.100", "2.1"),
             ("50", "50"),
             ("50.60", "50.6"),
         ],
@@ -41,7 +41,36 @@ class TestVesselsMeasurementsStr:
             vessels_characteristics_value=Decimal(value_input),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
-        assert str(vessels_measurements) == f"Length Overall > {value_output} Metre"
+        assert str(vessels_measurements) == f"Length Overall > {value_output} Metres"
+
+        str_from_memory = str(vessels_measurements)
+        vessels_measurements.refresh_from_db()
+        str_from_db = str(vessels_measurements)
+        assert str_from_db == str_from_memory
+
+    @pytest.mark.parametrize(
+        "value, unit_value, unit_str",
+        [
+            ("1.1", VesselsMeasurements.VesselsCharacteristicsUnit.FOOT, "Foot"),
+            ("3", VesselsMeasurements.VesselsCharacteristicsUnit.FOOT, "Feet"),
+            ("4.3", VesselsMeasurements.VesselsCharacteristicsUnit.METRE, "Metres"),
+            (
+                "5",
+                VesselsMeasurements.VesselsCharacteristicsUnit.CUBIC_METRES,
+                "Cubic Metres",
+            ),
+        ],
+    )
+    @pytest.mark.django_db
+    def test_unit_pluralize(self, value, unit_value, unit_str):
+        vessels_measurements = VesselsMeasurements.objects.create(
+            applicability=Applicability.objects.create(),
+            vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
+            comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
+            vessels_characteristics_value=Decimal(value),
+            vessels_characteristics_unit=unit_value,
+        )
+        assert str(vessels_measurements) == f"Length Overall > {value} {unit_str}"
 
         str_from_memory = str(vessels_measurements)
         vessels_measurements.refresh_from_db()
@@ -174,20 +203,20 @@ class TestApplicabilityStr:
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("3.1"),
+            vessels_characteristics_value=Decimal("1.1"),
             vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
         VesselsMeasurements.objects.create(
             applicability=applicability,
             vessels_characteristics=VesselsMeasurements.VesselsCharacteristics.LENGTH_OVERALL,
             comparison_operator=VesselsMeasurements.ComparisonOperator.GREATER_THAN,
-            vessels_characteristics_value=Decimal("4.2"),
-            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.FOOT,
+            vessels_characteristics_value=Decimal("1.2"),
+            vessels_characteristics_unit=VesselsMeasurements.VesselsCharacteristicsUnit.METRE,
         )
 
         assert (
             str(applicability)
-            == f"Length Overall > 3.1 Metres {logical_operator} Length Overall > 4.2 Feet"
+            == f"Length Overall > 1.1 Metre {logical_operator} Length Overall > 1.2 Metre"
         )
 
     @pytest.mark.django_db
