@@ -227,12 +227,18 @@ class ApplicabilityAdmin(
     ]
 
 
+@admin.display(description="Pilot Services")
+def pilot_services_for_pilotage_district(obj):
+    pilot_services = obj.pilot_services.all()
+    return ", ".join([str(pilot_service) for pilot_service in pilot_services])
+
+
 @admin.register(s127.models.PilotageDistrict)
 class PilotageDistrictAdmin(
     ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
 ):
     search_fields = ["id"]
-
+    list_display = ("__str__", pilot_services_for_pilotage_district)
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Geometry",
@@ -250,6 +256,7 @@ class SimplePilotageAdmin(
     ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
 ):
     search_fields = ["id"]
+    list_display = ("__str__", pilot_services_for_pilotage_district)
     fieldsets = [
         (
             None,
@@ -271,6 +278,7 @@ class FullPilotageAdmin(
     ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
 ):
     search_fields = ["id"]
+    list_display = ("__str__", pilot_services_for_pilotage_district)
     inlines = [FullPilotServiceInline]
     fieldsets_and_inlines_order = (
         FeatureNameInline,
@@ -287,6 +295,7 @@ class FullPilotageAdmin(
 @admin.register(s127.models.PilotService)
 class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
+    list_display = ("__str__", "pilotage_district")
 
 
 @admin.register(s127.models.PilotBoardingPlace)
@@ -294,6 +303,8 @@ class PilotBoardingPlaceAdmin(
     ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, ContactableAreaAdmin
 ):
     search_fields = ["id"]
+    list_display = ("__str__", "pilot_services", "pilotage_districts")
+
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Geometry",
@@ -328,6 +339,21 @@ class PilotBoardingPlaceAdmin(
         ("Geometry", {"fields": ["geometry"]}),
     )
 
+    @admin.display(description="Pilot Services")
+    def pilot_services(self, obj):
+        pilot_services = obj.pilotservice_set.all()
+        return ", ".join([str(pilot_service) for pilot_service in pilot_services])
+
+    @admin.display(description="Pilotage District")
+    def pilotage_districts(self, obj):
+        pilot_services = obj.pilotservice_set.all()
+        pilotage_districts = list(
+            set([pilot_service.pilotage_district for pilot_service in pilot_services])
+        )
+        return ", ".join(
+            [str(pilotage_district) for pilotage_district in pilotage_districts]
+        )
+
 
 @admin.register(s127.models.FullPilotServiceProxy)
 class FullPilotServiceAdmin(
@@ -337,6 +363,7 @@ class FullPilotServiceAdmin(
 ):
     autocomplete_fields = ["pilotage_district"]
     inlines = [NoticeTimeInline, PilotServicePilotBoardingPlaceInline]
+    list_display = ("__str__", "pilotage_district")
 
     fieldsets_and_inlines_order = (
         FeatureNameInline,
