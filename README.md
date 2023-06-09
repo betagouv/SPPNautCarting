@@ -2,7 +2,7 @@
 
 SPPNaut est une startup d'Etat dont la mission est la modernisaton et l'ouverture des publications nautiques.
 
-## Installer et exécuter SPPNaut et le générateur de PDF sur un poste local
+## Dévéloppement
 
 ### Pré-requis
 
