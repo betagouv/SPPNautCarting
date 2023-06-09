@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 
 import s100.models
 from carting.fields import ChoiceArrayField
@@ -7,6 +8,19 @@ from s127.models.contactable_area import PilotBoardingPlace
 from s127.models.feature_type import PilotageDistrict
 
 from .shared import BOOLEAN_CHOICES, ReportableServiceArea
+
+# class Prout(models.ForeignKey):
+#     def clean(self):
+#         super().clean()
+#         pilot_services = self.pilot_services
+#         pilot_boarding_places = list(set([pilot_service.pilot_boarding_places for pilot_service in pilot_services]))
+#         all_pilot_services = list(set([pilot_boarding_place.pilotservice_set for pilot_boarding_place in pilot_boarding_places]))
+#         all
+#         if self.pilot_services:
+#             raise ValidationError
+
+#     class Meta:
+#         abstract=True
 
 
 class PilotService(ReportableServiceArea):
@@ -41,6 +55,7 @@ class PilotService(ReportableServiceArea):
         null=True,
         help_text="An area within which a pilotage direction exists.",
     )
+
     pilot_boarding_places = models.ManyToManyField(PilotBoardingPlace)
     category_of_pilot = ChoiceArrayField(
         base_field=models.CharField(
@@ -72,6 +87,32 @@ class PilotService(ReportableServiceArea):
     )
     # https://github.com/betagouv/SPPNautInterface/issues/228
     geometry = s100.models.GMMultiSurface(null=True, blank=True)
+
+    def clean(self):
+        super().clean()
+        # FIXME: Si l'objet est en cours de création, je n'ai pas accès aux boarding places à connecter
+        if self.id is None:
+            return
+        # il faudrait que j'accède au set de pilot_boarding_place en cours de modif
+        pilot_boarding_places = self.pilot_boarding_places.all()
+        all_pilot_services = []
+        # A revoir probablement
+        for pilot_boarding_place in pilot_boarding_places:
+            for toto in pilot_boarding_place.pilotservice_set.all():
+                # je retire le pilot_service courant du lot car il correspond à la valeur en bdd et pas à la valeur en cours de modification
+                if toto != self:
+                    all_pilot_services.append(toto)
+        pilotage_districts = list(
+            set(pilot_service.pilotage_district for pilot_service in all_pilot_services)
+        )
+        if len(pilotage_districts) >= 2 or (
+            self.pilotage_district
+            and pilotage_districts
+            and pilotage_districts[0] != self.pilotage_district
+        ):
+            raise ValidationError(
+                "At least one of the related pilot boarding place has a connection with another Pilotage District"
+            )
 
     # Uncomment when upgrading to django 4.2
     # class Meta:
