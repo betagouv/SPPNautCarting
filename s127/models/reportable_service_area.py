@@ -15,7 +15,6 @@ from .shared import BOOLEAN_CHOICES, ReportableServiceArea
 #         pilot_services = self.pilot_services
 #         pilot_boarding_places = list(set([pilot_service.pilot_boarding_places for pilot_service in pilot_services]))
 #         all_pilot_services = list(set([pilot_boarding_place.pilotservice_set for pilot_boarding_place in pilot_boarding_places]))
-#         all
 #         if self.pilot_services:
 #             raise ValidationError
 
@@ -55,7 +54,6 @@ class PilotService(ReportableServiceArea):
         null=True,
         help_text="An area within which a pilotage direction exists.",
     )
-
     pilot_boarding_places = models.ManyToManyField(PilotBoardingPlace)
     category_of_pilot = ChoiceArrayField(
         base_field=models.CharField(
