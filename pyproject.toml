@@ -12,7 +12,6 @@ dependencies = [
     "django-tree-queries==0.14.0",
     "django==4.1.9",
     "lxml==4.9.2",
-    "natsort==8.3.1",
     "psycopg2==2.9.6",
     "python-decouple==3.8",
     "requests==2.31.0",

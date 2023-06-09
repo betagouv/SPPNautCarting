@@ -1,15 +1,20 @@
-# SPPNaut
+# SPPNaut Carting
 
 SPPNaut est une startup d'Etat dont la mission est la modernisaton et l'ouverture des publications nautiques.
 
 ## Dévéloppement
 
-### Prerequis
+### Pré-requis
+
+-   Docker
+-   Docker-compose
+
+La base de données est utilisée pour la modélisaton des normes s1xy et le fonctionnement de l'administration de Django.
 
 Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 
 -   Python >= 3.10
--   docker et docker-compose pour faire tourner la base de données Postgresql (cf. [SPPNautGenerator](https://github.com/betagouv/SPPNautGenerator))
+-   docker et docker-compose pour faire tourner la base de données Postgresql
 
 ### Installation
 
@@ -55,7 +60,7 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 
     `./manage.py migrate`
 
-    La base de données est composée des tables d'administration de django pour assurer l'authentification
+    La base de données est composée des tables d'administration de django pour assurer l'authentification et des tables de modélisations de la norme s1xy
 
 1. Installation des dépendances JS (Carting)
 
