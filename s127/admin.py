@@ -1,21 +1,16 @@
 import nested_admin
 from django.contrib import admin
 
-import s127
+import s127.models
 from carting.admin import GISModelAdminWithRasterMarine, ModelAdminWithOrderedFormsets
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
+
+# region Inlines
 
 
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
     verbose_name_plural = "Vessel measurements"
     model = s127.models.VesselsMeasurements
-    extra = 0
-    is_sortable = False
-
-
-class ApplicabilityInline(nested_admin.NestedGenericStackedInline):
-    model = s127.models.Applicability
-    inlines = [InformationInline, VesselsMeasurementsInline]
     extra = 0
     is_sortable = False
 
@@ -38,45 +33,10 @@ class RadiocommunicationsInline(nested_admin.NestedStackedInline):
     is_sortable = False
 
 
-@admin.register(s127.models.ContactDetails)
-class ContactDetailsAdmin(ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin):
-    search_fields = ["id"]
-
-    def get_fieldsets(self, request, obj=None):
-        return [
-            (
-                "Language",
-                {"fields": ["language"]},
-            ),
-            (
-                "Main Radiocommunication",
-                {
-                    "fields": [
-                        # FIXME: Write a generic concept to "dump" the fields
-                        # that were not mentioned in other fieldsets
-                        x
-                        for x in self.get_fields(request, obj)
-                        if x != "language"
-                    ]
-                },
-            ),
-        ]
-
-    inlines = [
-        FeatureNameInline,
-        RadiocommunicationsInline,
-        TelecommunicationsInline,
-        ContactAddressInline,
-        InformationInline,
-    ]
-    fieldsets_and_inlines_order = (FeatureNameInline,)
-
-
-class PilotBoardingPlaceInline(nested_admin.NestedStackedInline):
-    inlines = [FeatureNameInline]
-    model = s127.models.PilotBoardingPlace
-    extra = 0
-    is_sortable = False
+class NoticeTimeInline(nested_admin.NestedStackedInline):
+    model = s127.models.NoticeTime
+    extra = 1
+    max_num = 1
 
 
 class PilotServicePilotBoardingPlaceInline(nested_admin.NestedTabularInline):
@@ -115,6 +75,11 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
     is_sortable = False
 
 
+# endregion Inlines
+
+# region Admins
+
+
 class AccumulatedInlines:
     def get_inlines(self, *args, **kwargs):
         accumulated_inlines = []
@@ -123,20 +88,12 @@ class AccumulatedInlines:
         return list(dict.fromkeys(accumulated_inlines).keys())
 
 
-class FeatureTypeInlinesMixin(AccumulatedInlines):
+class FeatureTypeAdmin(AccumulatedInlines, nested_admin.NestedModelAdmin):
     inlines = [
         FeatureNameInline,
         FeatureTypePermissionTypeInline,
         TextContentInline,
     ]
-
-
-class FeatureTypeAdmin(FeatureTypeInlinesMixin, nested_admin.NestedModelAdmin):
-    pass
-
-
-class FeatureTypeInline(FeatureTypeInlinesMixin, nested_admin.NestedStackedInline):
-    pass
 
 
 class ContactableAreaAdmin(FeatureTypeAdmin):
@@ -151,10 +108,38 @@ class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
     pass
 
 
-class NoticeTimeInline(nested_admin.NestedStackedInline):
-    model = s127.models.NoticeTime
-    extra = 1
-    max_num = 1
+@admin.register(s127.models.ContactDetails)
+class ContactDetailsAdmin(ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin):
+    search_fields = ["id"]
+
+    def get_fieldsets(self, request, obj=None):
+        return [
+            (
+                "Language",
+                {"fields": ["language"]},
+            ),
+            (
+                "Main Radiocommunication",
+                {
+                    "fields": [
+                        # FIXME: Write a generic concept to "dump" the fields
+                        # that were not mentioned in other fieldsets
+                        x
+                        for x in self.get_fields(request, obj)
+                        if x != "language"
+                    ]
+                },
+            ),
+        ]
+
+    inlines = [
+        FeatureNameInline,
+        RadiocommunicationsInline,
+        TelecommunicationsInline,
+        ContactAddressInline,
+        InformationInline,
+    ]
+    fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 @admin.register(s127.models.Applicability)
@@ -247,25 +232,6 @@ class PilotageDistrictAdmin(
         )
 
 
-@admin.display(description="Pilot Boarding Places")
-def pilot_boarding_place_for_pilot_service(obj):
-    pilot_boarding_places = obj.pilot_boarding_places.all()
-    return ", ".join(
-        str(pilot_boarding_place) for pilot_boarding_place in pilot_boarding_places
-    )
-
-
-@admin.register(s127.models.PilotService)
-class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin):
-    autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
-    list_display = (
-        "__str__",
-        "pilotage_district",
-        pilot_boarding_place_for_pilot_service,
-    )
-    list_filter = ("pilotage_district",)
-
-
 @admin.register(s127.models.PilotBoardingPlace)
 class PilotBoardingPlaceAdmin(
     ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, ContactableAreaAdmin
@@ -321,6 +287,25 @@ class PilotBoardingPlaceAdmin(
         return str(pilot_service.pilotage_district)
 
 
+@admin.display(description="Pilot Boarding Places")
+def pilot_boarding_place_for_pilot_service(obj):
+    pilot_boarding_places = obj.pilot_boarding_places.all()
+    return ", ".join(
+        str(pilot_boarding_place) for pilot_boarding_place in pilot_boarding_places
+    )
+
+
+@admin.register(s127.models.PilotService)
+class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin):
+    autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
+    list_display = (
+        "__str__",
+        "pilotage_district",
+        pilot_boarding_place_for_pilot_service,
+    )
+    list_filter = ("pilotage_district",)
+
+
 @admin.register(s127.models.FullPilotServiceProxy)
 class FullPilotServiceAdmin(
     ModelAdminWithOrderedFormsets,
@@ -361,3 +346,6 @@ class FullPilotServiceAdmin(
             },
         ),
     ]
+
+
+# endregion Admins
