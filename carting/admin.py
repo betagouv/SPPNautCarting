@@ -64,12 +64,12 @@ class ModelAdminWithFormsetsIncludingInline(admin.ModelAdmin):
         return inlines
 
     def render_change_form(self, request, context, *args, **kwargs):
-        foo = {}
+        inlines_line_by_fieldset_name = {}
         for fieldset in self.fieldsets_and_inlines_ordered:
             fieldset_name = fieldset[0]
             for field in fieldset[1]["fields"]:
                 if not isinstance(field, str):
-                    foo[fieldset_name] = [
+                    inlines_line_by_fieldset_name[fieldset_name] = [
                         inline
                         for inline in context["inline_admin_formsets"]
                         if inline.opts.__class__ == field
@@ -77,8 +77,7 @@ class ModelAdminWithFormsetsIncludingInline(admin.ModelAdmin):
 
         context.update(
             {
-                "inlines_in_formsets_dict": foo,
-                "fieldsets_and_inlines_ordered": self.fieldsets_and_inlines_ordered,
+                "inlines_line_by_fieldset_name": inlines_line_by_fieldset_name,
             }
         )
         return super().render_change_form(request, context, *args, **kwargs)

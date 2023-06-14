@@ -32,7 +32,7 @@
                     {% endfor %}
                 </div>
             {% endfor %}
-            {% for fieldset_name, inline_admin_formsets in inlines_in_formsets_dict.items %}
+            {% for fieldset_name, inline_admin_formsets in inlines_line_by_fieldset_name.items %}
                 {% if fieldset_name == fieldset.name %}
                     {% for inline_admin_formset in inline_admin_formsets %}
                     {% include inline_admin_formset.opts.template %}
