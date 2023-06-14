@@ -77,8 +77,6 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
 
 # endregion Inlines
 
-# region Admins
-
 
 class AccumulatedInlines:
     def get_inlines(self, *args, **kwargs):
@@ -88,28 +86,17 @@ class AccumulatedInlines:
         return list(dict.fromkeys(accumulated_inlines).keys())
 
 
-class FeatureTypeAdmin(AccumulatedInlines, nested_admin.NestedModelAdmin):
-    inlines = [
-        FeatureNameInline,
-        FeatureTypePermissionTypeInline,
-        TextContentInline,
-    ]
+# region InformationTypeAdmins
 
 
-class ContactableAreaAdmin(FeatureTypeAdmin):
-    inlines = [SrvContactInline]
-
-
-class SupervisedAreaAdmin(ContactableAreaAdmin):
-    pass
-
-
-class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
-    pass
+class InformationTypeAdmin(
+    AccumulatedInlines, ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin
+):
+    inlines = [InformationInline]
 
 
 @admin.register(s127.models.ContactDetails)
-class ContactDetailsAdmin(ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin):
+class ContactDetailsAdmin(InformationTypeAdmin):
     search_fields = ["id"]
 
     def get_fieldsets(self, request, obj=None):
@@ -137,19 +124,14 @@ class ContactDetailsAdmin(ModelAdminWithOrderedFormsets, nested_admin.NestedMode
         RadiocommunicationsInline,
         TelecommunicationsInline,
         ContactAddressInline,
-        InformationInline,
     ]
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 @admin.register(s127.models.Applicability)
-class ApplicabilityAdmin(
-    ModelAdminWithOrderedFormsets,
-    nested_admin.NestedModelAdmin,
-    GISModelAdminWithRasterMarine,
-):
+class ApplicabilityAdmin(InformationTypeAdmin):
     search_fields = ["id"]
-    inlines = [InformationInline, VesselsMeasurementsInline]
+    inlines = [VesselsMeasurementsInline]
     fieldsets_and_inlines_order = (
         None,
         VesselsMeasurementsInline,
@@ -195,10 +177,38 @@ class ApplicabilityAdmin(
     ]
 
 
-@admin.register(s127.models.PilotageDistrict)
-class PilotageDistrictAdmin(
-    ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, FeatureTypeAdmin
+# endregion InformationTypeAdmins
+
+# region FeatureTypeAdmins
+
+
+class FeatureTypeAdmin(
+    AccumulatedInlines,
+    ModelAdminWithOrderedFormsets,
+    GISModelAdminWithRasterMarine,
+    nested_admin.NestedModelAdmin,
 ):
+    inlines = [
+        FeatureNameInline,
+        FeatureTypePermissionTypeInline,
+        TextContentInline,
+    ]
+
+
+class ContactableAreaAdmin(FeatureTypeAdmin):
+    inlines = [SrvContactInline]
+
+
+class SupervisedAreaAdmin(ContactableAreaAdmin):
+    pass
+
+
+class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
+    pass
+
+
+@admin.register(s127.models.PilotageDistrict)
+class PilotageDistrictAdmin(FeatureTypeAdmin):
     search_fields = ["id"]
     list_display = (
         "__str__",
@@ -233,9 +243,7 @@ class PilotageDistrictAdmin(
 
 
 @admin.register(s127.models.PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(
-    ModelAdminWithOrderedFormsets, GISModelAdminWithRasterMarine, ContactableAreaAdmin
-):
+class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
     search_fields = ["id"]
     list_display = ("__str__", "pilot_services", "pilotage_districts")
     list_filter = ("pilotservice__pilotage_district",)
@@ -296,7 +304,7 @@ def pilot_boarding_place_for_pilot_service(obj):
 
 
 @admin.register(s127.models.PilotService)
-class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmin):
+class PilotServiceAdmin(ReportableServiceAreaAdmin):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
     list_display = (
         "__str__",
@@ -308,8 +316,6 @@ class PilotServiceAdmin(GISModelAdminWithRasterMarine, ReportableServiceAreaAdmi
 
 @admin.register(s127.models.FullPilotServiceProxy)
 class FullPilotServiceAdmin(
-    ModelAdminWithOrderedFormsets,
-    GISModelAdminWithRasterMarine,
     ReportableServiceAreaAdmin,
 ):
     autocomplete_fields = ["pilotage_district"]
@@ -348,4 +354,4 @@ class FullPilotServiceAdmin(
     ]
 
 
-# endregion Admins
+# endregion FeatureTypeAdmins
