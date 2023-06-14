@@ -90,15 +90,11 @@ class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
 
     def render_change_form(self, request, context, *args, **kwargs):
         context.update(
-            {
-                "fieldsets_and_inlines": self._get_fieldsets_and_inlines(
-                    context, request
-                ),
-            }
+            {"fieldsets_and_inlines": self._get_fieldsets_and_inlines(context)}
         )
         return super().render_change_form(request, context, *args, **kwargs)
 
-    def _get_fieldsets_and_inlines(self, context, request):
+    def _get_fieldsets_and_inlines(self, context):
         admin_inlines_formsets = cast(
             list[forms.BaseInlineFormSet],
             context["inline_admin_formsets"],
@@ -109,10 +105,7 @@ class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
         fieldsets_and_inlines = []
         for fieldset_or_inline in fieldsets_and_inlines_order:
             match fieldset_or_inline:
-                case Toto():
-                    fieldset_or_inline.retrieve_formsets_and_fieldsets(request, self)
-                    fieldsets_and_inlines.extend([fieldset_or_inline])
-                case str() | NoneType():
+                case str() | None:
                     fieldsets_and_inlines.extend(
                         fieldset
                         for fieldset in adminform

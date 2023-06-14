@@ -3,16 +3,7 @@
 {# Here we render mixed normal and inline fieldsets #}
 {% block field_sets %}
   {% for fieldset_or_inline in fieldsets_and_inlines %}
-    {% if fieldset_or_inline.toto == "coucou" %}
-        {% for formset_or_fieldset in fieldset_or_inline.coucou %}
-        🟢
-            {% if formset_or_fieldset.opts.template %}
-                🟠
-                {{ formset_or_fieldset.opts }}
-               {% include formset_or_fieldset.opts.template with inline_admin_formset=formset_or_fieldset %}
-            {% endif %}
-        {% endfor %}
-    {% elif fieldset_or_inline.opts.template %}
+    {% if fieldset_or_inline.opts.template %}
       {% include fieldset_or_inline.opts.template with inline_admin_formset=fieldset_or_inline %}
     {% else %}
       {% include "admin/includes/fieldset.html" with fieldset=fieldset_or_inline %}

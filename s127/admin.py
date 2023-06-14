@@ -6,7 +6,6 @@ from carting.admin import (
     GISModelAdminWithRasterMarine,
     ModelAdminWithFormsetsIncludingInline,
     ModelAdminWithOrderedFormsets,
-    Toto,
 )
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
@@ -94,9 +93,7 @@ class AccumulatedInlines:
 # region InformationTypeAdmins
 
 
-class InformationTypeAdmin(
-    AccumulatedInlines, ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin
-):
+class InformationTypeAdmin(AccumulatedInlines, nested_admin.NestedModelAdmin):
     inlines = [InformationInline]
 
 
@@ -135,28 +132,18 @@ class ContactDetailsAdmin(InformationTypeAdmin):
 
 
 @admin.register(s127.models.Applicability)
-class ApplicabilityAdmin(InformationTypeAdmin):
+class ApplicabilityAdmin(
+    InformationTypeAdmin,
+    ModelAdminWithFormsetsIncludingInline,
+):
     search_fields = ["id"]
-    inlines = [InformationInline, VesselsMeasurementsInline]
-    toto = Toto(inlines=[VesselsMeasurementsInline], fields=["logical_connectives"])
-    fieldsets_and_inlines_order = (None, VesselsMeasurementsInline, toto)
+    inlines = [VesselsMeasurementsInline]
 
-    # def get_foo(self, request):
-    #     some_admin = self
-    #     some_admin.fieldsets = [(None, {"fields": ["logical_connectives"]})]
-    #     some_admin.inlines = [VesselsMeasurementsInline]
-    #     return {
-    #         "form": some_admin.get_form(request),
-    #         "formsets": some_admin.get_formsets_with_inlines(request),
-    #     }
-
-    fieldsets = [
+    fieldsets_and_inlines_ordered = [
         (
-            None,
+            "Vessels Measurements",
             {
-                "fields": [
-                    "logical_connectives",
-                ],
+                "fields": ["logical_connectives", VesselsMeasurementsInline],
             },
         ),
         (
@@ -186,6 +173,10 @@ class ApplicabilityAdmin(InformationTypeAdmin):
                     "category_of_vessel_registry",
                 ]
             },
+        ),
+        (
+            "Informations",
+            {"fields": [InformationInline], "classes": ["collapse"]},
         ),
     ]
 
