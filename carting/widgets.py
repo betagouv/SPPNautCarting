@@ -2,6 +2,10 @@ from django.contrib.gis import forms
 
 
 class CustomOSMWidget(forms.widgets.BaseGeometryWidget):
+    # This widget is inspired from OSMWidget in django.contrib.gis.forms.widgets
+    # but the SRID manipulation in geodjango breaks our implementation because the
+    # raw coordinates displayed are in the wrong system, hence the partial rewrite
+    # instead of inheritance.
     template_name = "admin/custom-openlayers.html"
     default_lon = -2
     default_lat = 48.6
@@ -13,12 +17,12 @@ class CustomOSMWidget(forms.widgets.BaseGeometryWidget):
     class Media:
         css = {
             "all": (
-                "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.css",
+                "https://cdn.jsdelivr.net/npm/ol@v7.2.2/ol.css",
                 "gis/css/ol3.css",
             )
         }
         js = (
-            "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js",
+            "https://cdn.jsdelivr.net/npm/ol@v7.2.2/dist/ol.js",
             "admin-map-widget.js",
         )
 
