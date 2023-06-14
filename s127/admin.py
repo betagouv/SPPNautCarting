@@ -133,11 +133,10 @@ class ContactDetailsAdmin(InformationTypeAdmin):
 
 @admin.register(s127.models.Applicability)
 class ApplicabilityAdmin(
-    InformationTypeAdmin,
     ModelAdminWithFormsetsIncludingInline,
+    InformationTypeAdmin,
 ):
     search_fields = ["id"]
-    inlines = [VesselsMeasurementsInline]
 
     fieldsets_and_inlines_ordered = [
         (
