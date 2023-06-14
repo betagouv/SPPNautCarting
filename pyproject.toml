@@ -2,6 +2,7 @@
 DJANGO_SETTINGS_MODULE = "core.settings"
 env_files = [".env.template"]
 addopts = "--reuse-db"
+filterwarnings = ["error"]
 
 [project]
 name = "sppnaut"
