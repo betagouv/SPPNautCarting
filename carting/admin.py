@@ -1,3 +1,4 @@
+import copy
 import logging
 from types import NoneType
 from typing import cast
@@ -38,36 +39,49 @@ def children(instance: TreeNode):
     )
 
 
-class Toto:
-    def __init__(self, inlines=None, fields=None):
-        self.inlines = inlines
-        self.fields = fields
-        self.formsets = []
+class ModelAdminWithFormsetsIncludingInline(admin.ModelAdmin):
+    change_form_template = "admin/change_form_with_ordered_formsets_test.html"
+    fieldsets_and_inlines_ordered = []
 
-    def retrieve_formsets_and_fieldsets(self, request, admin):
-        print(type(admin), admin)
-        if self.inlines:
-            admin.inlines = self.inlines
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = copy.deepcopy(self.fieldsets_and_inlines_ordered)
+        for fieldset in fieldsets:
+            fieldset[1]["fields"] = [
+                field for field in fieldset[1]["fields"] if isinstance(field, str)
+            ]
+        return fieldsets
 
-            formsets = []
-            inline_instances = []
+    def get_inlines(self, request, obj=None):
+        inlines = []
+        for fieldset in self.fieldsets_and_inlines_ordered:
+            inlines = inlines + [
+                field
+                for field in fieldset[1]["fields"]
+                if not isinstance(
+                    field, str
+                )  # FIXME: stronger to test if it is class inherit fro AdminInLine ?
+            ]
+        return inlines
 
-            for formset, inline in admin.get_formsets_with_inlines(request, None):
-                formsets.append(formset)
-                inline_instances.append(inline)
+    def render_change_form(self, request, context, *args, **kwargs):
+        foo = {}
+        for fieldset in self.fieldsets_and_inlines_ordered:
+            fieldset_name = fieldset[0]
+            for field in fieldset[1]["fields"]:
+                if not isinstance(field, str):
+                    foo[fieldset_name] = [
+                        inline
+                        for inline in context["inline_admin_formsets"]
+                        if inline.opts.__class__ == field
+                    ]
 
-            self.formsets = admin.get_inline_formsets(
-                request, formsets, inline_instances, obj=None
-            )
-
-        # self.fieldsets = [admin.get_form()]
-
-    @property
-    def coucou(self):
-        print(self.formsets)
-        return self.formsets
-
-    toto = "coucou"
+        context.update(
+            {
+                "inlines_in_formsets_dict": foo,
+                "fieldsets_and_inlines_ordered": self.fieldsets_and_inlines_ordered,
+            }
+        )
+        return super().render_change_form(request, context, *args, **kwargs)
 
 
 class ModelAdminWithOrderedFormsets(admin.ModelAdmin):
