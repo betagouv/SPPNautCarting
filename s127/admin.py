@@ -1,3 +1,5 @@
+import copy
+
 import nested_admin
 from django.contrib import admin
 
@@ -345,26 +347,64 @@ class PilotServiceAdmin(ReportableServiceAreaAdmin):
 
 
 @admin.register(s127.models.FullPilotServiceProxy)
-class FullPilotServiceAdmin(PilotServiceAdmin):
+class FullPilotServiceAdmin(
+    PilotServiceAdmin,
+):
+    change_form_template = "admin/change_form_with_ordered_formsets_test.html"
     autocomplete_fields = ["pilotage_district"]
-    inlines = [NoticeTimeInline, PilotServicePilotBoardingPlaceInline]
 
-    # NestedGenericTabularInline -> march pas avec ct_admin.GenericTabularInline
-    fieldsets_and_inlines_order = (
-        FeatureNameInline,
-        "Pilotage district",
-        PilotServicePilotBoardingPlaceInline,
-        SrvContactInline,
-        FeatureTypePermissionTypeInline,  # Collapse if possible
-        NoticeTimeInline,
-        "Pilot details",
-        TextContentInline,  # Collapse if possible
-        "Geometry",
+    list_display = (
+        "__str__",
+        "pilotage_district",
+        "pilot_boarding_places",
     )
+    list_filter = ("pilotage_district",)
 
-    fieldsets = [
-        ("Geometry", {"fields": ["geometry"], "classes": ["collapse"]}),
-        ("Pilotage district", {"fields": ["pilotage_district"]}),
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = copy.deepcopy(self.fieldsets_and_inlines_ordered)
+        for fieldset in fieldsets:
+            fieldset[1]["fields"] = [
+                field for field in fieldset[1]["fields"] if isinstance(field, str)
+            ]
+        return fieldsets
+
+    def get_inlines(self, request, obj=None):
+        inlines = []
+        for fieldset in self.fieldsets_and_inlines_ordered:
+            inlines = inlines + [
+                field
+                for field in fieldset[1]["fields"]
+                if not isinstance(
+                    field, str
+                )  # FIXME: stronger to test if it is class inherit fro AdminInLine ?
+            ]
+        return inlines
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        context.update(
+            {
+                "fieldsets_and_inlines_ordered": self.fieldsets_and_inlines_ordered,
+            }
+        )
+        return super().render_change_form(request, context, *args, **kwargs)
+
+    fieldsets_and_inlines_ordered = [
+        (
+            "Feature names",
+            {
+                "fields": [
+                    FeatureNameInline,
+                ]
+            },
+        ),
+        ("Pilotage districts", {"fields": ["pilotage_district"]}),
+        (
+            "Pilot Boarding Places",
+            {"fields": [PilotServicePilotBoardingPlaceInline, "pilotage_district"]},
+        ),
+        ("Contact Details", {"fields": [SrvContactInline]}),
+        ("Permission type", {"fields": [FeatureTypePermissionTypeInline]}),
+        ("Notice times", {"fields": [NoticeTimeInline]}),
         (
             "Pilot details",
             {
@@ -376,6 +416,8 @@ class FullPilotServiceAdmin(PilotServiceAdmin):
                 ]
             },
         ),
+        ("Text content", {"fields": [TextContentInline]}),
+        ("Geometry", {"fields": ["geometry"], "classes": ["collapse"]}),
     ]
 
 
