@@ -122,7 +122,11 @@ STATICFILES_DIRS = [
     BASE_DIR / "static" / "to_collect",
     BASE_DIR / "static" / "compiled",
 ]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    }
+}
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
