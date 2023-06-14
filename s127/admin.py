@@ -295,37 +295,28 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
         return str(pilot_service.pilotage_district)
 
 
-@admin.display(description="Pilot Boarding Places")
-def pilot_boarding_place_for_pilot_service(obj):
-    pilot_boarding_places = obj.pilot_boarding_places.all()
-    return ", ".join(
-        str(pilot_boarding_place) for pilot_boarding_place in pilot_boarding_places
-    )
-
-
 @admin.register(s127.models.PilotService)
 class PilotServiceAdmin(ReportableServiceAreaAdmin):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
     list_display = (
         "__str__",
         "pilotage_district",
-        pilot_boarding_place_for_pilot_service,
+        "pilot_boarding_places",
     )
     list_filter = ("pilotage_district",)
+
+    @admin.display(description="Pilot Boarding Places")
+    def pilot_boarding_places(obj):
+        pilot_boarding_places = obj.pilot_boarding_places.all()
+        return ", ".join(
+            str(pilot_boarding_place) for pilot_boarding_place in pilot_boarding_places
+        )
 
 
 @admin.register(s127.models.FullPilotServiceProxy)
-class FullPilotServiceAdmin(
-    ReportableServiceAreaAdmin,
-):
+class FullPilotServiceAdmin(PilotServiceAdmin):
     autocomplete_fields = ["pilotage_district"]
     inlines = [NoticeTimeInline, PilotServicePilotBoardingPlaceInline]
-    list_display = (
-        "__str__",
-        "pilotage_district",
-        pilot_boarding_place_for_pilot_service,
-    )
-    list_filter = ("pilotage_district",)
 
     fieldsets_and_inlines_order = (
         FeatureNameInline,
