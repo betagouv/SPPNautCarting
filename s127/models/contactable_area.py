@@ -10,7 +10,10 @@ from .shared import CategoryOfVessel, ContactableArea
 
 def validate_point_or_surface(collection: GeometryCollection):
     if not all(isinstance(geometry, Point | Polygon) for geometry in collection):
-        raise ValidationError(message="OH MY GOD !", code="point_or_surface")
+        raise ValidationError(
+            message="This field only accepts Points or Polygons",
+            code="point_or_surface",
+        )
 
 
 class PilotBoardingPlace(ContactableArea):
