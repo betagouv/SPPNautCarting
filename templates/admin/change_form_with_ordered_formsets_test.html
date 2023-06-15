@@ -2,6 +2,8 @@
 
 {% comment %}
 This template rewrite the fieldset include from this file https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html
+
+Everything except the line commented can be rewritten on future django upgrades
 {% endcomment %}
 
 {% block field_sets %}
@@ -40,6 +42,8 @@ This template rewrite the fieldset include from this file https://github.com/dja
                     {% if not line.fields|length == 1 %}</div>{% endif %}
                 </div>
             {% endfor %}
+
+            {# Addition to Django's original template #}
             {% for fieldset_name, inline_admin_formsets in inlines_line_by_fieldset_name.items %}
                 {% if fieldset_name == fieldset.name %}
                     {% for inline_admin_formset in inline_admin_formsets %}
