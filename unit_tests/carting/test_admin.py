@@ -1,7 +1,11 @@
 from django.contrib import admin
+from django.contrib.admin.helpers import InlineAdminFormSet
 from django.template.response import TemplateResponse
 
-from carting.admin import ModelAdminWithOrderedFormsets
+from carting.admin import (
+    ModelAdminWithFormsetsIncludingInline,
+    ModelAdminWithOrderedFormsets,
+)
 from s100.admin import FeatureNameInline, TextContentInline
 from s127.admin import FeatureTypePermissionTypeInline
 from s127.models import PilotageDistrict
@@ -14,6 +18,151 @@ def fieldsets_and_inlines_names(response: TemplateResponse):
         or getattr(fieldset_or_inline, "name")
         for fieldset_or_inline in response.context_data["fieldsets_and_inlines"]
     ]
+
+
+def inlines_admin_formsets_by_inline_names(response: TemplateResponse):
+    return [
+        hasattr(fieldset_or_inline, "opts")
+        and fieldset_or_inline.opts.verbose_name
+        or getattr(fieldset_or_inline, "name")
+        for fieldset_or_inline in response.context_data[""]
+    ]
+
+
+class TestModelAdminWithFormsetsIncludingInline:
+    def test_basic(self, rf, admin_user):
+        class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
+            pass
+
+        pilotage_district_admin = PilotageDistrictAdmin(
+            PilotageDistrict, admin.AdminSite()
+        )
+        request = rf.get("")
+        request.user = admin_user
+        response = pilotage_district_admin.add_view(request)
+
+        assert response.context_data["inline_admin_formsets_by_fieldset_name"] == {}
+        assert pilotage_district_admin.get_inlines() == []
+        assert pilotage_district_admin.get_fieldsets() == []
+
+    def test_without_inlines(self, rf, admin_user):
+        class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
+            fieldsets_and_inlines_ordered = [
+                (None, {"fields": ["communication_channel"]})
+            ]
+
+        pilotage_district_admin = PilotageDistrictAdmin(
+            PilotageDistrict, admin.AdminSite()
+        )
+        request = rf.get("")
+        request.user = admin_user
+        response = pilotage_district_admin.add_view(request)
+
+        assert response.context_data["inline_admin_formsets_by_fieldset_name"] == {
+            None: []
+        }
+        assert pilotage_district_admin.get_inlines() == []
+        assert (
+            pilotage_district_admin.get_fieldsets()
+            == PilotageDistrictAdmin.fieldsets_and_inlines_ordered
+        )
+
+    def test_with_inlines(self, rf, admin_user):
+        class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
+            fieldsets_and_inlines_ordered = [(None, {"fields": [FeatureNameInline]})]
+
+        pilotage_district_admin = PilotageDistrictAdmin(
+            PilotageDistrict, admin.AdminSite()
+        )
+        request = rf.get("")
+        request.user = admin_user
+        response = pilotage_district_admin.add_view(request)
+
+        assert isinstance(
+            response.context_data["inline_admin_formsets_by_fieldset_name"][None][0],
+            InlineAdminFormSet,
+        )
+        assert pilotage_district_admin.get_inlines() == [FeatureNameInline]
+        assert pilotage_district_admin.get_fieldsets() == [(None, {"fields": []})]
+
+    def test_full(self, rf, admin_user):
+        class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
+            fieldsets_and_inlines_ordered = [
+                (
+                    None,
+                    {
+                        "fields": [
+                            "communication_channel",
+                            FeatureNameInline,
+                            "geometry",
+                        ]
+                    },
+                ),
+                (
+                    "un nom de fieldset",
+                    {
+                        "fields": [
+                            FeatureTypePermissionTypeInline,
+                            TextContentInline,
+                            "communication_channel",
+                            FeatureNameInline,
+                        ]
+                    },
+                ),
+            ]
+
+        pilotage_district_admin = PilotageDistrictAdmin(
+            PilotageDistrict, admin.AdminSite()
+        )
+        request = rf.get("")
+        request.user = admin_user
+        response = pilotage_district_admin.add_view(request)
+
+        assert pilotage_district_admin.get_inlines() == [
+            FeatureNameInline,
+            FeatureTypePermissionTypeInline,
+            TextContentInline,
+            FeatureNameInline,
+        ]
+        assert pilotage_district_admin.get_fieldsets() == [
+            (
+                None,
+                {
+                    "fields": [
+                        "communication_channel",
+                        "geometry",
+                    ]
+                },
+            ),
+            (
+                "un nom de fieldset",
+                {
+                    "fields": [
+                        "communication_channel",
+                    ]
+                },
+            ),
+        ]
+        assert isinstance(
+            response.context_data["inline_admin_formsets_by_fieldset_name"][None][
+                0
+            ].opts,
+            FeatureNameInline,
+        )
+
+        for index, inline in enumerate(
+            [
+                FeatureTypePermissionTypeInline,
+                TextContentInline,
+                FeatureNameInline,
+            ]
+        ):
+            assert isinstance(
+                response.context_data["inline_admin_formsets_by_fieldset_name"][
+                    "un nom de fieldset"
+                ][index].opts,
+                inline,
+            )
 
 
 class TestModelAdminWithOrderedFormsets:

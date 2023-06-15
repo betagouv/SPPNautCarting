@@ -2,7 +2,7 @@
 DJANGO_SETTINGS_MODULE = "core.settings"
 env_files = [".env.template"]
 addopts = "--reuse-db"
-filterwarnings = ["error"]
+filterwarnings = ["error", "ignore:.*pkg_resources is deprecated as an API.*"]
 
 [project]
 name = "sppnaut"
