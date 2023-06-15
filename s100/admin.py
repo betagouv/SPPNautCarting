@@ -37,7 +37,9 @@ class InformationInline(
     is_sortable = False
 
 
-class TextContentInline(OneExtraWhenEmptyMixin, nested_admin.NestedGenericStackedInline):
+class TextContentInline(
+    OneExtraWhenEmptyMixin, nested_admin.NestedGenericStackedInline
+):
     model = s100.models.TextContent
     inlines = [InformationInline]
     extra = 0

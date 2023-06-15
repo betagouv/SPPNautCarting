@@ -207,7 +207,7 @@ class ApplicabilityAdmin(
                     "thickness_of_ice_capability",
                     "vessel_performance",
                 ],
-                "classes": ["collapse"]
+                "classes": ["collapse"],
             },
         ),
         (
@@ -216,8 +216,8 @@ class ApplicabilityAdmin(
                 "fields": [
                     "category_of_vessel",
                     "category_of_vessel_registry",
-                ], 
-                "classes": ["collapse"]
+                ],
+                "classes": ["collapse"],
             },
         ),
         (
