@@ -2,11 +2,7 @@ import nested_admin
 from django.contrib import admin
 
 import s127.models
-from carting.admin import (
-    GISModelAdminWithRasterMarine,
-    ModelAdminWithFormsetsIncludingInline,
-    ModelAdminWithOrderedFormsets,
-)
+from carting.admin import GISModelAdminWithRasterMarine, ModelAdminWithOrderedFormsets
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 # region Inlines
@@ -15,7 +11,7 @@ from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
     verbose_name_plural = "Vessel measurements"
     model = s127.models.VesselsMeasurements
-    extra = 1
+    extra = 0
     is_sortable = False
 
 
@@ -93,7 +89,9 @@ class AccumulatedInlines:
 # region InformationTypeAdmins
 
 
-class InformationTypeAdmin(AccumulatedInlines, nested_admin.NestedModelAdmin):
+class InformationTypeAdmin(
+    AccumulatedInlines, ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin
+):
     inlines = [InformationInline]
 
 
@@ -123,26 +121,29 @@ class ContactDetailsAdmin(InformationTypeAdmin):
 
     inlines = [
         FeatureNameInline,
+        RadiocommunicationsInline,
         TelecommunicationsInline,
-        RadiocommunicationsInline,  # to collapse
-        ContactAddressInline,  # to collapse
-        InformationInline,  # to collapse
+        ContactAddressInline,
     ]
     fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 @admin.register(s127.models.Applicability)
-class ApplicabilityAdmin(
-    ModelAdminWithFormsetsIncludingInline,
-    InformationTypeAdmin,
-):
+class ApplicabilityAdmin(InformationTypeAdmin):
     search_fields = ["id"]
+    inlines = [VesselsMeasurementsInline]
+    fieldsets_and_inlines_order = (
+        None,
+        VesselsMeasurementsInline,
+    )
 
-    fieldsets_and_inlines_ordered = [
+    fieldsets = [
         (
-            "Vessels Measurements",
+            None,
             {
-                "fields": ["logical_connectives", VesselsMeasurementsInline],
+                "fields": [
+                    "logical_connectives",
+                ]
             },
         ),
         (
@@ -172,10 +173,6 @@ class ApplicabilityAdmin(
                     "category_of_vessel_registry",
                 ]
             },
-        ),
-        (
-            "Informations",
-            {"fields": [InformationInline], "classes": ["collapse"]},
         ),
     ]
 
@@ -222,17 +219,12 @@ class PilotageDistrictAdmin(FeatureTypeAdmin):
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Geometry",
-        FeatureTypePermissionTypeInline,
-        TextContentInline,  # Collapse if possible
         "Communication channel",
     )
 
     fieldsets = [
         ("Geometry", {"fields": ["geometry"]}),
-        (
-            "Communication channel",
-            {"fields": ["communication_channel"], "classes": ["collapse"]},
-        ),
+        ("Communication channel", {"fields": ["communication_channel"]}),
     ]
 
     @admin.display(description="Pilot Services")
@@ -263,11 +255,8 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
     fieldsets_and_inlines_order = (
         FeatureNameInline,
         "Geometry",
-        "Details",
         "Communication",
-        SrvContactInline,  # Collapse if possible
-        FeatureTypePermissionTypeInline,  # Collapse if possible
-        TextContentInline,  # Collapse if possible
+        "Details",
     )
 
     fieldsets = (
@@ -278,7 +267,6 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
                     "communication_channel",
                     "call_sign",
                 ),
-                "classes": ["collapse"],
             },
         ),
         (
@@ -336,49 +324,34 @@ class PilotServiceAdmin(ReportableServiceAreaAdmin):
 
 
 @admin.register(s127.models.FullPilotServiceProxy)
-class FullPilotServiceAdmin(
-    ModelAdminWithFormsetsIncludingInline,
-    PilotServiceAdmin,
-):
+class FullPilotServiceAdmin(PilotServiceAdmin):
     autocomplete_fields = ["pilotage_district"]
+    inlines = [NoticeTimeInline, PilotServicePilotBoardingPlaceInline]
 
-    list_display = (
-        "__str__",
-        "pilotage_district",
-        "pilot_boarding_places",
+    fieldsets_and_inlines_order = (
+        FeatureNameInline,
+        "Pilotage district",
+        PilotServicePilotBoardingPlaceInline,
+        SrvContactInline,
+        FeatureTypePermissionTypeInline,
+        NoticeTimeInline,
+        "Geometry",
     )
-    list_filter = ("pilotage_district",)
 
-    fieldsets_and_inlines_ordered = [
-        (
-            "Feature names",
-            {
-                "fields": [
-                    FeatureNameInline,
-                ]
-            },
-        ),
-        ("Pilotage districts", {"fields": ["pilotage_district"]}),
-        (
-            "Pilot Boarding Places",
-            {"fields": [PilotServicePilotBoardingPlaceInline]},
-        ),
-        ("Contact Details", {"fields": [SrvContactInline]}),
-        ("Permission type", {"fields": [FeatureTypePermissionTypeInline]}),
-        ("Notice times", {"fields": [NoticeTimeInline]}),
+    fieldsets = [
+        ("Geometry", {"fields": ["geometry"], "classes": ["collapse"]}),
+        ("Pilotage district", {"fields": ["pilotage_district"]}),
         (
             "Pilot details",
             {
                 "fields": [
-                    "remote_pilot",
                     "category_of_pilot",
+                    "remote_pilot",
                     "pilot_qualification",
                     "pilot_request",
                 ]
             },
         ),
-        ("Text content", {"fields": [TextContentInline]}),
-        ("Geometry", {"fields": ["geometry"], "classes": ["collapse"]}),
     ]
 
 
