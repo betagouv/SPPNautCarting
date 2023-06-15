@@ -59,10 +59,10 @@ label.required::after {
     padding: 1rem 0;
 }
 
-fieldset fieldset h2 {
+.inlines-in-fieldset fieldset h2 {
     display: none;
 }
 
-fieldset .inline-group {
+.inlines-in-fieldset .inline-group {
     margin-bottom: 0px;
 }

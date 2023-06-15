@@ -8,7 +8,6 @@ Everything except the line commented can be rewritten on future django upgrades
 
 {% block field_sets %}
     {% for fieldset in adminform %}
-
         <fieldset class="module aligned {{ fieldset.classes }}">
             {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
             {% if fieldset.description %}
@@ -44,14 +43,15 @@ Everything except the line commented can be rewritten on future django upgrades
             {% endfor %}
 
             {# Addition to Django's original template #}
+            <div class="inlines-in-fieldset">
             {% for fieldset_name, inline_admin_formsets in inlines_line_by_fieldset_name.items %}
                 {% if fieldset_name == fieldset.name %}
                     {% for inline_admin_formset in inline_admin_formsets %}
-                    {% include inline_admin_formset.opts.template %}
+                      {% include inline_admin_formset.opts.template %}
                     {% endfor %}
-
-                    {% endif %}
+                  {% endif %}
             {% endfor %}
+            </div>
         </fieldset>
     {% endfor %}
 {% endblock %}
