@@ -1,7 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import GeometryCollection, Point, Polygon
 from django.contrib.postgres.fields import ArrayField
-from django.core.exceptions import ValidationError
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 
 from carting.fields import ChoiceArrayField
 
@@ -129,6 +129,24 @@ class PilotBoardingPlace(ContactableArea):
     )
 
     geometry = models.GeometryCollectionField(validators=[validate_point_or_surface])
+
+    @property
+    def pilotage_district(self):
+        all_pilot_services = []
+        for pilot_service in self.pilotservice_set.all():
+            all_pilot_services.append(pilot_service)
+        pilotage_districts = list(
+            set(
+                pilot_service.pilotage_district
+                for pilot_service in all_pilot_services
+                if pilot_service.pilotage_district is not None
+            )
+        )
+        if not pilotage_districts:
+            return None
+        if len(pilotage_districts) >= 2:
+            raise MultipleObjectsReturned()
+        return pilotage_districts[0]
 
     # Uncomment when upgrading to django 4.2
     # class Meta:
