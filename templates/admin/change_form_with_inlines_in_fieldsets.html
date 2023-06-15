@@ -1,7 +1,7 @@
 {% extends "admin/change_form.html" %}
 
 {% comment %}
-This template rewrite the fieldset include from this file https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html
+This template overrides the fieldset include from this file https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html
 
 Everything except the line commented can be rewritten on future django upgrades
 {% endcomment %}
@@ -42,7 +42,7 @@ Everything except the line commented can be rewritten on future django upgrades
                 </div>
             {% endfor %}
 
-            {# Addition to Django's original template #}
+            {# Addition to Django's original template - start #}
             <div class="inlines-in-fieldset">
             {% for fieldset_name, inline_admin_formsets in inline_admin_formsets_by_fieldset_name.items %}
                 {% if fieldset_name == fieldset.name %}
@@ -51,6 +51,7 @@ Everything except the line commented can be rewritten on future django upgrades
                     {% endfor %}
                   {% endif %}
             {% endfor %}
+            {# Addition to Django's original template - end #}
             </div>
         </fieldset>
     {% endfor %}
