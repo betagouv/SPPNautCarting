@@ -42,7 +42,7 @@ Everything except the line commented can be rewritten on future django upgrades
                 </div>
             {% endfor %}
 
-            {# Addition to Django's original template - start #}
+            {# start - Addition to Django's original template #}
             <div class="inlines-in-fieldset">
             {% for fieldset_name, inline_admin_formsets in inline_admin_formsets_by_fieldset_name.items %}
                 {% if fieldset_name == fieldset.name %}
@@ -51,7 +51,7 @@ Everything except the line commented can be rewritten on future django upgrades
                     {% endfor %}
                   {% endif %}
             {% endfor %}
-            {# Addition to Django's original template - end #}
+            {# end - Addition to Django's original template #}
             </div>
         </fieldset>
     {% endfor %}
