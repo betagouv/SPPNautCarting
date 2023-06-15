@@ -98,10 +98,9 @@ pip-licenses > licenses.csv
 
 ### Mise à jour de Django
 
-Plusieurs fichiers sont dupliqués depuis le code source de Django dans le but d'être supplantés.  
-Une montée de version de Django peut entraîner une incompatibilité entre ces modifications et les modifications apportées par Django. Il est important de vérifier à chaque mise à jour que les fichiers supplantés par ce projet ne sont pas modifiés également dans Django. Si c'est le cas, il faut adapter les modifications au sein de ceux-ci avec les nôtres.
-
-Ci-dessous les fichiers à maintenir synchronisé avec Django en cas de montée de version :
+Plusieurs fichiers sont dupliqués depuis le code source de Django pour en modifier le fonctionnement.  
+Une montée de version de ce dernier peut entraîner des régressions.  
+Il est important de vérifier à chaque mise à jour que les fichiers supplantés par ce projet ne sont pas modifiés également dans Django. Dans ce cas, il faut mettre à jour les templates ci-dessous :
 
 -   `templates/admin/change_form_with_ordered_formset_test.html` with [fieldset.html](https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html)
 -   `static/to_compile/entrypoints/admin-map-widget.ts` with [django/contrib/gis/static/gis/js/OLMapWidget.js](https://github.com/django/django/blob/main/django/contrib/gis/static/gis/js/OLMapWidget.js)
