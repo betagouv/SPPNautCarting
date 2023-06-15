@@ -164,6 +164,15 @@ class TestModelAdminWithFormsetsIncludingInline:
                 inline,
             )
 
+    def test_template(self):
+        class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
+            pass
+
+        assert (
+            PilotageDistrictAdmin.change_form_template
+            == "admin/change_form_with_inlines_in_fieldsets.html"
+        )
+
 
 class TestModelAdminWithOrderedFormsets:
     def test_basic(self, rf, admin_user):
