@@ -25,7 +25,9 @@ class FeatureNameInline(
     is_sortable = False
 
 
-class InformationInline(nested_admin.NestedGenericStackedInline):
+class InformationInline(
+    OneExtraWhenEmptyMixin, nested_admin.NestedGenericStackedInline
+):
     model = s100.models.Information
     fields = ("headline", "text")
     # FIXME: Why did we decide to make it a 1 when the spec says [0..*] ?
@@ -35,7 +37,7 @@ class InformationInline(nested_admin.NestedGenericStackedInline):
     is_sortable = False
 
 
-class TextContentInline(nested_admin.NestedGenericStackedInline):
+class TextContentInline(OneExtraWhenEmptyMixin, nested_admin.NestedGenericStackedInline):
     model = s100.models.TextContent
     inlines = [InformationInline]
     extra = 0

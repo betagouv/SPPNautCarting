@@ -7,7 +7,13 @@ from carting.admin import (
     ModelAdminWithFormsetsIncludingInline,
     ModelAdminWithOrderedFormsets,
 )
-from s100.admin import FeatureNameInline, InformationInline, TextContentInline
+from s100.admin import (
+    FeatureNameInline,
+    InformationInline,
+    OneExtraWhenEmptyMixin,
+    TextContentInline,
+)
+from s127.models.information_type import Radiocommunications
 
 # region Inlines
 
@@ -20,6 +26,7 @@ class VesselsMeasurementsInline(nested_admin.NestedStackedInline):
 
 
 class ContactAddressInline(nested_admin.NestedStackedInline):
+    # FIXME : display one by default, with OneExtraWhenEmptyMixin that works
     model = s127.models.ContactAddress
     extra = 0
     is_sortable = False
@@ -32,6 +39,7 @@ class TelecommunicationsInline(nested_admin.NestedStackedInline):
 
 
 class RadiocommunicationsInline(nested_admin.NestedStackedInline):
+    # FIXME : display one by default, with OneExtraWhenEmptyMixin that works
     model = s127.models.Radiocommunications
     extra = 0
     is_sortable = False
@@ -69,6 +77,7 @@ class SrvContactInline(nested_admin.NestedGenericTabularInline):
 
 
 class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
+    # FIXME : display one by default, with OneExtraWhenEmptyMixin that works
     ct_field = "feature_content_type"
     ct_fk_field = "feature_object_id"
     model = s127.models.PermissionType
@@ -98,37 +107,65 @@ class InformationTypeAdmin(AccumulatedInlines, nested_admin.NestedModelAdmin):
 
 
 @admin.register(s127.models.ContactDetails)
-class ContactDetailsAdmin(InformationTypeAdmin):
+class ContactDetailsAdmin(ModelAdminWithFormsetsIncludingInline, InformationTypeAdmin):
     search_fields = ["id", "feature_names__name"]
 
-    def get_fieldsets(self, request, obj=None):
-        return [
-            (
-                "Language",
-                {"fields": ["language"]},
-            ),
-            (
-                "Main Radiocommunication",
-                {
-                    "fields": [
-                        # FIXME: Write a generic concept to "dump" the fields
-                        # that were not mentioned in other fieldsets
-                        x
-                        for x in self.get_fields(request, obj)
-                        if x != "language"
+    fieldsets_and_inlines_ordered = [
+        ("Feature names", {"fields": [FeatureNameInline]}),
+        (
+            "Language",
+            {"fields": ["language"]},
+        ),
+        (
+            "Main Radiocommunication",
+            {
+                "fields": [
+                    # FIXME: Write a generic concept to "dump" the fields
+                    # that were not mentioned in other fieldsets
+                    x.name
+                    for x in s127.models.ContactDetails._meta.get_fields()
+                    if x.name
+                    not in [
+                        "id",
+                        "language",
+                        "feature_names",
+                        "information",
+                        "srvcontact",
+                        "telecommunications",
+                        "contact_addresses",
+                        "radiocommunications",
                     ]
-                },
-            ),
-        ]
-
-    inlines = [
-        FeatureNameInline,
-        TelecommunicationsInline,
-        RadiocommunicationsInline,  # to collapse
-        ContactAddressInline,  # to collapse
-        InformationInline,  # to collapse
+                ]
+            },
+        ),
+        (
+            "Telecommunications",
+            {
+                "fields": [TelecommunicationsInline],
+            },
+        ),
+        (
+            "Radiocommunications",
+            {
+                "fields": [RadiocommunicationsInline],
+                "classes": ["collapse"],
+            },
+        ),
+        (
+            "Contact addresses",
+            {
+                "fields": [ContactAddressInline],
+                "classes": ["collapse"],
+            },
+        ),
+        (
+            "Informations",
+            {
+                "fields": [InformationInline],
+                "classes": ["collapse"],
+            },
+        ),
     ]
-    fieldsets_and_inlines_order = (FeatureNameInline,)
 
 
 @admin.register(s127.models.Applicability)
@@ -146,22 +183,31 @@ class ApplicabilityAdmin(
             },
         ),
         (
+            "Cargo category",
+            {
+                "fields": [
+                    "category_of_cargo",
+                ]
+            },
+        ),
+        (
+            "Dangerous or hazardous detail",
+            {
+                "fields": [
+                    "category_of_dangerous_or_hazardous_cargo",
+                ],
+                "classes": ["collapse"],
+            },
+        ),
+        (
             "Ballast & Performances",
             {
                 "fields": [
                     "in_ballast",
                     "thickness_of_ice_capability",
                     "vessel_performance",
-                ]
-            },
-        ),
-        (
-            "Cargo category",
-            {
-                "fields": [
-                    "category_of_cargo",
-                    "category_of_dangerous_or_hazardous_cargo",
-                ]
+                ],
+                "classes": ["collapse"]
             },
         ),
         (
@@ -170,7 +216,8 @@ class ApplicabilityAdmin(
                 "fields": [
                     "category_of_vessel",
                     "category_of_vessel_registry",
-                ]
+                ], 
+                "classes": ["collapse"]
             },
         ),
         (
@@ -211,7 +258,7 @@ class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
 
 
 @admin.register(s127.models.PilotageDistrict)
-class PilotageDistrictAdmin(FeatureTypeAdmin):
+class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline, FeatureTypeAdmin):
     search_fields = ["id", "feature_names__name"]
     list_display = (
         "__str__",
@@ -219,16 +266,11 @@ class PilotageDistrictAdmin(FeatureTypeAdmin):
         "pilot_boarding_places",
     )
 
-    fieldsets_and_inlines_order = (
-        FeatureNameInline,
-        "Geometry",
-        FeatureTypePermissionTypeInline,
-        TextContentInline,  # Collapse if possible
-        "Communication channel",
-    )
-
-    fieldsets = [
+    fieldsets_and_inlines_ordered = [
+        ("Feature names", {"fields": [FeatureNameInline]}),
         ("Geometry", {"fields": ["geometry"]}),
+        ("Permission types", {"fields": [FeatureTypePermissionTypeInline]}),
+        ("Text contents", {"fields": [TextContentInline], "classes": ["collapse"]}),
         (
             "Communication channel",
             {"fields": ["communication_channel"], "classes": ["collapse"]},
@@ -251,7 +293,9 @@ class PilotageDistrictAdmin(FeatureTypeAdmin):
 
 
 @admin.register(s127.models.PilotBoardingPlace)
-class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
+class PilotBoardingPlaceAdmin(
+    ModelAdminWithFormsetsIncludingInline, ContactableAreaAdmin
+):
     search_fields = [
         "id",
         "feature_names__name",
@@ -260,27 +304,9 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
     list_display = ("__str__", "pilot_services", "pilotage_districts")
     list_filter = ("pilotservice__pilotage_district",)
 
-    fieldsets_and_inlines_order = (
-        FeatureNameInline,
-        "Geometry",
-        "Details",
-        "Communication",
-        SrvContactInline,  # Collapse if possible
-        FeatureTypePermissionTypeInline,  # Collapse if possible
-        TextContentInline,  # Collapse if possible
-    )
-
-    fieldsets = (
-        (
-            "Communication",
-            {
-                "fields": (
-                    "communication_channel",
-                    "call_sign",
-                ),
-                "classes": ["collapse"],
-            },
-        ),
+    fieldsets_and_inlines_ordered = (
+        ("Feature names", {"fields": [FeatureNameInline]}),
+        ("Geometry", {"fields": ["geometry"]}),
         (
             "Details",
             {
@@ -295,8 +321,25 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
                 ),
             },
         ),
-        ("Geometry", {"fields": ["geometry"]}),
+        (
+            "Communication",
+            {
+                "fields": (
+                    "communication_channel",
+                    "call_sign",
+                ),
+                "classes": ["collapse"],
+            },
+        ),
+        ("Contact details", {"fields": [SrvContactInline], "classes": ["collapse"]}),
+        (
+            "Permission types",
+            {"fields": [FeatureTypePermissionTypeInline], "classes": ["collapse"]},
+        ),
+        ("Text contents", {"fields": [TextContentInline], "classes": ["collapse"]}),
     )
+
+    fieldsets = ()
 
     @admin.display(description="Pilot Services")
     def pilot_services(self, obj):
@@ -365,19 +408,27 @@ class FullPilotServiceAdmin(
         ),
         ("Contact Details", {"fields": [SrvContactInline]}),
         ("Permission type", {"fields": [FeatureTypePermissionTypeInline]}),
-        ("Notice times", {"fields": [NoticeTimeInline]}),
+        ("Notice times", {"fields": [NoticeTimeInline], "classes": ["collapse"]}),
+        (
+            "Remote pilot",
+            {
+                "fields": [
+                    "remote_pilot",
+                ]
+            },
+        ),
         (
             "Pilot details",
             {
                 "fields": [
-                    "remote_pilot",
                     "category_of_pilot",
                     "pilot_qualification",
                     "pilot_request",
-                ]
+                ],
+                "classes": ["collapse"],
             },
         ),
-        ("Text content", {"fields": [TextContentInline]}),
+        ("Text content", {"fields": [TextContentInline], "classes": ["collapse"]}),
         ("Geometry", {"fields": ["geometry"], "classes": ["collapse"]}),
     ]
 
