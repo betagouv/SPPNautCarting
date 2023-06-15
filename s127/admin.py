@@ -97,7 +97,7 @@ class InformationTypeAdmin(
 
 @admin.register(s127.models.ContactDetails)
 class ContactDetailsAdmin(InformationTypeAdmin):
-    search_fields = ["id"]
+    search_fields = ["id", "feature_names__name"]
 
     def get_fieldsets(self, request, obj=None):
         return [
@@ -209,7 +209,7 @@ class ReportableServiceAreaAdmin(SupervisedAreaAdmin):
 
 @admin.register(s127.models.PilotageDistrict)
 class PilotageDistrictAdmin(FeatureTypeAdmin):
-    search_fields = ["id"]
+    search_fields = ["id", "feature_names__name"]
     list_display = (
         "__str__",
         "pilot_services",
@@ -244,7 +244,11 @@ class PilotageDistrictAdmin(FeatureTypeAdmin):
 
 @admin.register(s127.models.PilotBoardingPlace)
 class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
-    search_fields = ["id"]
+    search_fields = [
+        "id",
+        "feature_names__name",
+        "pilotservice__pilotage_district__feature_names__name",
+    ]
     list_display = ("__str__", "pilot_services", "pilotage_districts")
     list_filter = ("pilotservice__pilotage_district",)
 
@@ -298,6 +302,12 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
 @admin.register(s127.models.PilotService)
 class PilotServiceAdmin(ReportableServiceAreaAdmin):
     autocomplete_fields = ["pilotage_district", "pilot_boarding_places"]
+    search_fields = [
+        "id",
+        "feature_names__name",
+        "pilotage_district__feature_names__name",
+    ]
+
     list_display = (
         "__str__",
         "pilotage_district",
