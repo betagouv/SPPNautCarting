@@ -20,15 +20,6 @@ def fieldsets_and_inlines_names(response: TemplateResponse):
     ]
 
 
-def inlines_admin_formsets_by_inline_names(response: TemplateResponse):
-    return [
-        hasattr(fieldset_or_inline, "opts")
-        and fieldset_or_inline.opts.verbose_name
-        or getattr(fieldset_or_inline, "name")
-        for fieldset_or_inline in response.context_data[""]
-    ]
-
-
 class TestModelAdminWithFormsetsIncludingInline:
     def test_basic(self, rf, admin_user):
         class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
