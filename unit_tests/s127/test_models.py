@@ -5,15 +5,18 @@ from django.contrib.gis.geos import (
     GeometryCollection,
     LinearRing,
     LineString,
+    MultiPolygon,
     Point,
     Polygon,
 )
-from django.core.exceptions import ValidationError
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 
 from s127.models import (
     Applicability,
     ContactDetails,
+    PilotageDistrict,
     PilotBoardingPlace,
+    PilotService,
     Telecommunications,
     VesselsMeasurements,
 )
@@ -433,3 +436,78 @@ class TestTelecommunicationsStr:
             )
             == "Voice/Sms/Facsimile: a"
         )
+
+
+class TestPilotBoardingPlacePilotageDistrict:
+    @pytest.mark.django_db
+    def test_no_pilotage_district(self):
+        pilot_boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        assert pilot_boarding_place.pilotage_district == None
+
+    @pytest.mark.django_db
+    def test_one_pilotage_district(self):
+        pilot_boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        pilotage_district = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            communication_channel=["12"],
+        )
+        pilot_service = PilotService.objects.create(
+            pilotage_district=pilotage_district,
+        )
+        pilot_service.pilot_boarding_places.set([pilot_boarding_place])
+
+        assert pilot_boarding_place.pilotage_district.communication_channel == ["12"]
+
+    @pytest.mark.django_db
+    def test_two_identical_pilotage_district(self):
+        pilot_boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        pilotage_district = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            communication_channel=["12"],
+        )
+        pilot_service_1 = PilotService.objects.create(
+            pilotage_district=pilotage_district,
+        )
+        pilot_service_1.pilot_boarding_places.set([pilot_boarding_place])
+
+        pilot_service_2 = PilotService.objects.create(
+            pilotage_district=pilotage_district,
+        )
+        pilot_service_2.pilot_boarding_places.set([pilot_boarding_place])
+
+        assert pilot_boarding_place.pilotage_district.communication_channel == ["12"]
+
+    @pytest.mark.django_db
+    def test_two_different_pilotage_district(self):
+        pilot_boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        pilotage_district_1 = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            communication_channel=["12"],
+        )
+        pilotage_district_2 = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            communication_channel=["16"],
+        )
+        pilot_service_1 = PilotService.objects.create(
+            pilotage_district=pilotage_district_1,
+        )
+        pilot_service_1.pilot_boarding_places.set([pilot_boarding_place])
+
+        pilot_service_2 = PilotService.objects.create(
+            pilotage_district=pilotage_district_2,
+        )
+        pilot_service_2.pilot_boarding_places.set([pilot_boarding_place])
+
+        try:
+            pilot_boarding_place.pilotage_district
+            self.fail("This is meant to raise")
+        except MultipleObjectsReturned:
+            pass

@@ -41,7 +41,7 @@ class NoticeTimeInline(nested_admin.NestedStackedInline):
 
 class PilotServicePilotBoardingPlaceInline(nested_admin.NestedTabularInline):
     model = s127.models.PilotService.pilot_boarding_places.through
-    autocomplete_fields = ["pilotboardingplace"]
+    autocomplete_fields = ["pilot_boarding_place"]
     verbose_name = "Pilot boarding place"
 
     def get_extra(self, request, obj=None, **kwargs):
