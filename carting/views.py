@@ -1,5 +1,5 @@
 import requests
-from django.core import serializers
+from django.core.serializers import serialize
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -50,17 +50,7 @@ def index(request: HttpRequest) -> HttpResponse:
         )
     sections = [*section.ancestors(), *section.descendants(include_self=True)]
 
-    GeoJSONSerializer = serializers.get_serializer("geojson")
-
-    # https://stackoverflow.com/questions/34556679/geodjango-serialize-geojson-skipping-id-field
-    class Serializer(GeoJSONSerializer):
-        def get_dump_object(self, obj):
-            data = super(Serializer, self).get_dump_object(obj)
-            data.update(id=obj.pk)
-            return data
-
-    geojson = Serializer().serialize(s for s in sections if s.geometry)
-
+    geojson = serialize("geojson", (s for s in sections if s.geometry))
     return render(
         request,
         "carting/index.html",
