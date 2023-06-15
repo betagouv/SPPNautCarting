@@ -1,10 +1,12 @@
 import copy
+from inspect import getmro, isclass
 import logging
 from types import NoneType
 from typing import cast
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.gis.admin import GISModelAdmin
 from django.urls import reverse
@@ -40,44 +42,40 @@ def children(instance: TreeNode):
 
 
 class ModelAdminWithFormsetsIncludingInline(admin.ModelAdmin):
-    change_form_template = "admin/change_form_with_ordered_formsets_test.html"
+    change_form_template = "admin/change_form_with_inlines_in_fieldsets.html"
     fieldsets_and_inlines_ordered = []
 
-    def get_fieldsets(self, request, obj=None):
+    def get_fieldsets(self, *args, **kwargs):
         fieldsets = copy.deepcopy(self.fieldsets_and_inlines_ordered)
-        for fieldset in fieldsets:
-            fieldset[1]["fields"] = [
-                field for field in fieldset[1]["fields"] if isinstance(field, str)
+        for _, attributes in fieldsets:
+            attributes["fields"] = [
+                field for field in attributes["fields"] if isinstance(field, str)
             ]
         return fieldsets
 
-    def get_inlines(self, request, obj=None):
-        inlines = []
-        for fieldset in self.fieldsets_and_inlines_ordered:
-            inlines = inlines + [
-                field
-                for field in fieldset[1]["fields"]
-                if not isinstance(
-                    field, str
-                )  # FIXME: stronger to test if it is class inherit fro AdminInLine ?
-            ]
-        return inlines
+    def get_inlines(self, *args, **kwargs):
+        return [
+            field
+            for _, attributes in self.fieldsets_and_inlines_ordered
+            for field in attributes["fields"]
+            if isclass(field) and InlineModelAdmin in getmro(field)
+        ]
 
     def render_change_form(self, request, context, *args, **kwargs):
-        inlines_line_by_fieldset_name = {}
-        for fieldset in self.fieldsets_and_inlines_ordered:
-            fieldset_name = fieldset[0]
-            for field in fieldset[1]["fields"]:
-                if not isinstance(field, str):
-                    inlines_line_by_fieldset_name[fieldset_name] = [
-                        inline
-                        for inline in context["inline_admin_formsets"]
-                        if inline.opts.__class__ == field
-                    ]
+        inline_admin_formsets_by_fieldset_name = {}
+
+        for name, attributes in self.fieldsets_and_inlines_ordered:
+            inline_admin_formsets_by_fieldset_name[name] = [
+                formset
+                for field in attributes["fields"]
+                if isclass(field) and InlineModelAdmin in getmro(field)
+                for formset in context["inline_admin_formsets"]
+                if isinstance(formset.opts, field)
+            ]
 
         context.update(
             {
-                "inlines_line_by_fieldset_name": inlines_line_by_fieldset_name,
+                "inline_admin_formsets_by_fieldset_name": inline_admin_formsets_by_fieldset_name,
             }
         )
         return super().render_change_form(request, context, *args, **kwargs)
