@@ -1,5 +1,9 @@
 {% extends "admin/change_form.html" %}
 
+{% comment %}
+This template rewrite the fieldset include from this file https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html
+{% endcomment %}
+
 {% block field_sets %}
     {% for fieldset in adminform %}
 
