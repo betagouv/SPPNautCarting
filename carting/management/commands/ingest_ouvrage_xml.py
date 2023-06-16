@@ -7,8 +7,6 @@ from django.core.management.base import BaseCommand
 
 from carting.models import OuvrageSection
 
-# from spo import generator
-
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
