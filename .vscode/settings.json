@@ -6,6 +6,7 @@
     },
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["--ignore=pgdata"],
     "files.associations": {
         "*.html": "django-html"
     },

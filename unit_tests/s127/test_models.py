@@ -9,13 +9,14 @@ from django.contrib.gis.geos import (
     Point,
     Polygon,
 )
-from django.core.exceptions import MultipleObjectsReturned, ValidationError
+from django.core.exceptions import ValidationError
 
 from s127.models import (
     Applicability,
     ContactDetails,
     PilotageDistrict,
     PilotBoardingPlace,
+    PilotBoardingPlaceServiceThrough,
     PilotService,
     Telecommunications,
     VesselsMeasurements,
@@ -440,74 +441,170 @@ class TestTelecommunicationsStr:
 
 class TestPilotBoardingPlacePilotageDistrict:
     @pytest.mark.django_db
-    def test_no_pilotage_district(self):
-        pilot_boarding_place = PilotBoardingPlace.objects.create(
+    def test_returns_none_without_service(self):
+        boarding_place = PilotBoardingPlace.objects.create(
             geometry=GeometryCollection(Point(0, 0))
         )
-        assert pilot_boarding_place.pilotage_district == None
+        assert boarding_place.pilotage_district == None
 
     @pytest.mark.django_db
-    def test_one_pilotage_district(self):
-        pilot_boarding_place = PilotBoardingPlace.objects.create(
+    def test_returns_none_without_district(self):
+        boarding_place = PilotBoardingPlace.objects.create(
             geometry=GeometryCollection(Point(0, 0))
         )
-        pilotage_district = PilotageDistrict.objects.create(
-            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
-            communication_channel=["12"],
-        )
-        pilot_service = PilotService.objects.create(
-            pilotage_district=pilotage_district,
-        )
-        pilot_service.pilot_boarding_places.set([pilot_boarding_place])
+        service_a = PilotService.objects.create()
+        service_b = PilotService.objects.create()
+        boarding_place.pilotservice_set.set([service_a, service_b])
 
-        assert pilot_boarding_place.pilotage_district.communication_channel == ["12"]
+        assert boarding_place.pilotage_district == None
 
     @pytest.mark.django_db
-    def test_two_identical_pilotage_district(self):
-        pilot_boarding_place = PilotBoardingPlace.objects.create(
+    def test_returns_district_connected_to_multiple_services(self):
+        boarding_place = PilotBoardingPlace.objects.create(
             geometry=GeometryCollection(Point(0, 0))
         )
-        pilotage_district = PilotageDistrict.objects.create(
+        district = PilotageDistrict.objects.create(
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
-            communication_channel=["12"],
         )
-        pilot_service_1 = PilotService.objects.create(
-            pilotage_district=pilotage_district,
+        service_a = PilotService.objects.create(
+            pilotage_district=district,
         )
-        pilot_service_1.pilot_boarding_places.set([pilot_boarding_place])
+        service_b = PilotService.objects.create(
+            pilotage_district=district,
+        )
+        boarding_place.pilotservice_set.set([service_a, service_b])
 
-        pilot_service_2 = PilotService.objects.create(
-            pilotage_district=pilotage_district,
-        )
-        pilot_service_2.pilot_boarding_places.set([pilot_boarding_place])
-
-        assert pilot_boarding_place.pilotage_district.communication_channel == ["12"]
+        assert boarding_place.pilotage_district == district
 
     @pytest.mark.django_db
-    def test_two_different_pilotage_district(self):
-        pilot_boarding_place = PilotBoardingPlace.objects.create(
+    def test_returns_district_not_connected_to_one_service(self):
+        boarding_place = PilotBoardingPlace.objects.create(
             geometry=GeometryCollection(Point(0, 0))
         )
-        pilotage_district_1 = PilotageDistrict.objects.create(
+        district = PilotageDistrict.objects.create(
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
-            communication_channel=["12"],
         )
-        pilotage_district_2 = PilotageDistrict.objects.create(
-            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
-            communication_channel=["16"],
+        service_no_district = PilotService.objects.create()
+        service_with_district = PilotService.objects.create(
+            pilotage_district=district,
         )
-        pilot_service_1 = PilotService.objects.create(
-            pilotage_district=pilotage_district_1,
+        boarding_place.pilotservice_set.set(
+            [service_no_district, service_with_district]
         )
-        pilot_service_1.pilot_boarding_places.set([pilot_boarding_place])
 
-        pilot_service_2 = PilotService.objects.create(
-            pilotage_district=pilotage_district_2,
-        )
-        pilot_service_2.pilot_boarding_places.set([pilot_boarding_place])
+        assert boarding_place.pilotage_district == district
 
-        try:
-            pilot_boarding_place.pilotage_district
-            self.fail("This is meant to raise")
-        except MultipleObjectsReturned:
-            pass
+    @pytest.mark.django_db
+    def test_raises_for_two_different_districts(self):
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        service_a = PilotService.objects.create(
+            pilotage_district=PilotageDistrict.objects.create(
+                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            ),
+        )
+        service_b = PilotService.objects.create(
+            pilotage_district=PilotageDistrict.objects.create(
+                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            ),
+        )
+        boarding_place.pilotservice_set.set([service_a, service_b])
+
+        with pytest.raises(PilotageDistrict.MultipleObjectsReturned):
+            boarding_place.pilotage_district
+
+
+class TestCleanPilotBoardingPlaceServiceThrough:
+    @pytest.mark.django_db
+    def test_valid_no_district(self):
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        service = PilotService.objects.create()
+        assert (
+            PilotBoardingPlaceServiceThrough(
+                pilot_service=service, pilot_boarding_place=boarding_place
+            ).clean()
+            is None
+        )
+
+    @pytest.mark.django_db
+    def test_valid_without_district_on_boarding_place(self):
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        service = PilotService.objects.create(
+            pilotage_district=PilotageDistrict.objects.create(
+                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            )
+        )
+        assert (
+            PilotBoardingPlaceServiceThrough(
+                pilot_service=service, pilot_boarding_place=boarding_place
+            ).clean()
+            is None
+        )
+
+    @pytest.mark.django_db
+    def test_valid_without_district_on_service(self):
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        service_with_district = PilotService.objects.create(
+            pilotage_district=PilotageDistrict.objects.create(
+                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            )
+        )
+        service_no_district = PilotService.objects.create()
+        boarding_place.pilotservice_set.add(service_with_district)
+
+        assert (
+            PilotBoardingPlaceServiceThrough(
+                pilot_service=service_no_district, pilot_boarding_place=boarding_place
+            ).clean()
+            is None
+        )
+
+    @pytest.mark.django_db
+    def test_valid_same_district(self):
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        district = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        service_a = PilotService.objects.create(pilotage_district=district)
+        service_b = PilotService.objects.create(pilotage_district=district)
+        boarding_place.pilotservice_set.add(service_a)
+
+        assert (
+            PilotBoardingPlaceServiceThrough(
+                pilot_service=service_b, pilot_boarding_place=boarding_place
+            ).clean()
+            is None
+        )
+
+    @pytest.mark.django_db
+    def test_raises(self):
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        service_a = PilotService.objects.create(
+            pilotage_district=PilotageDistrict.objects.create(
+                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            ),
+        )
+        service_b = PilotService.objects.create(
+            pilotage_district=PilotageDistrict.objects.create(
+                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+            ),
+        )
+        boarding_place.pilotservice_set.add(service_a)
+
+        with pytest.raises(ValidationError):
+            PilotBoardingPlaceServiceThrough(
+                pilot_service=service_b, pilot_boarding_place=boarding_place
+            ).clean()
+
+    # FIXME : Ajouter un test qui vérifie l'appel à super.clean()

@@ -43,7 +43,7 @@ class PilotService(ReportableServiceArea):
         help_text="An area within which a pilotage direction exists.",
     )
     pilot_boarding_places = models.ManyToManyField(
-        PilotBoardingPlace, through="BoardingPlaceServiceProvider"
+        PilotBoardingPlace, through="PilotBoardingPlaceServiceThrough"
     )
     category_of_pilot = ChoiceArrayField(
         base_field=models.CharField(
@@ -83,7 +83,7 @@ class PilotService(ReportableServiceArea):
     #     "in a particular area and is licensed for that area."
 
 
-class BoardingPlaceServiceProvider(models.Model):
+class PilotBoardingPlaceServiceThrough(models.Model):
     pilot_service = models.ForeignKey(PilotService, on_delete=models.CASCADE)
     pilot_boarding_place = models.ForeignKey(
         PilotBoardingPlace, on_delete=models.CASCADE
@@ -98,7 +98,8 @@ class BoardingPlaceServiceProvider(models.Model):
             != self.pilot_service.pilotage_district
         ):
             raise ValidationError(
-                "At least one of the related pilot boarding place has a connection with another Pilotage District"
+                "At least one of the related pilot boarding place has a connection with another Pilotage District",
+                code="boarding_place_inconsistency",
             )
 
 
