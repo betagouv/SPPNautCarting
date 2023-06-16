@@ -79,7 +79,11 @@ La base de données est utilisée pour la modélisaton des normes s1xy et le fon
 Exécuter,
 
 ```sh
+<<<<<<< HEAD
 ./manage.py ingest_ouvrage_xml z99.xml
+=======
+./manage.py ingest_ouvrage_xml z99
+>>>>>>> fc27a7a (README)
 ./manage.py import_some_geometry
 ```
 
