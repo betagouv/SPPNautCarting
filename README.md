@@ -2,33 +2,36 @@
 
 SPPNaut est une startup d'Etat dont la mission est la modernisaton et l'ouverture des publications nautiques.
 
-## Dévéloppement
+## Développement
+
+L'application est basée sur :
+
+-   [Django et GeoDjango](https://www.djangoproject.com) pour le backend
+-   [DSFR](https://www.systeme-de-design.gouv.fr) pour les composants frontend
+-   [Stimulus](https://stimulus.hotwired.dev) pour la dynamisation du frontend
+-   [OpenLayers](https://openlayers.org) pour les cartes
 
 ### Pré-requis
 
--   Docker
--   Docker-compose
+-   Python >= 3.10
+-   Node.js >= 18
+-   [SPPNaut Generator](https://github.com/betagouv/SPPNautGenerator)
 
 La base de données est utilisée pour la modélisaton des normes s1xy et le fonctionnement de l'administration de Django.
 
-Pour faire tourner l'interface en local, il est conseiller d'utiliser :
-
--   Python >= 3.10
--   docker et docker-compose pour faire tourner la base de données Postgresql
-
 ### Installation
 
-1. Installation des librairies nécessaire à GeoDjango (Carting)
+1. Installation des librairies nécessaire à GeoDjango
 
-    Sur Debian/ubuntu,
+    Sur Debian/ubuntu :
 
     ```sh
     sudo apt-get install binutils libproj-dev gdal-bin
     ```
 
-    Sur MacOS,
+    Sur MacOS :
 
-    ```
+    ```sh
     brew install gdal
     ```
 
@@ -62,7 +65,7 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 
     La base de données est composée des tables d'administration de django pour assurer l'authentification et des tables de modélisations de la norme s1xy
 
-1. Installation des dépendances JS (Carting)
+1. Installation des dépendances JavaScript
 
     `npm install`
 
@@ -72,11 +75,11 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 
     L'interface est disponible sur votre navigateur à l'adresse [http://localhost:8000](http://localhost:8000)
 
-### Ingestion du fichier document.xml d'un ouvrage en base de données (Carting)
+### Ingestion du fichier document.xml d'un ouvrage en base de données
 
-Executer,
+Exécuter,
 
-```
+```sh
 ./manage.py ingest_ouvrage_xml z99.xml
 ./manage.py import_some_geometry
 ```
@@ -86,10 +89,10 @@ Executer,
 Processus à suivre en utilisant le package pip-licenses
 
 ```sh
-$> rm -rf .venv
-$> python -m venv .venv --prompt $(basename $(pwd))
-$> source .venv/bin/activate
-$> pip install -r requirements.txt -r dev-requirements.txt
-$> pip install -U pip-licenses
-$> pip-licenses > licenses.csv
+rm -rf .venv
+python -m venv .venv --prompt $(basename $(pwd))
+source .venv/bin/activate
+pip install -r requirements.txt -r dev-requirements.txt
+pip install -U pip-licenses
+pip-licenses > licenses.csv
 ```
