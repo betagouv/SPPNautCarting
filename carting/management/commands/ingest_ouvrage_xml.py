@@ -22,6 +22,6 @@ class Command(BaseCommand):
         content_root = ElementTree.parse(document_path)
         # FIXME: Valider bpn_id uniques
         ingested = OuvrageSection.objects.ingest_xml_subtree(
-            document_path.name[:10], content_root
+            document_path.name, content_root
         )
         self.stdout.write(self.style.SUCCESS(f"✨ {ingested} sections ingérées"))
