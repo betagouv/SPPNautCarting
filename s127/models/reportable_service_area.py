@@ -76,11 +76,19 @@ class PilotService(ReportableServiceArea):
     # https://github.com/betagouv/SPPNautInterface/issues/228
     geometry = s100.models.GMMultiSurface(null=True, blank=True)
 
-    # Uncomment when upgrading to django 4.2
-    # class Meta:
-    #     db_table_comment = "The service provided by a person who directs the movements of a vessel through pilot waters, "
-    #     "usually a person who has demonstrated extensive knowledge of channels, aids to navigation, dangers to navigation, etc., "
-    #     "in a particular area and is licensed for that area."
+    def clean(self):
+        super().clean()
+        # raise ValidationError(
+        #     "Unauthorized : A service is linked to another District through itss boarding places",
+        #     code="boarding_place_inconsistency",
+        # )
+
+
+# Uncomment when upgrading to django 4.2
+# class Meta:
+#     db_table_comment = "The service provided by a person who directs the movements of a vessel through pilot waters, "
+#     "usually a person who has demonstrated extensive knowledge of channels, aids to navigation, dangers to navigation, etc., "
+#     "in a particular area and is licensed for that area."
 
 
 class PilotBoardingPlaceServiceThrough(models.Model):

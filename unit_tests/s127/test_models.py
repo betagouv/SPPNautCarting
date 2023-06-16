@@ -608,3 +608,31 @@ class TestCleanPilotBoardingPlaceServiceThrough:
             ).clean()
 
     # FIXME : Ajouter un test qui vérifie l'appel à super.clean()
+
+
+class TestCleanPilotService:
+    @pytest.mark.django_db
+    def test_valid_no_boarding_place(self):
+        district = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        assert PilotService.objects.create(pilotage_district=district).clean() is None
+
+    @pytest.mark.django_db
+    def test_raises(self):
+        district_a = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        service_a = PilotService.objects.create(pilotage_district=district_a)
+        boarding_place_ab = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        service_b = PilotService.objects.create()
+        boarding_place_ab.pilotservice_set.set([service_a, service_b])
+        district_b = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0))),
+        )
+        service_b.pilotage_district = district_b
+
+        # with pytest.raises(ValidationError):
+        service_b.clean()

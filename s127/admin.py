@@ -2,7 +2,8 @@ import nested_admin
 from django.contrib import admin
 
 import s127.models
-from carting.admin import GISModelAdminWithRasterMarine, ModelAdminWithOrderedFormsets
+from carting.admin import (GISModelAdminWithRasterMarine,
+                           ModelAdminWithOrderedFormsets)
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 # region Inlines
@@ -247,9 +248,9 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
     search_fields = [
         "id",
         "feature_names__name",
-        "pilotservice__pilotage_district__feature_names__name",
+        "pilotage_district__feature_names__name",
     ]
-    list_display = ("__str__", "pilot_services", "pilotage_districts")
+    list_display = ("__str__", "pilot_services", "pilotage_district")
     list_filter = ("pilotservice__pilotage_district",)
 
     fieldsets_and_inlines_order = (
