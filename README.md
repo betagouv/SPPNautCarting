@@ -77,7 +77,7 @@ Pour faire tourner l'interface en local, il est conseiller d'utiliser :
 Executer,
 
 ```
-./manage.py ingest_ouvrage_xml z99
+./manage.py ingest_ouvrage_xml z99.xml
 ./manage.py import_some_geometry
 ```
 
