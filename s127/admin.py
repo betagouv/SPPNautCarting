@@ -5,12 +5,10 @@ import s127.models
 from carting.admin import (
     GISModelAdminWithRasterMarine,
     ModelAdminWithFormsetsIncludingInline,
-    ModelAdminWithOrderedFormsets,
 )
 from s100.admin import (
-    FeatureNameInline,
+    FeatureNameInline,  # OneExtraWhenEmptyMixin,
     InformationInline,
-    OneExtraWhenEmptyMixin,
     TextContentInline,
 )
 from s127.models.information_type import Radiocommunications
@@ -234,7 +232,6 @@ class ApplicabilityAdmin(
 
 class FeatureTypeAdmin(
     AccumulatedInlines,
-    ModelAdminWithOrderedFormsets,
     GISModelAdminWithRasterMarine,
     nested_admin.NestedModelAdmin,
 ):
