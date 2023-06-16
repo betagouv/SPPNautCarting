@@ -15,7 +15,6 @@ L'application est basée sur :
 
 -   Python >= 3.10
 -   Node.js >= 18
--   [SPPNaut Generator](https://github.com/betagouv/SPPNautGenerator)
 
 La base de données est utilisée pour la modélisaton des normes s1xy et le fonctionnement de l'administration de Django.
 
