@@ -66,3 +66,11 @@ label.required::after {
 .inlines-in-fieldset .inline-group {
     margin-bottom: 0px;
 }
+
+.admin-interface fieldset.collapse {
+    border: 1px solid var(--admin-interface-module-background-color) !important;
+}
+
+.admin-interface fieldset.collapse.collapsed {
+    border: 1px solid transparent !important;
+}
