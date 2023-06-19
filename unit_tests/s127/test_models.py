@@ -619,6 +619,35 @@ class TestCleanPilotService:
         assert PilotService.objects.create(pilotage_district=district).clean() is None
 
     @pytest.mark.django_db
+    def test_valid_one_boarding_place_not_connected(self):
+        district = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        service = PilotService.objects.create(pilotage_district=district)
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        boarding_place.pilotservice_set.set([service])
+        assert service.clean() is None
+
+    @pytest.mark.django_db
+    def test_valid_one_boarding_place_connected_to_same_district(self):
+        district = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        service_a = PilotService.objects.create(pilotage_district=district)
+        boarding_place = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        boarding_place.pilotservice_set.set([service_a])
+
+        service_b = PilotService.objects.create()
+        boarding_place.pilotservice_set.set([service_b])
+
+        service_b.pilotage_district = district
+        assert service_b.clean() is None
+
+    @pytest.mark.django_db
     def test_raises(self):
         district_a = PilotageDistrict.objects.create(
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
@@ -634,5 +663,5 @@ class TestCleanPilotService:
         )
         service_b.pilotage_district = district_b
 
-        # with pytest.raises(ValidationError):
-        service_b.clean()
+        with pytest.raises(ValidationError):
+            service_b.clean()

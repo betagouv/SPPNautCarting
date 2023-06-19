@@ -78,17 +78,28 @@ class PilotService(ReportableServiceArea):
 
     def clean(self):
         super().clean()
-        # raise ValidationError(
-        #     "Unauthorized : A service is linked to another District through itss boarding places",
-        #     code="boarding_place_inconsistency",
-        # )
+        pilotage_district = list(
+            set(
+                pilot_boarding_place.pilotage_district
+                for pilot_boarding_place in self.pilot_boarding_places.all()
+                if pilot_boarding_place.pilotage_district
+            )
+        )
+        if (
+            pilotage_district
+            and self.pilotage_district
+            and pilotage_district[0] != self.pilotage_district
+        ):
+            raise ValidationError(
+                "Unauthorized : A service is linked to another District through its boarding places",
+                code="district_inconsistency",
+            )
 
-
-# Uncomment when upgrading to django 4.2
-# class Meta:
-#     db_table_comment = "The service provided by a person who directs the movements of a vessel through pilot waters, "
-#     "usually a person who has demonstrated extensive knowledge of channels, aids to navigation, dangers to navigation, etc., "
-#     "in a particular area and is licensed for that area."
+    # Uncomment when upgrading to django 4.2
+    # class Meta:
+    #     db_table_comment = "The service provided by a person who directs the movements of a vessel through pilot waters, "
+    #     "usually a person who has demonstrated extensive knowledge of channels, aids to navigation, dangers to navigation, etc., "
+    #     "in a particular area and is licensed for that area."
 
 
 class PilotBoardingPlaceServiceThrough(models.Model):
