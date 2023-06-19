@@ -2,8 +2,7 @@ import nested_admin
 from django.contrib import admin
 
 import s127.models
-from carting.admin import (GISModelAdminWithRasterMarine,
-                           ModelAdminWithOrderedFormsets)
+from carting.admin import GISModelAdminWithRasterMarine, ModelAdminWithOrderedFormsets
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 # region Inlines
