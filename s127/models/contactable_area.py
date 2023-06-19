@@ -1,7 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import GeometryCollection, Point, Polygon
 from django.contrib.postgres.fields import ArrayField
-from django.core.exceptions import MultipleObjectsReturned, ValidationError
+from django.core.exceptions import ValidationError
 
 from carting.fields import ChoiceArrayField
 
