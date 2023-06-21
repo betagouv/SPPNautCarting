@@ -20,6 +20,9 @@ La base de données est utilisée pour la modélisaton des normes s1xy et le fon
 
 ### Installation
 
+ Ces instructions sont utiles pour travailler sur le développement du projet.   
+Si vous chercher les instructions de déploiement, elles se trouvent plus bas dans la page ⏬
+
 1. Installation des librairies nécessaire à GeoDjango
 
     Sur Debian/ubuntu :
@@ -79,11 +82,7 @@ La base de données est utilisée pour la modélisaton des normes s1xy et le fon
 Exécuter,
 
 ```sh
-<<<<<<< HEAD
 ./manage.py ingest_ouvrage_xml z99.xml
-=======
-./manage.py ingest_ouvrage_xml z99
->>>>>>> fc27a7a (README)
 ./manage.py import_some_geometry
 ```
 
@@ -100,6 +99,7 @@ pip install -U pip-licenses
 pip-licenses > licenses.csv
 ```
 
+<<<<<<< HEAD
 ### Mise à jour de Django
 
 Plusieurs fichiers sont dupliqués depuis le code source de Django pour en modifier le fonctionnement.  
@@ -108,3 +108,20 @@ Il est important de vérifier à chaque mise à jour que les fichiers supplanté
 
 -   `templates/admin/change_form_with_ordered_formset_test.html` with [fieldset.html](https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html)
 -   `static/to_compile/entrypoints/admin-map-widget.ts` with [django/contrib/gis/static/gis/js/OLMapWidget.js](https://github.com/django/django/blob/main/django/contrib/gis/static/gis/js/OLMapWidget.js)
+=======
+## Déploiement
+
+En production, il faut également disposer de Python et Node.js.
+
+### Compilation des assets statiques 
+  
+Le projet repose sur une phase de compilation des assets statiques (CSS, JavaScript).  
+```sh 
+# Depuis la racine du dépôt
+# Installation des dépendances
+npm ci
+
+# Compilation
+npm run build
+```
+>>>>>>> 6568ddb (wip)
