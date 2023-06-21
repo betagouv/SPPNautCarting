@@ -311,12 +311,12 @@ class PilotServiceAdmin(ReportableServiceAreaAdmin):
     list_display = (
         "__str__",
         "pilotage_district",
-        "pilot_boarding_places",
+        "pilot_boarding_places_display",
     )
     list_filter = ("pilotage_district",)
 
     @admin.display(description="Pilot Boarding Places")
-    def pilot_boarding_places(obj):
+    def pilot_boarding_places_display(self, obj):
         pilot_boarding_places = obj.pilot_boarding_places.all()
         return ", ".join(
             str(pilot_boarding_place) for pilot_boarding_place in pilot_boarding_places
