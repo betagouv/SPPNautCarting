@@ -1,0 +1,59 @@
+{% extends "layout/base.html" %}
+
+{% block content %}
+
+<h1>{{ pilotagedistrict }}</h1>
+
+{% if user.is_staff %}
+<a
+    href="{% url "admin:s127_pilotagedistrict_change" pilotagedistrict.pk %}"
+    class="fr-btn fr-btn--tertiary-no-outline fr-icon-pencil-line"
+>
+    Éditer
+</a>
+{% endif %}
+
+<p>
+    Liste des communications channels: {{ pilotagedistrict.communication_channel|join:', ' }}
+</p>
+
+{% regroup pilotagedistrict.permission_type.all|dictsort:"category_of_relationship" by category_of_relationship as grouped_permission_list %}
+
+{% for permission_group in grouped_permission_list %}
+    <p> <strong>{{ permission_group.grouper }}</strong>:
+        {% for permission in permission_group.list %}
+            {{ permission.applicability }},
+        {% endfor %}
+    </p>
+{% endfor %}
+
+{% for pilotservice in pilotagedistrict.pilot_services.all %}
+    <h2>{{ pilotservice }}</h2>
+
+    {% if user.is_staff %}
+    <a
+        href="{% url "admin:s127_pilotservice_change" pilotservice.pk %}"
+        class="fr-btn fr-btn--tertiary-no-outline fr-icon-pencil-line"
+    >
+        Éditer
+    </a>
+    {% endif %}
+
+    <p>
+        Le pilotage à distance est {% if not pilotservice.remote_pilot %}pas{% endif %} disponible
+    </p>
+
+    <p>
+        Category of pilot: {{ pilotservice.category_of_pilot|join:', ' }}
+    </p>
+
+    <p>
+        Pilot qualification: {{ pilotservice.pilot_qualification }}
+    </p>
+
+    <p>
+        Pilot request procedure: {{pilotservice.pilot_request}}
+    </p>
+{% endfor %}
+
+{% endblock content %}

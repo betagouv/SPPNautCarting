@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET
 
 from carting.models import OuvrageSection, SectionTypology
+from s127.models import PilotageDistrict
 
 
 # FIXME : Les sections commençant par '0.' ne devraient pas être affichées (pas de géométrie attachée); les illustrations en '0.' sont mal ordonnées
@@ -73,3 +74,13 @@ def wms_proxy(request, wms_url):
         if header in response.headers:
             http_response.headers[header] = response.headers[header]
     return http_response
+
+
+from django.views.generic import DetailView
+
+
+class PilotageDistrictV(DetailView):
+    model = PilotageDistrict
+
+
+pilotage_district = PilotageDistrictV.as_view()

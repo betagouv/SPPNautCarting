@@ -1,7 +1,20 @@
+from django.contrib.contenttypes.fields import GenericRelation
+
 import s100.models
 
 
-class _OrganisationContactArea(s100.models.FeatureType):
+class FeatureType(s100.models.FeatureType):
+    permission_type = GenericRelation(
+        "PermissionType",
+        "feature_object_id",
+        "feature_content_type",
+    )
+
+    class Meta:
+        abstract = True
+
+
+class _OrganisationContactArea(FeatureType):
     class Meta:
         abstract = True
 

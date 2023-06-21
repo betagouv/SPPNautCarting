@@ -2,9 +2,10 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 
 import s100.models
+from s127.models.shared import FeatureType
 
 
-class PilotageDistrict(s100.models.FeatureType):
+class PilotageDistrict(FeatureType):
     # https://github.com/betagouv/SPPNautInterface/issues/261
     communication_channel = ArrayField(
         models.CharField(max_length=255),
