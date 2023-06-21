@@ -46,10 +46,10 @@ Everything except the line commented can be rewritten on future django upgrades
             <div class="inlines-in-fieldset">
             {% for fieldset_name, inline_admin_formsets in inline_admin_formsets_by_fieldset_name.items %}
                 {% if fieldset_name == fieldset.name %}
-                    {% for inline_admin_formset in inline_admin_formsets %}
-                      {% include inline_admin_formset.opts.template %}
-                    {% endfor %}
-                  {% endif %}
+                  {% for inline_admin_formset in inline_admin_formsets %}
+                    {% include inline_admin_formset.opts.template %}
+                  {% endfor %}
+                {% endif %}
             {% endfor %}
             {# end - Addition to Django's original template #}
             </div>
