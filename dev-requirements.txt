@@ -89,9 +89,9 @@ django-tree-queries==0.14.0 \
     --hash=sha256:424ef445b2129762b567304186338b912ec90fe371dd5c92915093c6db063598 \
     --hash=sha256:8f83d6ef2d3871dbff7a9d9c68167dbe561565d99f4d41fae97676ae160360c5
     # via sppnaut (pyproject.toml)
-exceptiongroup==1.1.0 \
-    --hash=sha256:327cbda3da756e2de031a3107b81ab7b3770a602c4d16ca618298c526f4bec1e \
-    --hash=sha256:bcb67d800a4497e1b404c2dd44fca47d3b7a5e5433dbab67f96c1a685cdfdf23
+exceptiongroup==1.1.1 \
+    --hash=sha256:232c37c63e4f682982c8b6459f33a8981039e5fb8756b2074364e5055c498c9e \
+    --hash=sha256:d484c3090ba2889ae2928419117447a14daf3c1231d5e30d0aae34f354f01785
     # via pytest
 honcho==1.1.0 \
     --hash=sha256:a4d6e3a88a7b51b66351ecfc6e9d79d8f4b87351db9ad7e923f5632cc498122f \
