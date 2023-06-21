@@ -1,5 +1,7 @@
 {% extends "admin/change_form.html" %}
 
+{% load utils %}
+
 {% comment %}
 This template overrides the fieldset include from this file https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html
 
@@ -44,13 +46,11 @@ Everything except the line commented can be rewritten on future django upgrades
 
             {# start - Addition to Django's original template #}
             <div class="inlines-in-fieldset">
-            {% for fieldset_name, inline_admin_formsets in inline_admin_formsets_by_fieldset_name.items %}
-                {% if fieldset_name == fieldset.name %}
-                  {% for inline_admin_formset in inline_admin_formsets %}
-                    {% include inline_admin_formset.opts.template %}
-                  {% endfor %}
-                {% endif %}
-            {% endfor %}
+            {% with inline_admin_formsets_by_fieldset_name|lookup:fieldset.name as inline_admin_formsets %}
+              {% for inline_admin_formset in inline_admin_formsets %}
+                {% include inline_admin_formset.opts.template %}
+              {% endfor %}
+            {% endwith %}
             {# end - Addition to Django's original template #}
             </div>
         </fieldset>
