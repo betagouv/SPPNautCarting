@@ -5,6 +5,7 @@ from types import NoneType
 from typing import cast
 
 from django import forms
+from django.conf import ImproperlyConfigured
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.admin.helpers import AdminForm
@@ -44,6 +45,14 @@ def children(instance: TreeNode):
 class ModelAdminWithFormsetsIncludingInline(admin.ModelAdmin):
     change_form_template = "admin/change_form_with_inlines_in_fieldsets.html"
     fieldsets_and_inlines_ordered = []
+
+    def __init__(self, *args, **kwargs):
+        if self.inlines or self.fieldsets:
+            raise ImproperlyConfigured(
+                f"The class {self.__class__.__name__} inherits from ModelAdminWithFormsetsIncludingInline. It should only define fieldsets_and_inlines_ordered. Inlines and fieldsets won't be displayed \n"
+            )
+
+        super().__init__(*args, **kwargs)
 
     def get_fieldsets(self, *args, **kwargs):
         fieldsets = copy.deepcopy(self.fieldsets_and_inlines_ordered)
