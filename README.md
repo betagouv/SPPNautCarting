@@ -95,3 +95,12 @@ pip install -r requirements.txt -r dev-requirements.txt
 pip install -U pip-licenses
 pip-licenses > licenses.csv
 ```
+
+### Mise à jour de Django
+
+Plusieurs fichiers sont dupliqués depuis le code source de Django pour en modifier le fonctionnement.  
+Une montée de version de ce dernier peut entraîner des régressions.  
+Il est important de vérifier à chaque mise à jour que les fichiers supplantés par ce projet ne sont pas modifiés également dans Django. Dans ce cas, il faut mettre à jour les templates ci-dessous :
+
+-   `templates/admin/change_form_with_ordered_formset_test.html` with [fieldset.html](https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html)
+-   `static/to_compile/entrypoints/admin-map-widget.ts` with [django/contrib/gis/static/gis/js/OLMapWidget.js](https://github.com/django/django/blob/main/django/contrib/gis/static/gis/js/OLMapWidget.js)

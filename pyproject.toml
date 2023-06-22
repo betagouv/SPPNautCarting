@@ -2,7 +2,11 @@
 DJANGO_SETTINGS_MODULE = "core.settings"
 env_files = [".env.template"]
 addopts = "--reuse-db"
-filterwarnings = ["error"]
+filterwarnings = [
+  "error",
+  # nested_admin uses monkeybiz that raises a warning we want to ignore in our tests
+  "ignore:.*pkg_resources is deprecated as an API.*"
+]
 
 [project]
 name = "sppnaut"
