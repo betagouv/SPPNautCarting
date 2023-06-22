@@ -13,15 +13,15 @@ class Command(BaseCommand):
         parser.add_argument(
             "ouvrage",
             help="Ouvrage xml file, ex = ./12.xml, ./c22.xml, ./l1.xml",
+            type=Path
         )
 
     def handle(self, *args, **options):
-        ouvrage_location = options.get("ouvrage")
+        document_path = options.get("ouvrage")
 
-        document_path = Path(str(ouvrage_location))
         content_root = ElementTree.parse(document_path)
         # FIXME: Valider bpn_id uniques
         ingested = OuvrageSection.objects.ingest_xml_subtree(
-            document_path.name, content_root
+            document_path.stem, content_root
         )
         self.stdout.write(self.style.SUCCESS(f"✨ {ingested} sections ingérées"))
