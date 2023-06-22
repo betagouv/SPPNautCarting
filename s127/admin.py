@@ -6,12 +6,7 @@ from carting.admin import (
     GISModelAdminWithRasterMarine,
     ModelAdminWithFormsetsIncludingInline,
 )
-from s100.admin import (
-    FeatureNameInline,  # OneExtraWhenEmptyMixin,
-    InformationInline,
-    TextContentInline,
-)
-from s127.models.information_type import Radiocommunications
+from s100.admin import FeatureNameInline, InformationInline, TextContentInline
 
 # region Inlines
 
@@ -89,18 +84,10 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
 # endregion Inlines
 
 
-class AccumulatedInlines:
-    def get_inlines(self, *args, **kwargs):
-        accumulated_inlines = []
-        for ancestor_class in type(self).mro():
-            accumulated_inlines.extend(getattr(ancestor_class, "inlines", []))
-        return list(dict.fromkeys(accumulated_inlines).keys())
-
-
 # region InformationTypeAdmins
 
 
-class InformationTypeAdmin(AccumulatedInlines, nested_admin.NestedModelAdmin):
+class InformationTypeAdmin(nested_admin.NestedModelAdmin):
     inlines = [InformationInline]
 
 
@@ -230,11 +217,7 @@ class ApplicabilityAdmin(
 # region FeatureTypeAdmins
 
 
-class FeatureTypeAdmin(
-    AccumulatedInlines,
-    GISModelAdminWithRasterMarine,
-    nested_admin.NestedModelAdmin,
-):
+class FeatureTypeAdmin(GISModelAdminWithRasterMarine, nested_admin.NestedModelAdmin):
     inlines = [
         FeatureNameInline,
         FeatureTypePermissionTypeInline,
