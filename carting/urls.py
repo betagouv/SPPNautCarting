@@ -12,6 +12,7 @@ urlpatterns = [
         views.search_by_position_details,
         name="search_by_position_details",
     ),
+    path("pilotage", views.pilotage_search, name="pilotage_search"),
     path(
         "proxy/wms",
         views.wms_proxy,

@@ -1,0 +1,75 @@
+{% extends "layout/base.html" %}
+
+{% load static %}
+
+{% block page_title %}Carting - Recherche position{% endblock%}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static "carting.css" %}">
+{% endblock %}
+
+{% block js %}
+<script type="module" src="{% static "carting.js" %}"></script>
+{% endblock %}
+
+{% block main %}
+<div
+    class="
+        fr-container--fluid
+        sn-snap-always sn-snap-start
+    "
+>
+    <div
+        data-controller="map"
+        data-map-wms-url-value="{% url 'carting:wms-proxy' %}"
+        data-map-bbox-value="{{ bbox }}"
+        data-action="
+            ol:select->map#selectSectionInText
+            ol:changed->map#updateBboxInUrl
+            wms:featureInfoFetched->map#showFeaturePopin
+            hashchange@window->map#selectSectionInMapFromHash
+            hashchange@window->map#closeFeaturePopin
+        "
+        class="
+            fr-grid-row fr-m-1w
+            sn-bg-white
+        "
+    >
+        <div class="fr-col-12 fr-col-md-7">
+            <div
+                id="map"
+                data-map-target="map"
+                class="
+                    sn-h-screen sn-w-full
+                    fr-p-1w
+                "
+            >
+            </div>
+        </div>
+        <div class="
+                sn-relative
+                fr-col-12 fr-col-md-5 fr-p-1w
+            "
+        >
+            {% include 'carting/partial/layer_popin.html' %}
+
+            <turbo-frame
+                id="pilotage_districts"
+                data-map-target="turboframe"
+                data-turbo-action="advance"
+                class="
+                    sn-block sn-h-screen sn-overflow-auto sn-overscroll-contain sn-px-1v sn-pb-1v
+                    aria-busy:sn-opacity-50 sn-transition-opacity sn-ease-in aria-busy:sn-delay-150
+                "
+            >
+                <script type="application/geojson" data-map-target="geojson">
+                    {{ geojson|safe }}
+                </script>
+                {% for pilotage_district in pilotage_districts %}
+                    {% include 'carting/cards/pilotage_district.html' %}
+                {% endfor %}
+            </turbo-frame>
+        </div>
+    </div>
+</div>
+{% endblock %}
