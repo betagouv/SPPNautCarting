@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block page_title %}Carting{% endblock%}
+{% block page_title %}Carting - Recherche texte{% endblock%}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static "carting.css" %}">
@@ -47,26 +47,8 @@
                 fr-col-12 fr-col-md-5 fr-p-1w
             "
         >
-            <div
-                data-controller="popin"
-                data-map-target="featurePopin"
-                aria-hidden="true"
-                class="
-                    sn-flex aria-hidden:sn-hidden sn-sticky sn-top-0 sn-h-screen sn-flex-col sn-z-10
-                    fr-p-1w fr-background-default--grey
-                "
-            >
-                <button
-                    data-action="popin#close"
-                    class="fr-mb-1w fr-btn fr-btn--icon-right fr-btn--tertiary fr-icon-close-circle-fill"
-                >
-                    Fermer
-                </button>
-                <div
-                    data-popin-target="content"
-                    class="sn-overflow-y-auto sn-overscroll-contain"
-                ></div>
-            </div>
+            {% include 'carting/partial/layer_popin.html' %}
+
             <form>
                 <div class="fr-search-bar" role="search">
                     <input

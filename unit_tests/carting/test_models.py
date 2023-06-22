@@ -17,6 +17,16 @@ def normalize_multiline_string(xml_string):
     ]
 
 
+def test_section_typology_paragraphs():
+    assert SectionTypology.paragraph_likes == {
+        SectionTypology.CHAPTER,
+        SectionTypology.SUBCHAPTER,
+        SectionTypology.PARAGRAPH,
+        SectionTypology.SUBPARAGRAPH,
+        SectionTypology.SUBSUBPARAGRAPH,
+    }
+
+
 # FIXME : tester ingestion de deux ouvrages différents. Mais tester quoi ?
 # FIXME: assert_num_queries
 # FIXME: Tester que si un bpn_id change de place dans le XML, il change de place dans la base ou alors on veut émettre un warning

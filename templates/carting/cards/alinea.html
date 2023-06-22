@@ -1,0 +1,19 @@
+<div
+    id="{{section.pk}}"
+    class="sn-flex sn-gap-1w sn-mb-1w sn-max-w-readable target:sn-bg-info-975-active sn-scroll-mt-[20vh]"
+>
+<span class="sn-min-w-5w">
+    {% if section.geometry %}
+        <a
+            href="#{{ section.pk }}"
+            data-turbo="false"
+            class="fr-btn fr-btn--tertiary-no-outline fr-icon-map-pin-2-line"
+        >
+            Montrer sur la carte
+        </a>
+    {% endif %}
+</span>
+<div>
+    {{ section.content_html }}
+</div>
+</div>

@@ -25,6 +25,9 @@
     </head>
 
     <body>
+    {% if scroll_snap %}
+        <div class="sn-max-h-screen sn-overflow-auto sn-snap-y sn-snap-mandatory">
+    {% endif %}
         {% block header %}
             {% include "layout/header.html" %}
         {% endblock %}
@@ -67,5 +70,8 @@
 
         <script type="module" src="{% static "sppnaut.js" %}"></script>
         {% block js %}{% endblock %}
+    {% if scroll_snap %}
+        </div>
+    {% endif %}
     </body>
 </html>
