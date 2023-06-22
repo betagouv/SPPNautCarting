@@ -1,5 +1,4 @@
 import copy
-from itertools import tee, filterfalse
 from inspect import getmro, isclass
 import logging
 from types import NoneType
@@ -55,37 +54,15 @@ class ModelAdminWithFormsetsIncludingInline(admin.ModelAdmin):
 
         super().__init__(*args, **kwargs)
 
-    def _partition_fieldsets_and_inlines(self, fields_and_inlines):
-        def coucou(field_or_inline):
-            return isinstance(field_or_inline, str)
-
-        t1, t2 = tee(fields_and_inlines)
-
-        return filterfalse(coucou, t1), filter(coucou, t2)
-
     def get_fieldsets(self, *args, **kwargs):
         fieldsets = copy.deepcopy(self.fieldsets_and_inlines_ordered)
-
         for _, attributes in fieldsets:
-            _, fields = self._partition_fieldsets_and_inlines(attributes["fields"])
-            attributes["fields"] = list(fields)
-
+            attributes["fields"] = [
+                field for field in attributes["fields"] if isinstance(field, str)
+            ]
         return fieldsets
 
     def get_inlines(self, *args, **kwargs):
-        return [
-            inline
-            for _, attributes in self.fieldsets_and_inlines_ordered
-            for inlines, _ in self._partition_fieldsets_and_inlines(
-                attributes["fields"]
-            )
-            for inline in inlines
-        ]
-
-        for _, attributes in self.fieldsets_and_inlines_ordered:
-            inlines, _ = self._partition_fieldsets_and_inlines(attributes["fields"])
-            attributes["fields"] = list(inlines)
-
         return [
             field
             for _, attributes in self.fieldsets_and_inlines_ordered
