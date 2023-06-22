@@ -84,18 +84,15 @@ class TestModelAdminWithFormsetsIncludingInline:
             fieldsets_and_inlines_order = (FeatureNameInline, "fieldset_name", None)
 
         with pytest.raises(ImproperlyConfigured):
-            PilotageDistrictAdmin(
-                PilotageDistrict, admin.AdminSite()
-            )
+            PilotageDistrictAdmin(PilotageDistrict, admin.AdminSite())
 
         class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
             inlines = ["coucou"]
             fieldsets_and_inlines_order = (FeatureNameInline, "fieldset_name", None)
 
         with pytest.raises(ImproperlyConfigured):
-            PilotageDistrictAdmin(
-                PilotageDistrict, admin.AdminSite()
-            )
+            PilotageDistrictAdmin(PilotageDistrict, admin.AdminSite())
+
     def test_full(self, rf, admin_user):
         class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
             fieldsets_and_inlines_ordered = [
@@ -344,4 +341,3 @@ class TestModelAdminWithOrderedFormsets:
             "permission type",
             "text content",
         ]
-
