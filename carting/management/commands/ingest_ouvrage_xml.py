@@ -13,7 +13,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "ouvrage",
             help="Ouvrage xml file, ex = ./12.xml, ./c22.xml, ./l1.xml",
-            type=Path
+            type=Path,
         )
 
     def handle(self, *args, **options):
