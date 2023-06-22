@@ -4,6 +4,7 @@ from django.contrib import admin
 import s127.models
 from carting.admin import GISModelAdminWithRasterMarine, ModelAdminWithOrderedFormsets
 from s100.admin import FeatureNameInline, InformationInline, TextContentInline
+from carting.admin import ModelAdminWithFormsetsIncludingInline
 
 # region Inlines
 
@@ -92,7 +93,8 @@ class AccumulatedInlines:
 class InformationTypeAdmin(
     AccumulatedInlines, ModelAdminWithOrderedFormsets, nested_admin.NestedModelAdmin
 ):
-    inlines = [InformationInline]
+    # inlines = [InformationInline]
+    pass
 
 
 @admin.register(s127.models.ContactDetails)
@@ -129,21 +131,31 @@ class ContactDetailsAdmin(InformationTypeAdmin):
 
 
 @admin.register(s127.models.Applicability)
-class ApplicabilityAdmin(InformationTypeAdmin):
+class ApplicabilityAdmin(ModelAdminWithFormsetsIncludingInline, InformationTypeAdmin):
     search_fields = ["id"]
-    inlines = [VesselsMeasurementsInline]
-    fieldsets_and_inlines_order = (
-        None,
-        VesselsMeasurementsInline,
-    )
-
-    fieldsets = [
+    # inlines = [VesselsMeasurementsInline]
+    fieldsets_and_inlines_ordered = [
         (
-            None,
+            "Vessels Measurements",
+            {
+                "fields": ["logical_connectives", VesselsMeasurementsInline],
+            },
+        ),
+        (
+            "Cargo category",
             {
                 "fields": [
-                    "logical_connectives",
+                    "category_of_cargo",
                 ]
+            },
+        ),
+        (
+            "Dangerous or hazardous detail",
+            {
+                "fields": [
+                    "category_of_dangerous_or_hazardous_cargo",
+                ],
+                "classes": ["collapse"],
             },
         ),
         (
@@ -153,26 +165,13 @@ class ApplicabilityAdmin(InformationTypeAdmin):
                     "in_ballast",
                     "thickness_of_ice_capability",
                     "vessel_performance",
-                ]
+                ],
+                "classes": ["collapse"],
             },
         ),
         (
-            "Cargo category",
-            {
-                "fields": [
-                    "category_of_cargo",
-                    "category_of_dangerous_or_hazardous_cargo",
-                ]
-            },
-        ),
-        (
-            "Vessels category",
-            {
-                "fields": [
-                    "category_of_vessel",
-                    "category_of_vessel_registry",
-                ]
-            },
+            "Informations",
+            {"fields": [InformationInline], "classes": ["collapse"]},
         ),
     ]
 
