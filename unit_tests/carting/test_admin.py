@@ -1,4 +1,6 @@
 from django.contrib import admin
+import pytest
+from django.contrib.admin.filters import ImproperlyConfigured
 from django.contrib.admin.helpers import InlineAdminFormSet
 from django.template.response import TemplateResponse
 
@@ -76,6 +78,24 @@ class TestModelAdminWithFormsetsIncludingInline:
         assert pilotage_district_admin.get_inlines() == [FeatureNameInline]
         assert pilotage_district_admin.get_fieldsets() == [(None, {"fields": []})]
 
+    def test_assert_improperly_configured_is_raised(self, rf, admin_user):
+        class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
+            fieldsets = ["coucou"]
+            fieldsets_and_inlines_order = (FeatureNameInline, "fieldset_name", None)
+
+        with pytest.raises(ImproperlyConfigured):
+            PilotageDistrictAdmin(
+                PilotageDistrict, admin.AdminSite()
+            )
+
+        class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
+            inlines = ["coucou"]
+            fieldsets_and_inlines_order = (FeatureNameInline, "fieldset_name", None)
+
+        with pytest.raises(ImproperlyConfigured):
+            PilotageDistrictAdmin(
+                PilotageDistrict, admin.AdminSite()
+            )
     def test_full(self, rf, admin_user):
         class PilotageDistrictAdmin(ModelAdminWithFormsetsIncludingInline):
             fieldsets_and_inlines_ordered = [
@@ -324,3 +344,4 @@ class TestModelAdminWithOrderedFormsets:
             "permission type",
             "text content",
         ]
+
