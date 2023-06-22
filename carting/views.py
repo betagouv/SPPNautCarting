@@ -10,8 +10,35 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET
 
 from carting.models import OuvrageSection, SectionTypology
+from s127.models import PilotageDistrict, PilotBoardingPlace
 
 SAINT_MALO_BBOX = "-3.15, 47.32, -1.65, 49.14"
+
+
+@require_GET
+def pilotage_search(request: HttpRequest) -> HttpResponse:
+    qs_bbox = request.GET.get("bbox", SAINT_MALO_BBOX)
+    qs_bbox = [float(coordinate) for coordinate in qs_bbox.split(",")]
+    bbox = geos.Polygon.from_bbox(qs_bbox)
+
+    pilotage_districts = PilotageDistrict.objects.filter(geometry__bboverlaps=bbox)
+    boarding_places = PilotBoardingPlace.objects.filter(
+        pilotservice__pilotage_district__in=pilotage_districts
+    )
+    geojson = serialize(
+        "geojson", (*pilotage_districts, *boarding_places), id_field="geojson_id"
+    )
+
+    return render(
+        request,
+        "carting/pilotage_search.html",
+        {
+            "scroll_snap": True,
+            "geojson": geojson,
+            "bbox": json.dumps(qs_bbox),
+            "pilotage_districts": pilotage_districts,
+        },
+    )
 
 
 @require_GET

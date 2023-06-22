@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db import models
@@ -121,6 +123,10 @@ class FeatureType(models.Model):
             return str(feature_name)
 
         return super().__str__()
+
+    @cached_property
+    def geojson_id(self):
+        return f"{ContentType.objects.get_for_model(self).id}_{self.pk}"
 
 
 class InformationType(models.Model):
