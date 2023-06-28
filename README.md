@@ -99,7 +99,6 @@ pip install -U pip-licenses
 pip-licenses > licenses.csv
 ```
 
-<<<<<<< HEAD
 ### Mise à jour de Django
 
 Plusieurs fichiers sont dupliqués depuis le code source de Django pour en modifier le fonctionnement.  
@@ -108,7 +107,7 @@ Il est important de vérifier à chaque mise à jour que les fichiers supplanté
 
 -   `templates/admin/change_form_with_ordered_formset_test.html` with [fieldset.html](https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html)
 -   `static/to_compile/entrypoints/admin-map-widget.ts` with [django/contrib/gis/static/gis/js/OLMapWidget.js](https://github.com/django/django/blob/main/django/contrib/gis/static/gis/js/OLMapWidget.js)
-=======
+  
 ## Déploiement
 
 En production, il faut également disposer de Python et Node.js.
@@ -124,4 +123,9 @@ npm ci
 # Compilation
 npm run build
 ```
->>>>>>> 6568ddb (wip)
+### Django
+
+Le projet repose sur Django, framework web dont la documentation en production est richement documentée dans la [documentation officielle du projet](https://docs.djangoproject.com/fr/4.2/howto/deployment/wsgi/).
+  
+Il est possible de s'inspirer du [Dockerfile](./Dockerfile) pour connaître les instructions de déploiement spécifiques à Carting.
+
