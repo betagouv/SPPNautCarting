@@ -20,6 +20,9 @@ La base de données est utilisée pour la modélisaton des normes s1xy et le fon
 
 ### Installation
 
+ Ces instructions sont utiles pour travailler sur le développement du projet.  
+Si vous chercher les instructions de déploiement, elles se trouvent [plus bas ⏬](#déploiement)
+
 1. Installation des librairies nécessaire à GeoDjango
 
     Sur Debian/ubuntu :
@@ -104,3 +107,29 @@ Il est important de vérifier à chaque mise à jour que les fichiers supplanté
 
 -   `templates/admin/change_form_with_ordered_formset_test.html` with [fieldset.html](https://github.com/django/django/blob/stable/4.2.x/django/contrib/admin/templates/admin/includes/fieldset.html)
 -   `static/to_compile/entrypoints/admin-map-widget.ts` with [django/contrib/gis/static/gis/js/OLMapWidget.js](https://github.com/django/django/blob/main/django/contrib/gis/static/gis/js/OLMapWidget.js)
+
+## Déploiement
+
+En production, il faut également disposer de Python et Node.js.
+
+### Compilation des assets statiques
+
+Le projet repose sur une phase de compilation des assets statiques (CSS, JavaScript).
+
+```sh
+# Depuis la racine du dépôt
+# Installation des dépendances
+npm ci
+
+# Compilation
+npm run build
+```
+
+Ces fichiers statiques devront être compilés sur le serveur de production.  
+Ils seront ensuite collectés via la [commande `collectstatic`](https://docs.djangoproject.com/fr/4.2/howto/static-files/deployment/) qu'il est nécessaire de lancer avant le démarrage du serveur web (voir ci-dessous).
+
+### Django
+
+Le projet repose sur Django, framework web dont le déploiement sur un serveur de production est richement documentée dans la [documentation officielle du projet](https://docs.djangoproject.com/fr/4.2/howto/deployment/wsgi/).
+
+Il est possible de s'inspirer du [Dockerfile](./Dockerfile) pour connaître les instructions de déploiement spécifiques à Carting.
