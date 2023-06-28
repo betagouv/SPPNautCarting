@@ -88,7 +88,11 @@ class FeatureTypePermissionTypeInline(nested_admin.NestedGenericTabularInline):
 
 
 class InformationTypeAdmin(nested_admin.NestedModelAdmin):
-    inlines = [InformationInline]
+    # FIXME : keep `inlines = [InformationInline]`
+    # it is not possible to add inlines fields here because this class is used by an other one which inherite from ModelAdminWithFormsetsIncludingInline
+    # the configuration check raise an ImproperlyConfigure error
+    # Ideally, we would prefered to keep the inlines key here and add a garbage collector process to display not used inlines as fieldsets in inherit classes
+    pass
 
 
 @admin.register(s127.models.ContactDetails)
@@ -218,15 +222,19 @@ class ApplicabilityAdmin(
 
 
 class FeatureTypeAdmin(GISModelAdminWithRasterMarine, nested_admin.NestedModelAdmin):
-    inlines = [
-        FeatureNameInline,
-        FeatureTypePermissionTypeInline,
-        TextContentInline,
-    ]
+    # FIXME : keep (cf. InformationTypeAdmin)
+    # inlines = [
+    #     FeatureNameInline,
+    #     FeatureTypePermissionTypeInline,
+    #     TextContentInline,
+    # ]
+    pass
 
 
 class ContactableAreaAdmin(FeatureTypeAdmin):
-    inlines = [SrvContactInline]
+    # FIXME : keep (cf. InformationTypeAdmin)
+    # inlines = [SrvContactInline]
+    pass
 
 
 class SupervisedAreaAdmin(ContactableAreaAdmin):
