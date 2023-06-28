@@ -127,6 +127,6 @@ npm run build
 
 ### Django
 
-Le projet repose sur Django, framework web dont la documentation en production est richement documentée dans la [documentation officielle du projet](https://docs.djangoproject.com/fr/4.2/howto/deployment/wsgi/).
+Le projet repose sur Django, framework web dont le déploiement sur un serveur de production est richement documentée dans la [documentation officielle du projet](https://docs.djangoproject.com/fr/4.2/howto/deployment/wsgi/).
 
 Il est possible de s'inspirer du [Dockerfile](./Dockerfile) pour connaître les instructions de déploiement spécifiques à Carting.
