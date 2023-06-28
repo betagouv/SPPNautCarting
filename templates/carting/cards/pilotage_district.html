@@ -4,7 +4,7 @@
         !sn-h-auto target:sn-bg-info-975-active
         {% if pilotage_district.pk|safe == request.GET.expanded %}sn-bg-info-975-active{% endif %}
     "
-    id="{{pilotage_district.pk}}"
+    id="{{pilotage_district.geojson_id}}"
 >
     <div class="fr-card__body">
         <div class="fr-card__content">
