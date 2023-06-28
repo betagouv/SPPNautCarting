@@ -125,6 +125,9 @@ npm ci
 npm run build
 ```
 
+Ces fichiers statiques devront être compilés sur le serveur de production.  
+Ils seront ensuite collectés via la [commande `collectstatic`](https://docs.djangoproject.com/fr/4.2/howto/static-files/deployment/) qu'il est nécessaire de lancer avant le démarrage du serveur web (voir ci-dessous).
+
 ### Django
 
 Le projet repose sur Django, framework web dont le déploiement sur un serveur de production est richement documentée dans la [documentation officielle du projet](https://docs.djangoproject.com/fr/4.2/howto/deployment/wsgi/).
