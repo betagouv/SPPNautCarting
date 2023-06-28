@@ -21,7 +21,7 @@ La base de données est utilisée pour la modélisaton des normes s1xy et le fon
 ### Installation
 
  Ces instructions sont utiles pour travailler sur le développement du projet.  
-Si vous chercher les instructions de déploiement, elles se trouvent plus bas dans la page ⏬
+Si vous chercher les instructions de déploiement, elles se trouvent [plus bas ⏬](#déploiement)
 
 1. Installation des librairies nécessaire à GeoDjango
 
