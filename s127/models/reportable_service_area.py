@@ -78,18 +78,16 @@ class PilotService(ReportableServiceArea):
 
     def clean(self):
         super().clean()
-        pilotage_district = list(
-            set(
-                pilot_boarding_place.pilotage_district
-                for pilot_boarding_place in self.pilot_boarding_places.all()
-                if pilot_boarding_place.pilotage_district
+        try:
+            pilotage_district = PilotageDistrict.objects.distinct().get(
+                pilot_services__in=PilotService.objects.filter(
+                    pilot_boarding_places__in=self.pilot_boarding_places.all()
+                )
             )
-        )
-        if (
-            pilotage_district
-            and self.pilotage_district
-            and pilotage_district[0] != self.pilotage_district
-        ):
+        except PilotageDistrict.DoesNotExist:
+            return
+
+        if self.pilotage_district and pilotage_district != self.pilotage_district:
             raise ValidationError(
                 "Unauthorized : A service is linked to another District through its boarding places",
                 code="district_inconsistency",

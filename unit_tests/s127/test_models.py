@@ -611,6 +611,22 @@ class TestCleanPilotBoardingPlaceServiceThrough:
 
 
 class TestCleanPilotService:
+    def generate_services(self):
+        boarding_place_x = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+        boarding_place_y = PilotBoardingPlace.objects.create(
+            geometry=GeometryCollection(Point(0, 0))
+        )
+
+        service_a = PilotService.objects.create()
+        service_a.pilot_boarding_places.set([boarding_place_x, boarding_place_y])
+
+        service_b = PilotService.objects.create()
+        service_b.pilot_boarding_places.set([boarding_place_x, boarding_place_y])
+
+        return service_a, service_b
+
     @pytest.mark.django_db
     def test_valid_no_boarding_place(self):
         assert (
@@ -636,35 +652,68 @@ class TestCleanPilotService:
         assert service.clean() is None
 
     @pytest.mark.django_db
-    def test_valid_one_boarding_place_connected_to_same_district(self):
+    def test_valid_district_gets_a_second_service(self):
         district = PilotageDistrict.objects.create(
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
         )
-        service_a = PilotService.objects.create(pilotage_district=district)
-        service_b = PilotService.objects.create()
-        boarding_place = PilotBoardingPlace.objects.create(
-            geometry=GeometryCollection(Point(0, 0))
-        )
-        boarding_place.pilotservice_set.set([service_a, service_b])
+
+        service_a, service_b = self.generate_services()
+        service_a.pilotage_district = district
+        service_a.save()
 
         service_b.pilotage_district = district
         assert service_b.clean() is None
 
     @pytest.mark.django_db
-    def test_raises(self):
-        service_a = PilotService.objects.create(
-            pilotage_district=PilotageDistrict.objects.create(
-                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
-            )
-        )
-        boarding_place_ab = PilotBoardingPlace.objects.create(
-            geometry=GeometryCollection(Point(0, 0))
-        )
-        service_b = PilotService.objects.create()
-        boarding_place_ab.pilotservice_set.set([service_a, service_b])
-        service_b.pilotage_district = PilotageDistrict.objects.create(
+    def test_valid_service_disconnects_from_district(self, django_assert_num_queries):
+        district = PilotageDistrict.objects.create(
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
         )
 
+        service_a, service_b = self.generate_services()
+        service_a.pilotage_district = district
+        service_a.save()
+
+        service_b.pilotage_district = district
+        service_b.save()
+
+        service_b.pilotage_district = None
+        with django_assert_num_queries(1):
+            assert service_b.clean() is None
+
+    @pytest.mark.django_db
+    def test_raises_services_connected_to_different_districts(self):
+        district_x = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        district_y = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+
+        service_a, service_b = self.generate_services()
+        service_a.pilotage_district = district_x
+        service_a.save()
+
+        service_b.pilotage_district = district_y
+        with pytest.raises(ValidationError):
+            service_b.clean()
+
+    @pytest.mark.django_db
+    def test_raises_services_connected_to_different_districts3241234(self):
+        district_x = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        district_y = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+
+        service_a, service_b = self.generate_services()
+        service_a.pilotage_district = district_x
+        service_a.save()
+
+        service_b.pilotage_district = district_x
+        service_b.save()
+
+        service_b.pilotage_district = district_y
         with pytest.raises(ValidationError):
             service_b.clean()
