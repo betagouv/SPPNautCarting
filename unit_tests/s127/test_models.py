@@ -24,6 +24,13 @@ from s127.models import (
 from s127.models.shared import CategoryOfVessel
 
 
+def error_codes_by_field(excinfo):
+    return {
+        field: [error.code for error in error_list]
+        for field, error_list in excinfo.value.error_dict.items()
+    }
+
+
 class TestVesselsMeasurementsStr:
     def test_empty(self):
         assert str(VesselsMeasurements()) == "VesselsMeasurements object (None)"
@@ -323,10 +330,9 @@ class TestVesselsCharacteristicsValue:
                     "vessels_characteristics_unit",
                 ]
             )
-        assert {
-            field: [error.code for error in error_list]
-            for field, error_list in excinfo.value.error_dict.items()
-        } == {"vessels_characteristics_value": error_codes}
+        assert error_codes_by_field(excinfo) == {
+            "vessels_characteristics_value": error_codes
+        }
 
 
 class TestPilotBoardingPlaceGeometry:
@@ -363,10 +369,7 @@ class TestPilotBoardingPlaceGeometry:
     def test_rejects(self, value):
         with pytest.raises(ValidationError) as excinfo:
             PilotBoardingPlace(geometry=GeometryCollection(value)).clean_fields()
-        assert {
-            field: [error.code for error in error_list]
-            for field, error_list in excinfo.value.error_dict.items()
-        } == {"geometry": ["point_or_surface"]}
+        assert error_codes_by_field(excinfo) == {"geometry": ["point_or_surface"]}
 
 
 class TestContactDetailsMMSICode:
@@ -397,10 +400,7 @@ class TestContactDetailsMMSICode:
         with pytest.raises(ValidationError) as excinfo:
             ContactDetails(mmsi_code=value).clean_fields(exclude=["language"])
 
-        assert {
-            field: [error.code for error in error_list]
-            for field, error_list in excinfo.value.error_dict.items()
-        } == {"mmsi_code": ["invalid"]}
+        assert error_codes_by_field(excinfo) == {"mmsi_code": ["invalid"]}
 
 
 class TestTelecommunicationsStr:
@@ -602,10 +602,13 @@ class TestCleanPilotBoardingPlaceServiceThrough:
         )
         boarding_place.pilotservice_set.add(service_a)
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as excinfo:
             PilotBoardingPlaceServiceThrough(
                 pilot_service=service_b, pilot_boarding_place=boarding_place
             ).clean()
+        assert [error.code for error in excinfo.value.error_list] == [
+            "boarding_place_belongs_to_at_most_one_district"
+        ]
 
     # FIXME : Ajouter un test qui vérifie l'appel à super.clean()
 
@@ -619,13 +622,22 @@ class TestCleanPilotService:
             geometry=GeometryCollection(Point(0, 0))
         )
 
-        service_a = PilotService.objects.create()
-        service_a.pilot_boarding_places.set([boarding_place_x, boarding_place_y])
+        services = [PilotService.objects.create() for _ in range(3)]
+        boarding_place_x.pilotservice_set.set(services)
+        boarding_place_y.pilotservice_set.set(services)
 
-        service_b = PilotService.objects.create()
-        service_b.pilot_boarding_places.set([boarding_place_x, boarding_place_y])
+        return services
 
-        return service_a, service_b
+    @pytest.mark.django_db
+    def test_valid_unsaved(self):
+        assert (
+            PilotService(
+                pilotage_district=PilotageDistrict.objects.create(
+                    geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+                )
+            ).clean()
+            is None
+        )
 
     @pytest.mark.django_db
     def test_valid_no_boarding_place(self):
@@ -639,30 +651,20 @@ class TestCleanPilotService:
         )
 
     @pytest.mark.django_db
-    def test_valid_one_boarding_place_not_connected(self):
-        service = PilotService.objects.create(
-            pilotage_district=PilotageDistrict.objects.create(
-                geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
-            )
-        )
-        boarding_place = PilotBoardingPlace.objects.create(
-            geometry=GeometryCollection(Point(0, 0))
-        )
-        boarding_place.pilotservice_set.set([service])
-        assert service.clean() is None
-
-    @pytest.mark.django_db
-    def test_valid_district_gets_a_second_service(self):
+    def test_valid_service_connects_to_district(self):
         district = PilotageDistrict.objects.create(
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
         )
 
-        service_a, service_b = self.generate_services()
+        service_a, service_b, service_c = self.generate_services()
         service_a.pilotage_district = district
         service_a.save()
 
         service_b.pilotage_district = district
-        assert service_b.clean() is None
+        service_b.save()
+
+        service_c.pilotage_district = district
+        assert service_c.clean() is None
 
     @pytest.mark.django_db
     def test_valid_service_disconnects_from_district(self, django_assert_num_queries):
@@ -670,19 +672,22 @@ class TestCleanPilotService:
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
         )
 
-        service_a, service_b = self.generate_services()
+        service_a, service_b, service_c = self.generate_services()
         service_a.pilotage_district = district
         service_a.save()
 
         service_b.pilotage_district = district
         service_b.save()
 
-        service_b.pilotage_district = None
+        service_c.pilotage_district = district
+        service_c.save()
+
+        service_c.pilotage_district = None
         with django_assert_num_queries(1):
-            assert service_b.clean() is None
+            assert service_c.clean() is None
 
     @pytest.mark.django_db
-    def test_raises_services_connected_to_different_districts(self):
+    def test_raises_services_first_connected_to_different_districts(self):
         district_x = PilotageDistrict.objects.create(
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
         )
@@ -690,30 +695,42 @@ class TestCleanPilotService:
             geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
         )
 
-        service_a, service_b = self.generate_services()
-        service_a.pilotage_district = district_x
-        service_a.save()
-
-        service_b.pilotage_district = district_y
-        with pytest.raises(ValidationError):
-            service_b.clean()
-
-    @pytest.mark.django_db
-    def test_raises_services_connected_to_different_districts3241234(self):
-        district_x = PilotageDistrict.objects.create(
-            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
-        )
-        district_y = PilotageDistrict.objects.create(
-            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
-        )
-
-        service_a, service_b = self.generate_services()
+        service_a, service_b, service_c = self.generate_services()
         service_a.pilotage_district = district_x
         service_a.save()
 
         service_b.pilotage_district = district_x
         service_b.save()
 
-        service_b.pilotage_district = district_y
-        with pytest.raises(ValidationError):
-            service_b.clean()
+        service_c.pilotage_district = district_y
+        with pytest.raises(ValidationError) as excinfo:
+            service_c.clean()
+        assert error_codes_by_field(excinfo) == {
+            "pilotage_district": ["boarding_place_belongs_to_at_most_one_district"]
+        }
+
+    @pytest.mark.django_db
+    def test_raises_services_changes_connected_to_different_districts(self):
+        district_x = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+        district_y = PilotageDistrict.objects.create(
+            geometry=MultiPolygon(Polygon.from_bbox((0, 0, 0, 0)))
+        )
+
+        service_a, service_b, service_c = self.generate_services()
+        service_a.pilotage_district = district_x
+        service_a.save()
+
+        service_b.pilotage_district = district_x
+        service_b.save()
+
+        service_c.pilotage_district = district_x
+        service_c.save()
+
+        service_c.pilotage_district = district_y
+        with pytest.raises(ValidationError) as excinfo:
+            service_c.clean()
+        assert error_codes_by_field(excinfo) == {
+            "pilotage_district": ["boarding_place_belongs_to_at_most_one_district"]
+        }

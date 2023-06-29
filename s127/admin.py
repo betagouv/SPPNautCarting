@@ -291,13 +291,6 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
         pilot_services = obj.pilotservice_set.all()
         return ", ".join(str(pilot_service) for pilot_service in pilot_services)
 
-    @admin.display(description="Pilotage District")
-    def pilotage_districts(self, obj):
-        pilot_service = obj.pilotservice_set.first()
-        if not pilot_service:
-            return ""
-        return str(pilot_service.pilotage_district)
-
 
 @admin.register(s127.models.PilotService)
 class PilotServiceAdmin(ReportableServiceAreaAdmin):

@@ -78,6 +78,9 @@ class PilotService(ReportableServiceArea):
 
     def clean(self):
         super().clean()
+        if not self.pk:
+            return
+
         try:
             pilotage_district = PilotageDistrict.objects.distinct().get(
                 pilot_services__in=PilotService.objects.filter(
@@ -89,8 +92,12 @@ class PilotService(ReportableServiceArea):
 
         if self.pilotage_district and pilotage_district != self.pilotage_district:
             raise ValidationError(
-                "Unauthorized : A service is linked to another District through its boarding places",
-                code="district_inconsistency",
+                {
+                    "pilotage_district": ValidationError(
+                        f"Unauthorized : This service can only be connected to {pilotage_district}",
+                        code="boarding_place_belongs_to_at_most_one_district",
+                    )
+                }
             )
 
     # Uncomment when upgrading to django 4.2
@@ -116,7 +123,7 @@ class PilotBoardingPlaceServiceThrough(models.Model):
         ):
             raise ValidationError(
                 "At least one of the related pilot boarding place has a connection with another Pilotage District",
-                code="boarding_place_inconsistency",
+                code="boarding_place_belongs_to_at_most_one_district",
             )
 
 
