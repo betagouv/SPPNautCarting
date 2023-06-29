@@ -1,6 +1,4 @@
-from s127.admin import (
-    AccumulatedInlines,
-)
+from s127.admin import AccumulatedInlines
 
 
 class TestAccumulatedInlines:

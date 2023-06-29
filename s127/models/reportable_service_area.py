@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 
 import s100.models
 from carting.fields import ChoiceArrayField
@@ -41,7 +42,9 @@ class PilotService(ReportableServiceArea):
         null=True,
         help_text="An area within which a pilotage direction exists.",
     )
-    pilot_boarding_places = models.ManyToManyField(PilotBoardingPlace)
+    pilot_boarding_places = models.ManyToManyField(
+        PilotBoardingPlace, through="PilotBoardingPlaceServiceThrough"
+    )
     category_of_pilot = ChoiceArrayField(
         base_field=models.CharField(
             max_length=255,
@@ -73,11 +76,55 @@ class PilotService(ReportableServiceArea):
     # https://github.com/betagouv/SPPNautInterface/issues/228
     geometry = s100.models.GMMultiSurface(null=True, blank=True)
 
+    def clean(self):
+        super().clean()
+        if not self.pk:
+            return
+
+        try:
+            pilotage_district = PilotageDistrict.objects.distinct().get(
+                pilot_services__in=PilotService.objects.filter(
+                    pilot_boarding_places__in=self.pilot_boarding_places.all()
+                )
+            )
+        except PilotageDistrict.DoesNotExist:
+            return
+
+        if self.pilotage_district and pilotage_district != self.pilotage_district:
+            raise ValidationError(
+                {
+                    "pilotage_district": ValidationError(
+                        f"Unauthorized : This service can only be connected to {pilotage_district}",
+                        code="boarding_place_belongs_to_at_most_one_district",
+                    )
+                }
+            )
+
     # Uncomment when upgrading to django 4.2
     # class Meta:
     #     db_table_comment = "The service provided by a person who directs the movements of a vessel through pilot waters, "
     #     "usually a person who has demonstrated extensive knowledge of channels, aids to navigation, dangers to navigation, etc., "
     #     "in a particular area and is licensed for that area."
+
+
+class PilotBoardingPlaceServiceThrough(models.Model):
+    pilot_service = models.ForeignKey(PilotService, on_delete=models.CASCADE)
+    pilot_boarding_place = models.ForeignKey(
+        PilotBoardingPlace, on_delete=models.CASCADE
+    )
+
+    def clean(self):
+        super().clean()
+        if (
+            self.pilot_boarding_place.pilotage_district
+            and self.pilot_service.pilotage_district
+            and self.pilot_boarding_place.pilotage_district
+            != self.pilot_service.pilotage_district
+        ):
+            raise ValidationError(
+                "At least one of the related pilot boarding place has a connection with another Pilotage District",
+                code="boarding_place_belongs_to_at_most_one_district",
+            )
 
 
 class NoticeTime(s100.models.ComplexAttributeType):

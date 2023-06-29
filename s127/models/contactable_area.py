@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 from carting.fields import ChoiceArrayField
 
+from .feature_type import PilotageDistrict
 from .shared import CategoryOfVessel, ContactableArea
 
 
@@ -58,9 +59,6 @@ class PilotBoardingPlace(ContactableArea):
         EXISTENCE_DOUBTFUL = "existence doubtful" # A feature that has been reported but has not been definitely determined to exist.
         BUOYED = "buoyed" # Marked by buoys
         # fmt: on
-
-    # We choose to skip this relation as we believe it's implicit through PilotService
-    # pilotage_district = models.ForeignKey(PilotageDistrict, on_delete=models.CASCADE)
 
     # https://github.com/betagouv/SPPNautInterface/issues/261
     communication_channel = ArrayField(
@@ -129,6 +127,15 @@ class PilotBoardingPlace(ContactableArea):
     )
 
     geometry = models.GeometryCollectionField(validators=[validate_point_or_surface])
+
+    @property
+    def pilotage_district(self):
+        try:
+            return PilotageDistrict.objects.distinct().get(
+                pilot_services__in=self.pilotservice_set.all()
+            )
+        except PilotageDistrict.DoesNotExist:
+            return None
 
     # Uncomment when upgrading to django 4.2
     # class Meta:

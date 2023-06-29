@@ -41,7 +41,7 @@ class NoticeTimeInline(nested_admin.NestedStackedInline):
 
 class PilotServicePilotBoardingPlaceInline(nested_admin.NestedTabularInline):
     model = s127.models.PilotService.pilot_boarding_places.through
-    autocomplete_fields = ["pilotboardingplace"]
+    autocomplete_fields = ["pilot_boarding_place"]
     verbose_name = "Pilot boarding place"
 
     def get_extra(self, request, obj=None, **kwargs):
@@ -249,7 +249,7 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
         "feature_names__name",
         "pilotservice__pilotage_district__feature_names__name",
     ]
-    list_display = ("__str__", "pilot_services", "pilotage_districts")
+    list_display = ("__str__", "pilot_services", "pilotage_district")
     list_filter = ("pilotservice__pilotage_district",)
 
     fieldsets_and_inlines_order = (
@@ -290,13 +290,6 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
     def pilot_services(self, obj):
         pilot_services = obj.pilotservice_set.all()
         return ", ".join(str(pilot_service) for pilot_service in pilot_services)
-
-    @admin.display(description="Pilotage District")
-    def pilotage_districts(self, obj):
-        pilot_service = obj.pilotservice_set.first()
-        if not pilot_service:
-            return ""
-        return str(pilot_service.pilotage_district)
 
 
 @admin.register(s127.models.PilotService)
