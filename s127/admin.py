@@ -247,7 +247,7 @@ class PilotBoardingPlaceAdmin(ContactableAreaAdmin):
     search_fields = [
         "id",
         "feature_names__name",
-        "pilotage_district__feature_names__name",
+        "pilotservice__pilotage_district__feature_names__name",
     ]
     list_display = ("__str__", "pilot_services", "pilotage_district")
     list_filter = ("pilotservice__pilotage_district",)
