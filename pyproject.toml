@@ -28,7 +28,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black==23.3.0",
-    "django-browser-reload==1.8.0",
+    "django-browser-reload==1.11.0",
     "django-debug-toolbar==4.0.0",
     "honcho==1.1.0",
     "pytest-django==4.5.2",

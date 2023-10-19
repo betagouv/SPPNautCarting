@@ -65,9 +65,9 @@ django-admin-interface==0.26.0 \
     --hash=sha256:dff7aa2e3eeb6d3676255a92ad5ade9e93277292c01cf9ae27f470246d984019 \
     --hash=sha256:f633bee7654eecbd120ef0ffcecc3b09b1aa1a553e5ba22c3e6504c02dc3c162
     # via sppnaut (pyproject.toml)
-django-browser-reload==1.8.0 \
-    --hash=sha256:054ef5ce8b80f46e0beda1a3c847becdff51272cad6f2bda607e201a7afe7425 \
-    --hash=sha256:6db7e6c5807fff87e421b53926c50cfa3de0115e438f3c2de6103d3069557adb
+django-browser-reload==1.11.0 \
+    --hash=sha256:ce9576bd31562fda01dd8fca73e07696a9a1c7138d2aee084abfb7315dc633a4 \
+    --hash=sha256:fe232478a58e9e5d8b703537651d5a76b017d2208d1da5dfbe013937b5cca065
     # via sppnaut (pyproject.toml)
 django-colorfield==0.8.0 \
     --hash=sha256:b7a25e2c430f4e80726ab171805d0d76d1f82cc7ff3799d60c2682f50d2ca03c \
