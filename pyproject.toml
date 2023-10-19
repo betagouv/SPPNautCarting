@@ -15,7 +15,7 @@ dependencies = [
     "django-extensions==3.2.1",
     "django-nested-admin==4.0.2",
     "django-tree-queries==0.14.0",
-    "django==4.2.2",
+    "django==4.2.5",
     "lxml==4.9.2",
     "psycopg2==2.9.6",
     "python-decouple==3.8",
